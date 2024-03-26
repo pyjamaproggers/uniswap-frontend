@@ -69,7 +69,7 @@ function Footer(){
                         fontSize: '$xs'
                     }
                 }}>
-                    © 2023 UniSwap™ @Ashoka University. All Rights Reserved.
+                    © 2024 UniSwap™ @Ashoka University. All Rights Reserved.
                 </Text>
             </Col>
         </Container>
