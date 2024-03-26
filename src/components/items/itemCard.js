@@ -2,6 +2,10 @@ import React from "react";
 import { Badge, Col, Grid, Avatar, Text, Image, Row, Collapse } from "@nextui-org/react";
 import './itemCard.css'
 import { IoLogoWhatsapp } from "react-icons/io";
+import { FaRegHeart } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa6";
+import { IoMdHeart } from "react-icons/io";
+
 
 
 export default function ItemCard(props) {
@@ -10,6 +14,8 @@ export default function ItemCard(props) {
     let number = item.contactNumber.replace(/[^\w\s]/gi, '').replace(/ /g, '')
     let message = `Hi, this is regarding the ${item.itemName} you put on the UniSwap™ website priced at ${item.itemPrice}...`
     let url = `${URL}/${number}?text=${encodeURI(message)}`;
+    let favouriteItems = props.favouriteItems
+    // console.log(item.id, favouriteItems, favouriteItems.includes(item.id))
 
     const categoryColors = {
         apparel: 'error', // Assuming NextUI's color system
@@ -25,7 +31,7 @@ export default function ItemCard(props) {
 
     return (
         <Grid css={{
-            margin: '16px 12px'
+            margin: '24px 12px'
         }}>
             <Col css={{
                 display: 'flex',
@@ -128,11 +134,27 @@ export default function ItemCard(props) {
                         {item.itemDescription}
                     </Text>
                     <Row css={{
-                        padding: '8px 8px 0px 8px'
+                        padding: '8px 8px 0px 8px',
+                        gap: 6,
+                        alignItems: 'center'
                     }}>
                         <IoLogoWhatsapp size={'24px'} color={"#25D366"} onClick={() => {
                             window.open(url)
-                        }} />
+                        }} className="item-icon"/>
+                        {favouriteItems.includes(item.id) ?
+                            <IoMdHeart size={24} style={{
+                                borderRadius: '12px',
+                                color: 'red'
+                            }} className="item-icon"/>
+                            :
+                            <IoMdHeart size={24} style={{
+                                borderRadius: '12px',
+                                // color: 'white',
+                                // borderWidth: '1px',
+                                // borderStyle: 'solid',
+                                // borderColor: 'black'
+                            }} className="item-icon"/>
+                        }
                     </Row>
                 </Collapse>
             </Col>

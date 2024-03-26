@@ -63,7 +63,7 @@ export default function HomePage() {
                                 Looking for Apparel? Food? Tickets? Jewellry? Stationery? We have it all here.
                             </Text>
                             <Button auto flat color={'error'} onClick={() => {
-                                window.location.pathname = 'allitems'
+                                window.location.pathname = '/saleitems'
                             }}>
                                 Items On Sale →
                             </Button>

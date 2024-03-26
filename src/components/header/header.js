@@ -11,6 +11,12 @@ import { FaFilePen } from "react-icons/fa6";
 import { MdOutlineQuestionMark } from "react-icons/md";
 import jwt_decode from "jwt-decode";
 import Skeleton from '@mui/material/Skeleton';
+import { FaPlus } from "react-icons/fa";
+import { FaBagShopping } from "react-icons/fa6";
+import { IoMdHeart } from "react-icons/io";
+import { IoLogOut } from "react-icons/io5";
+
+
 
 export default function Header() {
     const [render, setRender] = useState(false)
@@ -22,7 +28,7 @@ export default function Header() {
     ];
 
     const collapseItemsLoggedIn = [
-        { key: 'allitems', value: "All Items" },
+        { key: 'saleitems', value: "Sale Items" },
         { key: 'outlets', value: "Outlets" },
         { key: 'about', value: "About" },
         { key: 'logout', value: "Log Out" },
@@ -134,7 +140,7 @@ export default function Header() {
                         hideIn="xs"
                         variant="underline"
                     >
-                        <Navbar.Link href="/allitems" >All Items</Navbar.Link>
+                        <Navbar.Link href="/saleitems" >Sale Items</Navbar.Link>
                         <Dropdown isBordered>
                             <Navbar.Item>
                                 <Dropdown.Button
@@ -155,7 +161,7 @@ export default function Header() {
                                 aria-label="Items Category"
                                 selectionMode="single"
                                 // selectedKeys={selected}
-                                onSelectionChange={(selection) => { window.location.pathname = `allitems/${selection.currentKey}` }}
+                                onSelectionChange={(selection) => { window.location.pathname = `saleitems/${selection.currentKey}` }}
                                 css={{
                                     $$dropdownMenuWidth: "340px",
                                     $$dropdownItemHeight: "70px",
@@ -229,7 +235,7 @@ export default function Header() {
                                     if(actionKey==='logout'){
                                         handleLogout()
                                     }
-                                    else if(actionKey==='posts' || actionKey==='favourites'){
+                                    else if(actionKey==='mysaleitems' || actionKey==='favourites' || actionKey=='createsale'){
                                         window.location.pathname=`/${actionKey}`
                                     }
                                     else{
@@ -256,13 +262,20 @@ export default function Header() {
                                         {localStorage.getItem('userEmail')}
                                     </Text> */}
                                 </Dropdown.Item>
-                                <Dropdown.Item key="posts" withDivider color="">
-                                    Posts
+                                <Dropdown.Item key="createsale" withDivider color=""
+                                icon={<FaPlus size={16} />}>
+                                    Create Sale
                                 </Dropdown.Item>
-                                <Dropdown.Item key="favourites" color="">
+                                <Dropdown.Item key="mysaleitems"  color=""
+                                icon={<FaBagShopping size={16} />}>
+                                    My Sale Items
+                                </Dropdown.Item>
+                                <Dropdown.Item key="favourites" color=""
+                                icon={<IoMdHeart size={16} />}>
                                     Favourites
                                 </Dropdown.Item>
-                                <Dropdown.Item key="logout" withDivider color="error">
+                                <Dropdown.Item key="logout" withDivider color="error"
+                                icon={<IoLogOut size={16} />}>
                                     Log Out
                                 </Dropdown.Item>
                             </Dropdown.Menu>

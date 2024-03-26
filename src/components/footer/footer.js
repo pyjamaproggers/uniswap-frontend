@@ -16,14 +16,14 @@ function Footer(){
                     borderColor: '$gray600',
                     borderWidth: '0px 0px 0px 0px'
                 }}>
-                    <Text hideIn={'xs'}
+                    <Text
                     css={{
                         padding: '1% 0.35%',
                         fontSize: '$normal'
                     }}>
-                        Made with 🤍 by
+                        Made with 🤍
                     </Text>
-                    <Text showIn={'xs'}
+                    {/* <Text showIn={'xs'}
                     css={{
                         padding: '1%',
                     }}>
@@ -54,7 +54,7 @@ function Footer(){
                     }} target='_blank' href="https://zahaanshapoorjee.netlify.app/"
                     >
                         Zahaan Shapoorjee
-                    </Link>
+                    </Link> */}
                 </Row>
                 <Text
                 css={{
