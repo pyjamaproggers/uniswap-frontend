@@ -1,0 +1,7 @@
+.errorAuth-bg{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+    background-color: rgb(219, 219, 219);
+}

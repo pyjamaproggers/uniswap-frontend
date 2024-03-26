@@ -11,7 +11,6 @@ import { FaFilePen } from "react-icons/fa6";
 import { MdOutlineQuestionMark } from "react-icons/md";
 import jwt_decode from "jwt-decode";
 import Skeleton from '@mui/material/Skeleton';
-import BottomNavigation from '@mui/material/BottomNavigation';
 
 export default function Header() {
     const [render, setRender] = useState(false)
@@ -23,18 +22,20 @@ export default function Header() {
     ];
 
     const collapseItemsLoggedIn = [
+        { key: 'allitems', value: "All Items" },
+        { key: 'outlets', value: "Outlets" },
         { key: 'about', value: "About" },
         { key: 'logout', value: "Log Out" },
     ];
 
     const categories = [
-        { key: 'clothing', value: 'Apparel', icon: <GiClothes size={40} color="#e91e63" />, description: 'Tees, Shirts, Corsettes, Shorts, Cargos, Dresses, Footwear and more.' }, // Vibrant Pink
-        { key: 'food', value: 'Food', icon: <IoFastFoodSharp size={40} color="#ff9800" />, description: 'Fruits, Ramen, Masalas and more.' }, // Orange
-        { key: 'tickets', value: 'Tickets', icon: <IoTicket size={40} color="#3f51b5" />, description: 'Concert, Show, Shuttle and more.' }, // Indigo
-        { key: 'stationery', value: 'Stationery', icon: <FaFilePen size={40} color="#26a69a" />, description: 'Pens, Pencils, Erasers, Sharpeners, Notebooks, Highlighters and more.' }, // Green
-        { key: 'jewellry', value: 'Jewellry', icon: <GiJewelCrown size={40} color="gold" />, description: 'Necklaces, Earrings, Nose Rings and more.' }, // Yellow
-        { key: 'lostandfound', value: 'Lost & Found', icon: <MdOutlineQuestionMark size={40} color="#9e9e9e" />, description: 'Anything and everything lost around campus.' }, // Grey
-        { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={40} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
+        { key: 'apparel', value: 'Apparel', icon: <GiClothes size={24} color="#F31260" />, description: 'Tees, Shirts, Corsettes, Shorts, Cargos, Dresses, Footwear and more.' }, // Vibrant Pink
+        { key: 'food', value: 'Food', icon: <IoFastFoodSharp size={24} color="#7828C8" />, description: 'Fruits, Ramen, Masalas and more.' }, // Orange
+        { key: 'tickets', value: 'Tickets', icon: <IoTicket size={24} color="#0072F5" />, description: 'Concert, Show, Shuttle and more.' }, // Indigo
+        { key: 'stationery', value: 'Stationery', icon: <FaFilePen size={24} color="#17C964" />, description: 'Pens, Pencils, Erasers, Sharpeners, Notebooks, Highlighters and more.' }, // Green
+        { key: 'jewellry', value: 'Jewellry', icon: <GiJewelCrown size={24} color="#F5A524" />, description: 'Necklaces, Earrings, Nose Rings and more.' }, // Yellow
+        { key: 'lostandfound', value: 'Lost & Found', icon: <MdOutlineQuestionMark size={24} color="#889096" />, description: 'Anything and everything lost around campus.' }, // Grey
+        { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
     ]
 
     // funciton to handle callback for google sign in
@@ -180,7 +181,9 @@ export default function Header() {
                                         description={category.description}
                                         icon={category.icon}
                                     >
-                                        <Navbar.Link href={category.key}>
+                                        <Navbar.Link href={category.key} css={{
+                                            fontWeight: '$semibold'
+                                        }}>
                                             {category.value}
                                         </Navbar.Link>
                                     </Dropdown.Item>
@@ -188,6 +191,7 @@ export default function Header() {
                             </Dropdown.Menu>
                         </Dropdown>
                         <Navbar.Link href="/about">About</Navbar.Link>
+                        <Navbar.Link href="/outlets">Outlets</Navbar.Link>
                     </Navbar.Content>
                 }
 

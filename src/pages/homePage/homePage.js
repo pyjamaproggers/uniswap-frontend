@@ -38,7 +38,7 @@ export default function HomePage() {
                         textAlign: 'center',
                         color: '$white'
                     }}>
-                        Official UniSwap™ Website
+                        Official Ashoka University UniSwap™ Website
                     </Text>
                     {isSignedIn ?
                         <Col css={{

@@ -5,6 +5,7 @@ import Footer from './components/footer/footer';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { createTheme, NextUIProvider } from "@nextui-org/react"
 import HomePage from './pages/homePage/homePage';
+import AllItemsPage from './pages/allItemsPage/allItemsPage';
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
                 <Router>
                     <Routes>
                         <Route exact path='/' element={<HomePage />} />
+                        <Route exact path='/allitems' element={<AllItemsPage />} />
                     </Routes>
                 </Router>
                 <Footer />
