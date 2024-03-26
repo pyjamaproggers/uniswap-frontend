@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AshokaLogo from '../../assets/AshokaLogo.png'
-import { Link, Text, Avatar, Dropdown, Image, Navbar } from "@nextui-org/react";
+import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col } from "@nextui-org/react";
 import { icons } from "../icons/icons.js";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
@@ -10,14 +10,21 @@ import { GiJewelCrown } from "react-icons/gi";
 import { FaFilePen } from "react-icons/fa6";
 import { MdOutlineQuestionMark } from "react-icons/md";
 import jwt_decode from "jwt-decode";
+import Skeleton from '@mui/material/Skeleton';
+import BottomNavigation from '@mui/material/BottomNavigation';
 
 export default function Header() {
     const [render, setRender] = useState(false)
-    const [userPicture, setUserPicture] = useState()
+    const [loginLoader, setLoginLoader] = useState(true)
+    const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
 
-    const collapseItems = [
+    const collapseItemsLoggedOut = [
         { key: 'about', value: "About" },
-        { key: 'logout', value: "Log Out" }
+    ];
+
+    const collapseItemsLoggedIn = [
+        { key: 'about', value: "About" },
+        { key: 'logout', value: "Log Out" },
     ];
 
     const categories = [
@@ -33,14 +40,20 @@ export default function Header() {
     // funciton to handle callback for google sign in
     function handleCallbackresponse(response) {
         var userObject = jwt_decode(response.credential)
-        document.getElementById("GoogleButton").hidden = true;
         console.log(userObject)
-        localStorage.setItem('userEmail', userObject.email)
-        localStorage.setItem('userName', userObject.name)
-        localStorage.setItem('userEmailVerified', userObject.email_verified)
-        localStorage.setItem('userPicture', userObject.picture)
+        if (userObject.email.split('@')[1] !== 'ashoka.edu.in') {
+            setShowAshokaOnlyModal(true)
+        }
+        else {
+            document.getElementById("GoogleButton").hidden = true;
+            localStorage.setItem('userEmail', userObject.email)
+            localStorage.setItem('userName', userObject.name)
+            localStorage.setItem('userEmailVerified', userObject.email_verified)
+            localStorage.setItem('userPicture', userObject.picture)
+            setRender((prev) => !prev)
+            window.location.pathname='/'
+        }
         console.log(localStorage)
-        setRender((prev)=>!prev)
     }
 
     function handleLogout() {
@@ -49,10 +62,11 @@ export default function Header() {
         localStorage.removeItem('userEmailVerified')
         localStorage.removeItem('userPicture')
         console.log(localStorage)
-        window.location.pathname='/'
+        window.location.pathname = '/'
     }
 
     useEffect(() => {
+        setLoginLoader(true)
         window.setTimeout(() => {
             window.google.accounts.id.initialize({
                 client_id: process.env.REACT_APP_GOOGLE_CLIENTID,
@@ -61,8 +75,9 @@ export default function Header() {
 
             window.google.accounts.id.renderButton(
                 document.getElementById("GoogleButton"),
-                { theme: 'outlined', size: 'large', shape: 'circle', type: 'icon'}
+                { theme: 'outlined', size: 'large', shape: 'circle', type: 'icon' }
             );
+            setLoginLoader(false)
         }, 2000)
 
     }, [])
@@ -87,81 +102,95 @@ export default function Header() {
         <>
             <Navbar isBordered variant="sticky">
                 <Navbar.Toggle showIn={'xs'} />
-                <Navbar.Brand>
+                <Navbar.Brand onClick={()=>{
+                    window.location.pathname='/'
+                }}
+                css={{
+                    '&:hover':{
+                        cursor: 'pointer'
+                    }
+                }}>
                     <Image
                         css={{
-                            height: '48px',
+                            height: '24px',
                             width: '100%',
                         }}
                         src={AshokaLogo} />
                     <Text b color="inherit" css={{
-                        padding: '0px 8px'
+                        padding: '0px 8px',
+                        '&:hover':{
+                            cursor: 'pointer',
+                            textDecoration: 'underline'
+                        }
                     }}>
                         UniSwap™
                     </Text>
                 </Navbar.Brand>
-                <Navbar.Content
-                    enableCursorHighlight
-                    activeColor="error"
-                    hideIn="xs"
-                    variant="underline"
-                >
-                    <Navbar.Link href="/">Items</Navbar.Link>
-                    <Dropdown isBordered>
-                        <Navbar.Item>
-                            <Dropdown.Button
-                                auto
-                                light
-                                css={{
-                                    px: 0,
-                                    dflex: "center",
-                                    svg: { pe: "none" },
-                                }}
-                                iconRight={icons.chevron}
-                                ripple={false}
-                            >
-                                Category
-                            </Dropdown.Button>
-                        </Navbar.Item>
-                        <Dropdown.Menu
-                            aria-label="Items Category"
-                            selectionMode="single"
-                            // selectedKeys={selected}
-                            onSelectionChange={(selection) => { window.location.pathname = selection.currentKey }}
-                            css={{
-                                $$dropdownMenuWidth: "340px",
-                                $$dropdownItemHeight: "70px",
-                                "& .nextui-dropdown-item": {
-                                    py: "$4",
-                                    // dropdown item left icon
-                                    svg: {
-                                        color: "$secondary",
-                                        mr: "$4",
-                                    },
-                                    // dropdown item title
-                                    "& .nextui-dropdown-item-content": {
-                                        w: "100%",
-                                        fontWeight: "$semibold",
-                                    },
-                                },
-                            }}
-                        >
-                            {categories.map((category, index) => (
-                                <Dropdown.Item
-                                    key={category.key}
-                                    showFullDescription
-                                    description={category.description}
-                                    icon={category.icon}
+                {Object.keys(localStorage).length >= 2 &&
+                    <Navbar.Content
+                        enableCursorHighlight
+                        activeColor="error"
+                        hideIn="xs"
+                        variant="underline"
+                    >
+                        <Navbar.Link href="/allitems" >All Items</Navbar.Link>
+                        <Dropdown isBordered>
+                            <Navbar.Item>
+                                <Dropdown.Button
+                                    auto
+                                    light
+                                    css={{
+                                        px: 0,
+                                        dflex: "center",
+                                        svg: { pe: "none" },
+                                    }}
+                                    iconRight={icons.chevron}
+                                    ripple={false}
                                 >
-                                    <Navbar.Link href={category.key}>
-                                        {category.value}
-                                    </Navbar.Link>
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                    <Navbar.Link href="/about">About</Navbar.Link>
-                </Navbar.Content>
+                                    Category
+                                </Dropdown.Button>
+                            </Navbar.Item>
+                            <Dropdown.Menu
+                                aria-label="Items Category"
+                                selectionMode="single"
+                                // selectedKeys={selected}
+                                onSelectionChange={(selection) => { window.location.pathname = `allitems/${selection.currentKey}` }}
+                                css={{
+                                    $$dropdownMenuWidth: "340px",
+                                    $$dropdownItemHeight: "70px",
+                                    "& .nextui-dropdown-item": {
+                                        py: "$4",
+                                        // dropdown item left icon
+                                        svg: {
+                                            color: "$secondary",
+                                            mr: "$4",
+                                        },
+                                        // dropdown item title
+                                        "& .nextui-dropdown-item-content": {
+                                            w: "100%",
+                                            fontWeight: "$semibold",
+                                        },
+                                    },
+                                }}
+                            >
+                                {categories.map((category, index) => (
+                                    <Dropdown.Item
+                                        key={category.key}
+                                        showFullDescription
+                                        description={category.description}
+                                        icon={category.icon}
+                                    >
+                                        <Navbar.Link href={category.key}>
+                                            {category.value}
+                                        </Navbar.Link>
+                                    </Dropdown.Item>
+                                ))}
+                            </Dropdown.Menu>
+                        </Dropdown>
+                        <Navbar.Link href="/about">About</Navbar.Link>
+                    </Navbar.Content>
+                }
+
                 <Navbar.Content
                     css={{
                         "@xs": {
@@ -170,6 +199,9 @@ export default function Header() {
                         },
                     }}
                 >
+                    {loginLoader && Object.keys(localStorage).length <= 2 &&
+                        <Skeleton variant="circular" width={40} height={40} />
+                    }
                     {Object.keys(localStorage).length <= 2 ?
                         <div className="GoogleButton" id='GoogleButton'></div>
                         :
@@ -189,17 +221,42 @@ export default function Header() {
                             <Dropdown.Menu
                                 aria-label="User menu actions"
                                 color="error"
-                                onAction={(actionKey)=>{
-                                    actionKey==='logout' ? handleLogout() : console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
+                                onAction={(actionKey) => {
+                                    if(actionKey==='logout'){
+                                        handleLogout()
+                                    }
+                                    else if(actionKey==='posts' || actionKey==='favourites'){
+                                        window.location.pathname=`/${actionKey}`
+                                    }
+                                    else{
+                                        console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
+                                    }
                                 }}
                             >
-                                <Dropdown.Item key="profile" css={{ height: "$18" }}>
-                                    <Text b color="inherit" css={{ d: "flex" }}>
+                                <Dropdown.Item key="profile" css={{ height: "$22", }}>
+                                    <Text b color="$gray600" css={{ d: "flex", fontSize: '$xs' }}>
                                         Signed in as
                                     </Text>
-                                    <Text b color="inherit" css={{ d: "flex", fontSize: '$xs' }}>
-                                        {localStorage.getItem('userEmail')}
+                                    <Text b color="inherit" css={{ d: "flex", fontSize: '$base' }}>
+                                        {localStorage.getItem('userName')}
                                     </Text>
+                                    {/* <Text b color="inherit" 
+                                    css={{ 
+                                        d: "flex", 
+                                        fontSize: '$sm',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}
+                                    >
+                                        {localStorage.getItem('userEmail')}
+                                    </Text> */}
+                                </Dropdown.Item>
+                                <Dropdown.Item key="posts" withDivider color="">
+                                    Posts
+                                </Dropdown.Item>
+                                <Dropdown.Item key="favourites" color="">
+                                    Favourites
                                 </Dropdown.Item>
                                 <Dropdown.Item key="logout" withDivider color="error">
                                     Log Out
@@ -208,29 +265,99 @@ export default function Header() {
                         </Dropdown>
                     }
                 </Navbar.Content>
-                <Navbar.Collapse>
-                    {collapseItems.map((item, index) => (
-                        <Navbar.CollapseItem
-                            key={item.key}
-                            activeColor=""
-                            css={{
-                                color: index === collapseItems.length - 1 ? "$error" : "",
-                            }}
-                            isActive={index === 2}
-                        >
-                            <Link
-                                color="inherit"
-                                css={{
-                                    minWidth: "100%",
-                                }}
-                                href={item.key}
+                {Object.keys(localStorage).length <= 2 ?
+                    <Navbar.Collapse>
+                        {collapseItemsLoggedOut.map((item, index) => (
+                            <Navbar.CollapseItem
+                                key={item.key}
+                                activeColor=""
                             >
-                                {item.value}
-                            </Link>
-                        </Navbar.CollapseItem>
-                    ))}
-                </Navbar.Collapse>
+                                <Link
+                                    color="inherit"
+                                    css={{
+                                        minWidth: "100%",
+                                    }}
+                                    href=''
+                                >
+                                    {item.value}
+                                </Link>
+                            </Navbar.CollapseItem>
+                        ))}
+                    </Navbar.Collapse>
+                    :
+                    <Navbar.Collapse>
+                        {collapseItemsLoggedIn.map((item, index) => (
+                            <Navbar.CollapseItem
+                                key={item.key}
+                                activeColor=""
+                                css={{
+                                    color: index === collapseItemsLoggedIn.length - 1 ? "$error" : "",
+                                }}
+                            >
+                                {item.key === 'logout' ?
+                                    <Link href="" onClick={handleLogout} css={{
+                                        color: '$error'
+                                    }}>
+                                        {item.value}
+                                    </Link>
+                                    :
+                                    <Link
+                                        color="inherit"
+                                        css={{
+                                            minWidth: "100%",
+                                        }}
+                                        href={item.key}
+                                    >
+                                        {item.value}
+                                    </Link>
+                                }
+                            </Navbar.CollapseItem>
+                        ))}
+                    </Navbar.Collapse>
+                }
             </Navbar>
+
+            <Modal
+                open={showAshokaOnlyModal}
+                closeButton
+            >
+                <Modal.Header
+                    css={{
+                        paddingTop: '0px',
+                    }}>
+                    <Col>
+                        <Text
+                            css={{
+                                textAlign: 'center',
+                                fontSize: '$2xl',
+                                fontWeight: '$bold',
+                                color: '$red600',
+                                borderStyle: 'solid',
+                                borderWidth: '0px 0px 1px 0px',
+                                borderColor: '$gray800'
+                            }}>
+                            Error!
+                        </Text>
+
+                    </Col>
+                </Modal.Header>
+                <Modal.Body
+                    css={{
+                        paddingTop: '0px'
+                    }}>
+                    <Text
+                        css={{
+                            textAlign: 'center',
+                            fontSize: '$lg',
+                            fontWeight: '$semibold',
+                            color: '$black',
+                        }}>
+                        Please login with an ashoka email only.
+                    </Text>
+                </Modal.Body>
+
+            </Modal>
+
         </>
     );
 }

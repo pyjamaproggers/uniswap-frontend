@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import Header from './components/header/header';
-// import Footer from './components/footer/footer';
+import Footer from './components/footer/footer';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { createTheme, NextUIProvider } from "@nextui-org/react"
 import HomePage from './pages/homePage/homePage';
@@ -28,7 +28,7 @@ function App() {
                         <Route exact path='/' element={<HomePage />} />
                     </Routes>
                 </Router>
-                {/* <Footer /> */}
+                <Footer />
             </NextUIProvider>
         </>
     );
