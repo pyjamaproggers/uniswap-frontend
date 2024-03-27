@@ -15,13 +15,15 @@ import { FaPlus } from "react-icons/fa";
 import { FaBagShopping } from "react-icons/fa6";
 import { IoMdHeart } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
-
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Header() {
     const [render, setRender] = useState(false)
     const [loginLoader, setLoginLoader] = useState(true)
     const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
+
+    const navigate = useNavigate();
 
     const collapseItemsLoggedOut = [
         { key: 'about', value: "About" },
@@ -192,7 +194,9 @@ export default function Header() {
                                 aria-label="Items Category"
                                 selectionMode="single"
                                 // selectedKeys={selected}
-                                onSelectionChange={(selection) => { window.location.pathname = `saleitems/${selection.currentKey}` }}
+                                onSelectionChange={(selection) => { 
+                                    navigate('/saleitems', { state: { category: `${selection.currentKey}` } }); 
+                                }}
                                 css={{
                                     $$dropdownMenuWidth: "340px",
                                     $$dropdownItemHeight: "70px",
@@ -220,7 +224,13 @@ export default function Header() {
                                     >
                                         <Navbar.Link href={category.key} css={{
                                             fontWeight: '$semibold'
-                                        }}>
+                                        }}
+                                        // onClick={()=>{
+                                        //     navigate('/saleitems', {state: {
+                                        //         category: `${category.key}`
+                                        //     }})
+                                        // }}
+                                        >
                                             {category.value}
                                         </Navbar.Link>
                                     </Dropdown.Item>

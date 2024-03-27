@@ -24,8 +24,8 @@ function App() {
     return (
         <>
             <NextUIProvider theme={theme}>
-                <Header />
                 <Router>
+                <Header />
                     <Routes>
                         <Route exact path='/' element={<HomePage />} />
                         <Route exact path='/saleitems' element={<AllItemsPage />} />

@@ -17,9 +17,11 @@ import Chip from '@mui/material/Chip';
 import './allItemsPage.css'
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useLocation } from 'react-router-dom';
 
 
 export default function AllItemsPage() {
+
     const [fetchingAllItems, setFetchingAllItems] = useState(true)
     const [render, setRender] = useState(false)
 
@@ -200,10 +202,6 @@ export default function AllItemsPage() {
         filterItems();
     }, [filtersApplied,]);
 
-    const HandleBackdropLoader = (value) => {
-        setBackdropLoaderOpen(value)
-    }
-
     const fetchAllItems = () => {
         console.log('Fetching')
     }
@@ -236,7 +234,6 @@ export default function AllItemsPage() {
         setRender((prev) => (!prev))
     }
 
-
     useEffect(() => {
         console.log('Updated favourite items on allItemsPage')
     }, [favouriteItems])
@@ -247,6 +244,35 @@ export default function AllItemsPage() {
             fetchAllItems()
             setFetchingAllItems(false)
         }, 2000)
+    }, [])
+
+    const location = useLocation();
+    useEffect(() => {
+        const categoryKeyFromNavbar = location.state?.category;
+        if (categoryKeyFromNavbar) {
+            // Toggle the "chosen" property for the clicked filter
+            const updatedCategoryFilters = categoryFilters.map(filter => {
+                if (filter.key === categoryKeyFromNavbar) {
+                    return { ...filter, chosen: !filter.chosen };
+                }
+                return filter;
+            });
+            console.log(categoryKeyFromNavbar)
+            setCategoryFilters(updatedCategoryFilters);
+    
+            // Update filtersApplied state for categories
+            setFiltersApplied(prevState => {
+                const isFilterApplied = prevState.category.includes(categoryKeyFromNavbar);
+                const newCategoryFilters = isFilterApplied
+                    ? prevState.category.filter(k => k !== categoryKeyFromNavbar) // Remove filter
+                    : [...prevState.category, categoryKeyFromNavbar]; // Add filter
+    
+                return {
+                    ...prevState,
+                    category: newCategoryFilters,
+                };
+            });
+        }
     }, [])
 
     if (localStorage.getItem('userEmail') === null) {
@@ -701,7 +727,7 @@ export default function AllItemsPage() {
                             ))}
                         </>
                     } */}
-                    {!fetchingAllItems && favouriteItems && !backdropLoaderOpen && 
+                    {!fetchingAllItems && favouriteItems && !backdropLoaderOpen &&
                         <>
                             {(filtersApplied.searched.length == 0 && filtersApplied.category.length == 0 && filtersApplied.price.length == 0) ? //filters applied or not
                                 <>
@@ -725,10 +751,10 @@ export default function AllItemsPage() {
                                             {/* If filters applied but no filtered items to show */}
                                             <Text css={{
                                                 fontWeight: '$semibold',
-                                                '@xsMax':{
+                                                '@xsMax': {
                                                     fontSize: '$xl'
                                                 },
-                                                '@xsMin':{
+                                                '@xsMin': {
                                                     fontSize: '$2xl'
                                                 },
                                                 padding: '48px 0px 50vh 0px'
