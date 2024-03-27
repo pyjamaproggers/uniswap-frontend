@@ -1,0 +1,16 @@
+.horizontal-scroller {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap; /* Prevents wrapping of child elements */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+    scrollbar-width: none; /* For Firefox */
+    max-width: 300px;
+}
+
+.horizontal-scroller::-webkit-scrollbar {
+    display: none; /* For Webkit browsers */
+}
+
+.horizontal-scroller > * {
+    flex: 0 0 auto; /* Prevents flex items from growing or shrinking */
+}

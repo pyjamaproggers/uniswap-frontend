@@ -97,6 +97,8 @@ export default function Header() {
         localStorage.removeItem('userName')
         localStorage.removeItem('userEmailVerified')
         localStorage.removeItem('userPicture')
+        localStorage.removeItem('favouriteItems')
+        localStorage.removeItem('itemsPosted')
         console.log(localStorage)
         window.location.pathname = '/'
     }
