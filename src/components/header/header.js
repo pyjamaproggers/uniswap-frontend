@@ -70,40 +70,70 @@ export default function Header() {
 
     // funciton to handle callback for google sign in
     function handleCallbackresponse(response) {
-        var googleUserObject = jwt_decode(response.credential)
-        console.log(googleUserObject)
-        if (googleUserObject.email.split('@')[1] !== 'ashoka.edu.in') { //ashoka email check
-            setShowAshokaOnlyModal(true)
+        var googleUserObject = jwt_decode(response.credential);
+        console.log(googleUserObject);
+        if (googleUserObject.email.split('@')[1] !== 'ashoka.edu.in') {
+            setShowAshokaOnlyModal(true);
+        } else {
+            fetch('http://localhost:8080/api/auth/google', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: response.credential }), // Send Google token to backend
+                credentials: 'include', // Necessary to include the cookie in requests
+            })
+            .then(res => {
+                if (res.ok) {
+                    // Successfully authenticated and cookie is set, update UI accordingly
+                    setRender((prev) => !prev);
+                    window.location.pathname = '/';
+                } else {
+                    throw new Error('Authentication failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle authentication error (e.g., show error message)
+            });
         }
-        else {
-            document.getElementById("GoogleButton").hidden = true;
-            handleLogin(googleUserObject)
-
-            // delete all these localStorage updates once our handleLogin function is up and running
-            localStorage.setItem('userEmail', googleUserObject.email)
-            localStorage.setItem('userName', googleUserObject.name)
-            localStorage.setItem('userEmailVerified', googleUserObject.email_verified)
-            localStorage.setItem('userPicture', googleUserObject.picture)
-            localStorage.setItem('favouriteItems', JSON.stringify([1,2,4]))
-            localStorage.setItem('itemsPosted', JSON.stringify([]))
-            // -----------------------------------------------------------------------
-
-            setRender((prev) => !prev)
-            window.location.pathname='/'
-        }
-        console.log(localStorage)
     }
 
     function handleLogout() {
-        localStorage.removeItem('userEmail')
-        localStorage.removeItem('userName')
-        localStorage.removeItem('userEmailVerified')
-        localStorage.removeItem('userPicture')
-        localStorage.removeItem('favouriteItems')
-        localStorage.removeItem('itemsPosted')
-        console.log(localStorage)
-        window.location.pathname = '/'
+        fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include', // Necessary to include the cookie in requests
+        })
+        .then(res => {
+            if (res.ok) {
+                // Successfully logged out, update UI accordingly
+                window.location.pathname = '/';
+            } else {
+                throw new Error('Logout failed');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle logout error
+        });
     }
+    
+
+  
+
+    useEffect(() => {
+        fetch('/api/auth/profile', {
+            credentials: 'include',
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.isAuthenticated) {
+                // Update UI to reflect authenticated state
+            } else {
+                // User is not authenticated
+            }
+        });
+    }, []);
 
     useEffect(() => {
         setLoginLoader(true)
