@@ -1,12 +1,18 @@
 import React, { useEffect } from "react";
-import { Badge, Col, Grid, Avatar, Text, Image, Row, Collapse } from "@nextui-org/react";
+import { Badge, Col, Grid, Avatar, Text, Image, Row, Collapse, Button } from "@nextui-org/react";
 import './itemCard.css'
 import { IoLogoWhatsapp } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import { IoMdHeart } from "react-icons/io";
+import { IoPencil } from "react-icons/io5";
+import { MdDelete } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
+
 
 export default function ItemCard(props) {
+
+    const navigate = useNavigate()
 
     const item = props.item
 
@@ -25,9 +31,9 @@ export default function ItemCard(props) {
         handleFavouriteItemToggle(favouriteItems, itemIDToUpdate)
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log('Updated favouriteItems in ItemCard component')
-    },[favouriteItems])
+    }, [favouriteItems])
 
     const categoryColors = {
         apparel: 'error',
@@ -35,8 +41,10 @@ export default function ItemCard(props) {
         tickets: 'primary',
         stationery: 'success',
         jewellry: 'warning',
-        lostandfound: 'neutral', 
+        lostandfound: 'neutral',
     };
+
+    const type = props.type
 
     // Default to some color if item.category is not found in the mapping
     const badgeColor = categoryColors[item.itemCategory] || 'default';
@@ -89,7 +97,7 @@ export default function ItemCard(props) {
                             color: '$gray600'
                         }}>
                             • 5m
-                            {/* Here, you'd calculate the post time based on "dateAdded" */}
+                            {/* Here we need calculate the post time based on "dateAdded" variable of an item */}
                         </Text>
                     </Row>
                     <Badge variant="flat" size={'lg'} color={badgeColor}>
@@ -108,11 +116,12 @@ export default function ItemCard(props) {
                 <Collapse css={{
                     width: '330px'
                 }}
+                    expanded={type === 'user'}
                     divider={false}
                     title={
                         <Row css={{
                             alignItems: 'center',
-                            jc: 'start'
+                            jc: 'start',
                         }}>
                             <Text css={{
                                 fontWeight: '$semibold',
@@ -123,16 +132,32 @@ export default function ItemCard(props) {
                                     fontSize: '$xl'
                                 },
                                 paddingRight: '4px',
-                                lineHeight: '1.15'
+                                lineHeight: '1.15',
                             }}>
                                 {item.itemName}
                             </Text>
                             <Badge variant="flat" size={'lg'} color={"primary"}>
                                 ₹ {item.itemPrice}
                             </Badge>
+                            {type === 'user' &&
+                                <>
+                                    {item.live === 'y' ?
+                                        <>
+                                            <Badge variant="flat" size={'lg'} color={'success'}>
+                                                • Live
+                                            </Badge>
+                                        </>
+                                        :
+                                        <>
+                                            <Badge variant="flat" size={'lg'} color={'error'}>
+                                                • Not Live
+                                            </Badge>
+                                        </>
+                                    }
+                                </>
+                            }
                         </Row>
                     }
-                // arrowIcon={<PriceComponent price={item.itemPrice}/>}
                 >
                     <Text css={{
                         fontWeight: '$regular',
@@ -144,34 +169,58 @@ export default function ItemCard(props) {
                         },
                         padding: '4px 8px',
                         lineHeight: '1.3',
+                        borderStyle: 'solid',
+                        borderColor: '$gray100',
+                        borderWidth: '1px 0px'
                     }}>
                         {item.itemDescription}
                     </Text>
-                    <Row css={{
-                        padding: '8px 8px 0px 8px',
-                        gap: 6,
-                        alignItems: 'center'
-                    }}>
-                        <IoLogoWhatsapp size={'24px'} color={"#25D366"} onClick={() => {
-                            window.open(url)
-                        }} className="item-icon"/>
-                        {favouriteItems.includes(item.id) ?
-                            <IoMdHeart size={24} style={{
-                                borderRadius: '12px',
-                                color: 'red'
-                            }} className="item-icon"
+                    {type === 'sale' ?
+                        <Row css={{
+                            padding: '4px 8px 0px 8px',
+                            gap: 6,
+                            alignItems: 'center'
+                        }}>
+                            <IoLogoWhatsapp size={'24px'} color={"#25D366"} onClick={() => {
+                                window.open(url)
+                            }} className="item-icon" />
+                            {favouriteItems.includes(item.id) ?
+                                <IoMdHeart size={24} style={{
+                                    borderRadius: '12px',
+                                    color: 'red'
+                                }} className="item-icon"
+                                    onClick={() => {
+                                        handleFavouriteButtonClick(favouriteItems, item)
+                                    }} />
+                                :
+                                <IoMdHeart size={24} style={{
+                                    borderRadius: '12px',
+                                }} className="item-icon"
+                                    onClick={() => {
+                                        handleFavouriteButtonClick(favouriteItems, item)
+                                    }} />
+                            }
+                        </Row>
+                        :
+                        <Row css={{
+                            jc: 'flex-end',
+                            alignItems: 'center',
+                            gap: 6,
+                            margin: '8px 0px 24px 0px'
+                        }}>
+                            <Button auto flat color={'primary'}
+                                iconRight={<IoPencil size={16} />}
                             onClick={()=>{
-                                handleFavouriteButtonClick(favouriteItems, item)
-                            }}/>
-                            :
-                            <IoMdHeart size={24} style={{
-                                borderRadius: '12px',
-                            }} className="item-icon"
-                            onClick={()=>{
-                                handleFavouriteButtonClick(favouriteItems, item)
-                            }}/>
-                        }
-                    </Row>
+                                navigate('/editsale', {state: item})
+                            }}>
+                                Edit
+                            </Button>
+                            <Button auto flat color={'error'}
+                                iconRight={<MdDelete size={16} />}>
+                                Delete
+                            </Button>
+                        </Row>
+                    }
                 </Collapse>
             </Col>
         </Grid>

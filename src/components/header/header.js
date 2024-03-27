@@ -276,7 +276,7 @@ export default function Header() {
                                     if(actionKey==='logout'){
                                         handleLogout()
                                     }
-                                    else if(actionKey==='mysaleitems' || actionKey==='favourites' || actionKey=='createsale'){
+                                    else if(actionKey==='useritems' || actionKey==='favourites' || actionKey=='createsale'){
                                         window.location.pathname=`/${actionKey}`
                                     }
                                     else{
@@ -307,7 +307,7 @@ export default function Header() {
                                 icon={<FaPlus size={16} />}>
                                     Create Sale
                                 </Dropdown.Item>
-                                <Dropdown.Item key="mysaleitems"  color=""
+                                <Dropdown.Item key="useritems"  color=""
                                 icon={<FaBagShopping size={16} />}>
                                     My Sale Items
                                 </Dropdown.Item>

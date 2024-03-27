@@ -14,13 +14,15 @@ import { IoSearchSharp } from "react-icons/io5";
 import Drawer from '@mui/material/Drawer';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import Chip from '@mui/material/Chip';
-import './allItemsPage.css'
+import './ItemsPage.css'
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useLocation } from 'react-router-dom';
 
 
-export default function AllItemsPage() {
+export default function ItemsPage(props) {
+
+    const type = props.type
 
     const [fetchingAllItems, setFetchingAllItems] = useState(true)
     const [render, setRender] = useState(false)
@@ -86,7 +88,7 @@ export default function AllItemsPage() {
             itemCategory: 'tickets',
             itemPicture: Pic4,
             contactNumber: "+918104213125",
-            live: 'y',
+            live: 'n',
             dateAdded: 'date'
         },
         {
@@ -118,6 +120,8 @@ export default function AllItemsPage() {
             dateAdded: 'date'
         },
     ]
+
+    const [userItems, setUserItems] = useState([])
 
     const [filteredItems, setFilteredItems] = useState([...allItems]);
 
@@ -159,10 +163,10 @@ export default function AllItemsPage() {
         return itemPrice >= range.min && itemPrice <= range.max;
     };
 
-    function filterItems() {
+    function filterItems(type) {
         setBackdropLoaderOpen(true)
         window.setTimeout(() => {
-            let result = allItems;
+            let result = type === 'sale' ? allItems : userItems;
 
             // Filter by price
             if (filtersApplied.price.length > 0) {
@@ -199,8 +203,13 @@ export default function AllItemsPage() {
     }
 
     useEffect(() => {
-        filterItems();
-    }, [filtersApplied,]);
+        if (type === 'sale') {
+            filterItems(type);
+        }
+        else {
+            filterItems(type)
+        }
+    }, [filtersApplied]);
 
     const fetchAllItems = () => {
         console.log('Fetching')
@@ -234,6 +243,18 @@ export default function AllItemsPage() {
         setRender((prev) => (!prev))
     }
 
+    function filterItemsByEmail(email) {
+        return allItems.filter(item => item.userEmail === email);
+    }
+
+    useEffect(() => {
+        if (type === 'user') {
+            let userEmail = localStorage.getItem('userEmail')
+            let tempUserItems = filterItemsByEmail(userEmail)
+            setUserItems(tempUserItems)
+        }
+    }, [])
+
     useEffect(() => {
         console.log('Updated favourite items on allItemsPage')
     }, [favouriteItems])
@@ -259,14 +280,14 @@ export default function AllItemsPage() {
             });
             console.log(categoryKeyFromNavbar)
             setCategoryFilters(updatedCategoryFilters);
-    
+
             // Update filtersApplied state for categories
             setFiltersApplied(prevState => {
                 const isFilterApplied = prevState.category.includes(categoryKeyFromNavbar);
                 const newCategoryFilters = isFilterApplied
                     ? prevState.category.filter(k => k !== categoryKeyFromNavbar) // Remove filter
                     : [...prevState.category, categoryKeyFromNavbar]; // Add filter
-    
+
                 return {
                     ...prevState,
                     category: newCategoryFilters,
@@ -288,20 +309,37 @@ export default function AllItemsPage() {
                     padding: '4px 4px',
                     jc: 'center'
                 }}>
-                    <Text css={{
-                        fontWeight: '$semibold',
-                        '@xsMin': {
-                            fontSize: '$3xl',
-                            padding: '1% 2%'
-                        },
-                        '@xsMax': {
-                            fontSize: '$2xl',
-                            padding: '4%'
-                        },
-                        width: 'max-content'
-                    }}>
-                        All Items On Sale
-                    </Text>
+                    {type === 'sale' ?
+                        <Text css={{
+                            fontWeight: '$semibold',
+                            '@xsMin': {
+                                fontSize: '$3xl',
+                                padding: '1% 2%'
+                            },
+                            '@xsMax': {
+                                fontSize: '$2xl',
+                                padding: '4%'
+                            },
+                            width: 'max-content'
+                        }}>
+                            All Items On Sale
+                        </Text>
+                        :
+                        <Text css={{
+                            fontWeight: '$semibold',
+                            '@xsMin': {
+                                fontSize: '$3xl',
+                                padding: '1% 2%'
+                            },
+                            '@xsMax': {
+                                fontSize: '$2xl',
+                                padding: '4%'
+                            },
+                            width: 'max-content'
+                        }}>
+                            {localStorage.getItem('userName')}'s Items
+                        </Text>
+                    }
                     <Row css={{
                         '@xsMin': {
                             padding: '0% 2% 1% 2%'
@@ -720,21 +758,33 @@ export default function AllItemsPage() {
                             </Col>
                         </>
                     }
-                    {/* {!fetchingAllItems && favouriteItems &&
+
+                    {type === 'sale' ?
                         <>
-                            {allItems.map((item, index) => (
-                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} />
-                            ))}
                         </>
-                    } */}
+                        :
+                        <>
+                        </>
+                    }
+
                     {!fetchingAllItems && favouriteItems && !backdropLoaderOpen &&
                         <>
                             {(filtersApplied.searched.length == 0 && filtersApplied.category.length == 0 && filtersApplied.price.length == 0) ? //filters applied or not
                                 <>
                                     {/* If filters not applied then show allItems */}
-                                    {allItems.map((item, index) => (
-                                        <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} />
-                                    ))}
+                                    {type === 'sale' ?
+                                        <>
+                                            {allItems.map((item, index) => (
+                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} />
+                                            ))}
+                                        </>
+                                        :
+                                        <>
+                                            {userItems.map((item, index) => (
+                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} />
+                                            ))}
+                                        </>
+                                    }
                                 </>
                                 :
                                 <>
@@ -742,7 +792,7 @@ export default function AllItemsPage() {
                                         <>
                                             {/* If filters applied and there are filtered items */}
                                             {filteredItems.map((item, index) => (
-                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} />
+                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} />
                                             ))}
                                         </>
                                     }
