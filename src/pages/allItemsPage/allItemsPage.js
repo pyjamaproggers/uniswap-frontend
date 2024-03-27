@@ -14,6 +14,7 @@ import Skeleton from '@mui/material/Skeleton';
 export default function AllItemsPage() {
     const [fetchingAllItems, setFetchingAllItems] = useState(true)
     const [searchedItem, setSearchedItem] = useState('')
+    const [render, setRender] = useState(false)
     // const[allItems, setAllItems] = useState()
     const allItems = [
         {
@@ -102,15 +103,46 @@ export default function AllItemsPage() {
         },
     ]
 
-    const favouriteItems = [1, 2, 4]
+    // this is fetched from the users DB (favouriteItems: array of (ObjectID()))
+    let tempFavouriteItems = JSON.parse(localStorage.getItem('favouriteItems'))
+    const [favouriteItems, setFavouriteItems] = useState(tempFavouriteItems)
 
     const fetchAllItems = () => {
         console.log('Fetching')
     }
 
-    const handleFavouriteItemToggle = () => {
-        // to toggle favourite iteam (like instagram "save" option)
+    const sendNewFavouriteItemsToDB = (newFavouriteItems) => {
+        console.log('New Favourite Items to save: ', newFavouriteItems)
+        // post request to update user's "favouriteItems" data variable - replace old array with new array
+
     }
+
+    const handleFavouriteItemToggle = (favouriteItems, itemIDToUpdate) => {
+        // to toggle favourite iteam (like instagram "save" option)
+        let updatedFavItems = favouriteItems
+        // console.log('Function to handle when clicked on favourite: ', updatedFavItems, itemIDToUpdate)
+        // console.log('ItemId clicked on: ', itemIDToUpdate)
+        // console.log('Favourite Items array: ', updatedFavItems)
+        // console.log(updatedFavItems.includes(itemIDToUpdate))
+        if (updatedFavItems.includes(itemIDToUpdate)){
+            updatedFavItems = updatedFavItems.filter(itemID => itemID !== itemIDToUpdate)
+        }
+        else{
+            updatedFavItems.push(itemIDToUpdate)
+        }
+        // console.log('Previous Favourite Items: ', favouriteItems)
+        // console.log('New Favourite Items: ', updatedFavItems)
+        setFavouriteItems(updatedFavItems)
+        localStorage.setItem('favouriteItems', JSON.stringify(updatedFavItems))
+        console.log(localStorage)
+        sendNewFavouriteItemsToDB(updatedFavItems)
+        setRender((prev) => (!prev))
+    }
+
+
+    useEffect(()=>{
+        console.log('Updated favourite items on allItemsPage')
+    }, [favouriteItems])
 
     useEffect(() => {
         window.setTimeout(() => {
@@ -128,53 +160,53 @@ export default function AllItemsPage() {
     else {
         return (
             <Grid.Container css={{
-                padding: '12px'
             }}>
-                <Text css={{
-                    fontWeight: '$semibold',
-                    '@xsMin': {
-                        fontSize: '$3xl',
-                        padding: '1% 2%'
-                    },
-                    '@xsMax': {
-                        fontSize: '$2xl',
-                        padding: '2.5%'
-                    },
-                    width: '100vw'
-                }}>
-                    All Items On Sale
-                </Text>
-                <Row css={{
-                    '@xsMin': {
-                        padding: '0.5% 2% 2% 2%'
-                    },
-                    '@xsMax': {
-                        padding: '1% 3% 5% 3%'
-                    },
-                    alignItems: 'center',
-                    gap: 10,
-                }}>
-                    <IoFilter />
-                    <Input
-                        clearable
-                        underlined
-                        placeholder="Corsette / Pants ..."
-                        css={{
-                            width: '280px'
-                        }}
-                    />
-                </Row>
                 <Grid.Container css={{
                     padding: '4px 4px',
-                    jc: 'space-around'
+                    jc: 'center'
                 }}>
+                    <Text css={{
+                        fontWeight: '$semibold',
+                        '@xsMin': {
+                            fontSize: '$3xl',
+                            padding: '1% 2%'
+                        },
+                        '@xsMax': {
+                            fontSize: '$2xl',
+                            padding: '4%'
+                        },
+                        width: 'max-content'
+                    }}>
+                        All Items On Sale
+                    </Text>
+                    <Row css={{
+                        '@xsMin': {
+                            padding: '0.5% 2% 2% 2%'
+                        },
+                        '@xsMax': {
+                            padding: '1% 4% 5% 4%'
+                        },
+                        alignItems: 'center',
+                        gap: 10,
+                        jc: 'center'
+                    }}>
+                        <IoFilter />
+                        <Input
+                            clearable
+                            underlined
+                            placeholder="Corsette / Pants ..."
+                            css={{
+                                width: '280px'
+                            }}
+                        />
+                    </Row>
                     {fetchingAllItems &&
                         <>
                             <Col css={{
                                 display: 'flex',
                                 flexDirection: 'column',
                                 width: '330px',
-                                margin: '24px 12px'
+                                margin: '24px 24px'
                             }}>
                                 <Row css={{
                                     alignItems: 'center',
@@ -220,7 +252,7 @@ export default function AllItemsPage() {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 width: '330px',
-                                margin: '24px 12px'
+                                margin: '24px 24px'
                             }}>
                                 <Row css={{
                                     alignItems: 'center',
@@ -266,7 +298,145 @@ export default function AllItemsPage() {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 width: '330px',
-                                margin: '24px 12px'
+                                margin: '24px 24px'
+                            }}>
+                                <Row css={{
+                                    alignItems: 'center',
+                                    padding: '4px 4px 12px 4px',
+                                    jc: 'space-between'
+                                }}>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        width: 'max-content',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
+                                        <Col css={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            jc: 'center',
+                                            gap: 4,
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                        </Col>
+                                    </Row>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        width: 'max-content'
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
+                                    </Row>
+                                </Row>
+                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
+                                <Row css={{
+                                    alignItems: 'center',
+                                    paddingTop: '12px',
+                                    gap: 10
+                                }}>
+                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
+                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
+                                </Row>
+                            </Col>
+
+                            <Col css={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                width: '330px',
+                                margin: '24px 24px'
+                            }}>
+                                <Row css={{
+                                    alignItems: 'center',
+                                    padding: '4px 4px 12px 4px',
+                                    jc: 'space-between'
+                                }}>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        width: 'max-content',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
+                                        <Col css={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            jc: 'center',
+                                            gap: 4,
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                        </Col>
+                                    </Row>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        width: 'max-content'
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
+                                    </Row>
+                                </Row>
+                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
+                                <Row css={{
+                                    alignItems: 'center',
+                                    paddingTop: '12px',
+                                    gap: 10
+                                }}>
+                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
+                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
+                                </Row>
+                            </Col>
+
+                            <Col css={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                width: '330px',
+                                margin: '24px 24px'
+                            }}>
+                                <Row css={{
+                                    alignItems: 'center',
+                                    padding: '4px 4px 12px 4px',
+                                    jc: 'space-between'
+                                }}>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        width: 'max-content',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
+                                        <Col css={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            jc: 'center',
+                                            gap: 4,
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                        </Col>
+                                    </Row>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        width: 'max-content'
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
+                                    </Row>
+                                </Row>
+                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
+                                <Row css={{
+                                    alignItems: 'center',
+                                    paddingTop: '12px',
+                                    gap: 10
+                                }}>
+                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
+                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
+                                </Row>
+                            </Col>
+
+                            <Col css={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                width: '330px',
+                                margin: '24px 24px'
                             }}>
                                 <Row css={{
                                     alignItems: 'center',
@@ -309,10 +479,10 @@ export default function AllItemsPage() {
                             </Col>
                         </>
                     }
-                    {!fetchingAllItems &&
+                    {!fetchingAllItems && favouriteItems &&
                         <>
                             {allItems.map((item, index) => (
-                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} />
+                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle}/>
                             ))}
                         </>
                     }

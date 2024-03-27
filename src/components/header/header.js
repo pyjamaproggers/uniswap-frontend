@@ -44,19 +44,48 @@ export default function Header() {
         { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
     ]
 
+    const handleLogin = (googleUserObject) => {
+        // check if user already exists in the DB
+        // if (userExists) { 
+            // get user details 
+            // localStorage.setItem('userEmail', JSON.stringify(user.userEmail))
+            // localStorage.setItem('userName', JSON.stringify(user.userName))
+            // localStorage.setItem('userPicture', JSON.stringify(user.userPicture))
+            // localStorage.setItem('favouriteItems', JSON.stringify(user.favouriteItems))
+            // localStorage.setItem('itemsPosted', JSON.stringify(user.itemsPosted))
+        // }
+        // else {
+            // post request to send user to db as it is a new user
+            // user = {
+                // userName: googleUserObject.name,
+                // userEmail: googleUserObject.email,
+                // userPicture: googleUserObject.picture,
+                // favouriteItems: [],
+                // itemsPosted: []
+            // }
+        // }
+    }
+
     // funciton to handle callback for google sign in
     function handleCallbackresponse(response) {
-        var userObject = jwt_decode(response.credential)
-        console.log(userObject)
-        if (userObject.email.split('@')[1] !== 'ashoka.edu.in') {
+        var googleUserObject = jwt_decode(response.credential)
+        console.log(googleUserObject)
+        if (googleUserObject.email.split('@')[1] !== 'ashoka.edu.in') { //ashoka email check
             setShowAshokaOnlyModal(true)
         }
         else {
             document.getElementById("GoogleButton").hidden = true;
-            localStorage.setItem('userEmail', userObject.email)
-            localStorage.setItem('userName', userObject.name)
-            localStorage.setItem('userEmailVerified', userObject.email_verified)
-            localStorage.setItem('userPicture', userObject.picture)
+            handleLogin(googleUserObject)
+
+            // delete all these localStorage updates once our handleLogin function is up and running
+            localStorage.setItem('userEmail', googleUserObject.email)
+            localStorage.setItem('userName', googleUserObject.name)
+            localStorage.setItem('userEmailVerified', googleUserObject.email_verified)
+            localStorage.setItem('userPicture', googleUserObject.picture)
+            localStorage.setItem('favouriteItems', JSON.stringify([1,2,4]))
+            localStorage.setItem('itemsPosted', JSON.stringify([]))
+            // -----------------------------------------------------------------------
+
             setRender((prev) => !prev)
             window.location.pathname='/'
         }

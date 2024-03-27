@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Badge, Col, Grid, Avatar, Text, Image, Row, Collapse } from "@nextui-org/react";
 import './itemCard.css'
 import { IoLogoWhatsapp } from "react-icons/io";
@@ -6,24 +6,36 @@ import { FaRegHeart } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import { IoMdHeart } from "react-icons/io";
 
-
-
 export default function ItemCard(props) {
+
     const item = props.item
+
     const URL = 'https://wa.me'
     let number = item.contactNumber.replace(/[^\w\s]/gi, '').replace(/ /g, '')
     let message = `Hi, this is regarding the ${item.itemName} you put on the UniSwap™ website priced at ${item.itemPrice}...`
     let url = `${URL}/${number}?text=${encodeURI(message)}`;
+
     let favouriteItems = props.favouriteItems
+    let handleFavouriteItemToggle = props.handleFavouriteItemToggle
     // console.log(item.id, favouriteItems, favouriteItems.includes(item.id))
+    // console.log(props)
+
+    const handleFavouriteButtonClick = (favouriteItems, item) => {
+        let itemIDToUpdate = item.id
+        handleFavouriteItemToggle(favouriteItems, itemIDToUpdate)
+    }
+
+    useEffect(()=>{
+        console.log('Updated favouriteItems in ItemCard component')
+    },[favouriteItems])
 
     const categoryColors = {
-        apparel: 'error', // Assuming NextUI's color system
-        food: 'secondary', // Adjust color names as per NextUI's color system
+        apparel: 'error',
+        food: 'secondary',
         tickets: 'primary',
         stationery: 'success',
         jewellry: 'warning',
-        lostandfound: 'neutral', // Assuming 'default' is akin to grey in NextUI
+        lostandfound: 'neutral', 
     };
 
     // Default to some color if item.category is not found in the mapping
@@ -31,7 +43,7 @@ export default function ItemCard(props) {
 
     return (
         <Grid css={{
-            margin: '24px 12px'
+            margin: '24px 24px'
         }}>
             <Col css={{
                 display: 'flex',
@@ -87,7 +99,9 @@ export default function ItemCard(props) {
                 <Image src={item.itemPicture}
                     css={{
                         height: '300px',
-                        width: '330px',
+                        // minWidth: '300px',
+                        // maxW: '330px',
+                        width: '320px',
                         objectFit: 'cover',
                         borderRadius: '8px'
                     }} />
@@ -145,15 +159,17 @@ export default function ItemCard(props) {
                             <IoMdHeart size={24} style={{
                                 borderRadius: '12px',
                                 color: 'red'
-                            }} className="item-icon"/>
+                            }} className="item-icon"
+                            onClick={()=>{
+                                handleFavouriteButtonClick(favouriteItems, item)
+                            }}/>
                             :
                             <IoMdHeart size={24} style={{
                                 borderRadius: '12px',
-                                // color: 'white',
-                                // borderWidth: '1px',
-                                // borderStyle: 'solid',
-                                // borderColor: 'black'
-                            }} className="item-icon"/>
+                            }} className="item-icon"
+                            onClick={()=>{
+                                handleFavouriteButtonClick(favouriteItems, item)
+                            }}/>
                         }
                     </Row>
                 </Collapse>
