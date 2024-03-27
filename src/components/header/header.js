@@ -22,7 +22,8 @@ export default function Header() {
     const [render, setRender] = useState(false)
     const [loginLoader, setLoginLoader] = useState(true)
     const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
-
+    const bucket = process.env.REACT_APP_BACKEND
+    console.log(bucket)
     const navigate = useNavigate();
 
     const collapseItemsLoggedOut = [

@@ -22,6 +22,9 @@ import { useLocation } from 'react-router-dom';
 
 export default function ItemsPage(props) {
 
+    const backend = process.env.REACT_APP_BACKEND
+    const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
+
     const type = props.type
 
     const [fetchingAllItems, setFetchingAllItems] = useState(true)
@@ -33,93 +36,93 @@ export default function ItemsPage(props) {
         searched: ''
     })
 
-    // const[allItems, setAllItems] = useState()
-    const allItems = [
-        {
-            id: 1,
-            userName: 'Aryan Yadav',
-            userEmail: 'aryan.yadav_asp24@ashoka.edu.in',
-            userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
-            itemName: 'Corset',
-            itemDescription: 'Corset my girlfriend has bought but is not allowed to wear.',
-            itemPrice: 250,
-            itemCategory: 'apparel',
-            itemPicture: Pic1,
-            contactNumber: "+918104213125",
-            live: 'y',
-            dateAdded: 'date'
-        },
-        {
-            id: 2,
-            userName: 'Aryan Yadav',
-            userEmail: 'aryan.yadav_asp24@ashoka.edu.in',
-            userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
-            itemName: 'Cargo Pants',
-            itemDescription: "My roommate's cargos I stole and am now selling",
-            itemPrice: 450,
-            itemCategory: 'apparel',
-            itemPicture: Pic2,
-            contactNumber: "+918104213125",
-            live: 'y',
-            dateAdded: 'date'
-        },
-        {
-            id: 3,
-            userName: 'Aryan Yadav',
-            userEmail: 'aryan.yadav_asp24@ashoka.edu.in',
-            userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
-            itemName: 'Apple',
-            itemDescription: 'Apple I bought today but did not have',
-            itemPrice: 30,
-            itemCategory: 'food',
-            itemPicture: Pic3,
-            contactNumber: "+918104213125",
-            live: 'y',
-            dateAdded: 'date'
-        },
-        {
-            id: 4,
-            userName: 'Aryan Yadav',
-            userEmail: 'aryan.yadav_asp24@ashoka.edu.in',
-            userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
-            itemName: 'Shuttle Ticket',
-            itemDescription: 'Shuttle Ticket for thursday 10:00 am',
-            itemPrice: 0,
-            itemCategory: 'tickets',
-            itemPicture: Pic4,
-            contactNumber: "+918104213125",
-            live: 'n',
-            dateAdded: 'date'
-        },
-        {
-            id: 5,
-            userName: 'Aryan Yadav',
-            userEmail: 'aryan.yadav_asp24@ashoka.edu.in',
-            userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
-            itemName: 'Necklace',
-            itemDescription: 'Necklace I boguth for my girlfriend but she refuses to wear it.',
-            itemPrice: 80,
-            itemCategory: 'jewellry',
-            itemPicture: Pic5,
-            contactNumber: "+918104213125",
-            live: 'y',
-            dateAdded: 'date'
-        },
-        {
-            id: 6,
-            userName: 'Zahaan Shapoorjee',
-            userEmail: 'zahaan.shapoorjee_ug24@ashoka.edu.in',
-            userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
-            itemName: 'Keyboard',
-            itemDescription: 'My old keyboard I have played countless valorant games on',
-            itemPrice: 350,
-            itemCategory: 'miscellaneous',
-            itemPicture: Pic6,
-            contactNumber: "+918104213125",
-            live: 'y',
-            dateAdded: 'date'
-        },
-    ]
+    const[allItems, setAllItems] = useState([])
+    // const allItems = [
+    //     {
+    //         id: 1,
+    //         userName: 'Aryan Yadav',
+    //         userEmail: 'aryan.yadav_asp24@ashoka.edu.in',
+    //         userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
+    //         itemName: 'Corset',
+    //         itemDescription: 'Corset my girlfriend has bought but is not allowed to wear.',
+    //         itemPrice: 250,
+    //         itemCategory: 'apparel',
+    //         itemPicture: Pic1,
+    //         contactNumber: "+918104213125",
+    //         live: 'y',
+    //         dateAdded: 'date'
+    //     },
+    //     {
+    //         id: 2,
+    //         userName: 'Aryan Yadav',
+    //         userEmail: 'aryan.yadav_asp24@ashoka.edu.in',
+    //         userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
+    //         itemName: 'Cargo Pants',
+    //         itemDescription: "My roommate's cargos I stole and am now selling",
+    //         itemPrice: 450,
+    //         itemCategory: 'apparel',
+    //         itemPicture: Pic2,
+    //         contactNumber: "+918104213125",
+    //         live: 'y',
+    //         dateAdded: 'date'
+    //     },
+    //     {
+    //         id: 3,
+    //         userName: 'Aryan Yadav',
+    //         userEmail: 'aryan.yadav_asp24@ashoka.edu.in',
+    //         userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
+    //         itemName: 'Apple',
+    //         itemDescription: 'Apple I bought today but did not have',
+    //         itemPrice: 30,
+    //         itemCategory: 'food',
+    //         itemPicture: Pic3,
+    //         contactNumber: "+918104213125",
+    //         live: 'y',
+    //         dateAdded: 'date'
+    //     },
+    //     {
+    //         id: 4,
+    //         userName: 'Aryan Yadav',
+    //         userEmail: 'aryan.yadav_asp24@ashoka.edu.in',
+    //         userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
+    //         itemName: 'Shuttle Ticket',
+    //         itemDescription: 'Shuttle Ticket for thursday 10:00 am',
+    //         itemPrice: 0,
+    //         itemCategory: 'tickets',
+    //         itemPicture: Pic4,
+    //         contactNumber: "+918104213125",
+    //         live: 'n',
+    //         dateAdded: 'date'
+    //     },
+    //     {
+    //         id: 5,
+    //         userName: 'Aryan Yadav',
+    //         userEmail: 'aryan.yadav_asp24@ashoka.edu.in',
+    //         userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
+    //         itemName: 'Necklace',
+    //         itemDescription: 'Necklace I boguth for my girlfriend but she refuses to wear it.',
+    //         itemPrice: 80,
+    //         itemCategory: 'jewellry',
+    //         itemPicture: Pic5,
+    //         contactNumber: "+918104213125",
+    //         live: 'y',
+    //         dateAdded: 'date'
+    //     },
+    //     {
+    //         id: 6,
+    //         userName: 'Zahaan Shapoorjee',
+    //         userEmail: 'zahaan.shapoorjee_ug24@ashoka.edu.in',
+    //         userPicture: "https://lh3.googleusercontent.com/a/ACg8ocJWo5t5Y6Xzht9M2-NIejpohhPrYmvxc-hkP8kijHUzBQ=s96-c",
+    //         itemName: 'Keyboard',
+    //         itemDescription: 'My old keyboard I have played countless valorant games on',
+    //         itemPrice: 350,
+    //         itemCategory: 'miscellaneous',
+    //         itemPicture: Pic6,
+    //         contactNumber: "+918104213125",
+    //         live: 'y',
+    //         dateAdded: 'date'
+    //     },
+    // ]
 
     const [userItems, setUserItems] = useState([])
 
@@ -195,9 +198,14 @@ export default function ItemsPage(props) {
                     return searchTerms.every(term => itemText.includes(term));
                 });
             }
+            var final = []
+            result.forEach(item=>{
+                final.push(item)
+            })
 
-            console.log(result)
-            setFilteredItems(result);
+            
+            setFilteredItems(final);
+            console.log({favouriteItems})
             setBackdropLoaderOpen(false)
         }, 1000)
     }
@@ -211,9 +219,30 @@ export default function ItemsPage(props) {
         }
     }, [filtersApplied]);
 
-    const fetchAllItems = () => {
-        console.log('Fetching')
-    }
+    const fetchAllItems = async () => {
+        setFetchingAllItems(true); // Show loading state
+        try {
+            const response = await fetch(`${backend}/items`, {
+                credentials: 'include', // to include cookies in the request (if your backend is set to send cookies)
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const items = await response.json();
+            setAllItems(items); // Update your state with the fetched items
+            setFilteredItems(items); // Assuming you want to initially display all items
+            setFetchingAllItems(false)
+        } catch (error) {
+            console.error('There has been a problem with your fetch operation:', error);
+        } finally {
+            setFetchingAllItems(false); // Hide loading state
+        }
+    };
+
+    useEffect(() => {
+        fetchAllItems();
+    }, []);
+    
 
     const sendNewFavouriteItemsToDB = (newFavouriteItems) => {
         console.log('New Favourite Items to save: ', newFavouriteItems)
@@ -767,7 +796,7 @@ export default function ItemsPage(props) {
                         </>
                     }
 
-                    {!fetchingAllItems && favouriteItems && !backdropLoaderOpen &&
+                    {!fetchingAllItems && !backdropLoaderOpen &&
                         <>
                             {(filtersApplied.searched.length == 0 && filtersApplied.category.length == 0 && filtersApplied.price.length == 0) ? //filters applied or not
                                 <>
@@ -791,9 +820,12 @@ export default function ItemsPage(props) {
                                     {filteredItems && filteredItems.length > 0 &&
                                         <>
                                             {/* If filters applied and there are filtered items */}
-                                            {filteredItems.map((item, index) => (
+                                            {
+                                            filteredItems.map((item, index) =>{
+                                                console.log("whatsup") 
+                                                return (
                                                 <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} />
-                                            ))}
+                                            )})}
                                         </>
                                     }
                                     {filteredItems && filteredItems.length == 0 &&

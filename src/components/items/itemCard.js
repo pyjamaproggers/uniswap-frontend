@@ -15,9 +15,11 @@ export default function ItemCard(props) {
     const navigate = useNavigate()
 
     const item = props.item
-
+    console.log("HIII")
     const URL = 'https://wa.me'
-    let number = item.contactNumber.replace(/[^\w\s]/gi, '').replace(/ /g, '')
+    // let number = item.contactNumber.replace(/[^\w\s]/gi, '').replace(/ /g, '')
+    let number = item.contactNumber
+    console.log(number)
     let message = `Hi, this is regarding the ${item.itemName} you put on the UniSwap™ website priced at ${item.itemPrice}...`
     let url = `${URL}/${number}?text=${encodeURI(message)}`;
 
@@ -183,8 +185,8 @@ export default function ItemCard(props) {
                         }}>
                             <IoLogoWhatsapp size={'24px'} color={"#25D366"} onClick={() => {
                                 window.open(url)
-                            }} className="item-icon" />
-                            {favouriteItems.includes(item.id) ?
+                            }} className="item-icon" />{number}
+                            {/* {favouriteItems.includes(item.id) ?
                                 <IoMdHeart size={24} style={{
                                     borderRadius: '12px',
                                     color: 'red'
@@ -199,7 +201,7 @@ export default function ItemCard(props) {
                                     onClick={() => {
                                         handleFavouriteButtonClick(favouriteItems, item)
                                     }} />
-                            }
+                            } */}
                         </Row>
                         :
                         <Row css={{
