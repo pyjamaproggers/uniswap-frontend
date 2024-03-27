@@ -83,9 +83,13 @@ export default function Header() {
                 body: JSON.stringify({ token: response.credential }), // Send Google token to backend
                 credentials: 'include', // Necessary to include the cookie in requests
             })
-            .then(res => {
-                if (res.ok) {
-                    // Successfully authenticated and cookie is set, update UI accordingly
+            .then(res => res.json()) // Adjusted to parse JSON body
+            .then(data => {
+                if (data.user) { // Assuming the backend sends back an object with a user property
+                    // Store user details for future use.
+                    localStorage.setItem('userEmail', data.user.userEmail);
+                    localStorage.setItem('userName', data.user.userName);
+                    localStorage.setItem('userPicture', data.user.userPicture);
                     setRender((prev) => !prev);
                     window.location.pathname = '/';
                 } else {
@@ -98,29 +102,33 @@ export default function Header() {
             });
         }
     }
+    
 
     function handleLogout() {
-        fetch('/api/auth/logout', {
+        fetch('http://localhost:8080/api/auth/logout', {
             method: 'POST',
             credentials: 'include', // Necessary to include the cookie in requests
         })
         .then(res => {
             if (res.ok) {
-                // Successfully logged out, update UI accordingly
-                window.location.pathname = '/';
+                // Assuming the backend has now invalidated the session/cookie...
+    
+                // Clear client-side storage of user details
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userPicture');
+                // Redirect user to the homepage or login page
+                navigate('/'); // Adjust the path as necessary for your application
             } else {
                 throw new Error('Logout failed');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            // Handle logout error
+            // Optionally handle the error, maybe show a notification to the user
         });
     }
     
-
-  
-
     useEffect(() => {
         fetch('/api/auth/profile', {
             credentials: 'include',
