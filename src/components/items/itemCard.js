@@ -258,7 +258,7 @@ export default function ItemCard(props) {
                                 WhatsApp
                             </Button>
 
-                            {favouriteItems.includes(item.id) ?
+                            {favouriteItems.includes(item._id) ?
                                 <Button auto flat color={'error'}>
                                     <IoMdHeart size={24} style={{
                                         borderRadius: '12px',
