@@ -8,41 +8,51 @@ import HomePage from './pages/homePage/homePage';
 import ItemsPage from './pages/ItemsPage/ItemsPage';
 import CreateSalePage from './pages/createSalePage/createSalePage';
 import EditSalePage from './pages/editSalePage/editSalePage';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function App() {
 
-    const [mode, setMode] = useState(localStorage.getItem('mode') ? localStorage.getItem('mode') : 'light')
-    const [render, setRender] = useState(false)
+    const [isLightMode, setIsLightMode] = useState(getPrefersColorScheme() ? 'light' : 'dark');
 
-    const toggleMode = (userSelect) => {
-        // setMode(userSelect ? 'dark' : 'light')
-        localStorage.setItem('mode', JSON.stringify(userSelect))
-        setRender(prev => !prev)
+    function getPrefersColorScheme() {
+        return window.matchMedia('(prefers-color-scheme: light)').matches;
     }
 
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+        const handleChange = () => setIsLightMode(mediaQuery.matches ? 'light' : 'dark');
+
+        mediaQuery.addEventListener('change', handleChange);
+
+        // Cleanup
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
+
+
     const theme = createTheme({
-        type: mode,
+        type: isLightMode ? 'light' : 'dark', // Adjusted this line
         theme: {
             colors: {
-                white: '#ffffff',
-                black: '#000000',
-                // background: '#0c0c0c',
-                // text: '#f0f0f0'
+                // Assuming these color configurations are correct; adjust as necessary.
+                white: isLightMode ? '#fff' : '#f0f0f0',
+                black: isLightMode ? '#000' : '#0c0c0c',
+                background: isLightMode ? '#fff' : '#0c0c0c',
+                text: isLightMode ? '#000' : '#f0f0f0'
             }
         }
-    })
+    });
+
 
 
     return (
         <>
             <NextUIProvider theme={theme}>
                 <Router>
-                <Header toggleMode={toggleMode}/>
+                    <Header />
                     <Routes>
                         <Route exact path='/' element={<HomePage />} />
-                        <Route exact path='/saleitems' element={<ItemsPage type={'sale'}/>} />
-                        <Route exact path='/useritems' element={<ItemsPage type={'user'}/>} />
+                        <Route exact path='/saleitems' element={<ItemsPage type={'sale'} />} />
+                        <Route exact path='/useritems' element={<ItemsPage type={'user'} />} />
                         <Route exact path='/createsale' element={<CreateSalePage />} />
                         <Route exact path='/editsale' element={<EditSalePage />} />
                     </Routes>

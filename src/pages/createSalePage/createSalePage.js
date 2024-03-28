@@ -14,8 +14,8 @@ import { IoLogoWhatsapp } from "react-icons/io";
 import { IoSendSharp } from "react-icons/io5";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CreateSalePage() {
 
@@ -63,10 +63,10 @@ export default function CreateSalePage() {
     const checkForm = () => {
         setBackdropLoaderOpen(true)
         if (Object.values(itemsStatus).some(value => (value === 'default' || value === 'error'))) {
+            setBackdropLoaderOpen(false)
             return false
         }
         else {
-            setBackdropLoaderOpen(true)
             return true
         }
     }
@@ -87,18 +87,53 @@ export default function CreateSalePage() {
                 const responseData = await response.json();
                 console.log('Item posted successfully:', responseData);
                 setBackdropLoaderOpen(false)
-                window.location.pathname='/useritems'
+                toast.success('Item posted!', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: "Flip",
+                    });
+                window.setTimeout(()=>{
+                    window.location.pathname = '/useritems'
+                },2000)
                 // Here, you can redirect the user or show a success message
             } else {
                 // Handle the error if the server response was not OK.
                 const errorData = await response.json();
                 console.error('Failed to post item:', errorData);
-                setBackdropLoaderOpen(true)
+                toast.error('Image upload failed', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                    });
+                setBackdropLoaderOpen(false)
                 // Show an error message to the user
             }
         } catch (error) {
             console.error('Error posting item to backend:', error);
-            setBackdropLoaderOpen(true)
+            toast.error('Some error occured. Please try again.', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: 'Flip',
+                });
+            setBackdropLoaderOpen(false)
             // Handle network errors or other errors outside the HTTP response
         }
     };
@@ -176,7 +211,19 @@ export default function CreateSalePage() {
                 jc: 'center',
                 alignItems: 'center'
             }}>
-
+                <ToastContainer
+                    position="top-right"
+                    autoClose={2000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="colored"
+                    transition="Flip"
+                />
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                     open={backdropLoaderOpen}

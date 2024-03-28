@@ -307,7 +307,7 @@ export default function ItemCard(props) {
                                 <Button auto flat color={'error'} className="collapse-buttons">
                                     <IoMdHeart size={20} style={{
                                         borderRadius: '12px',
-                                        color: 'rgb(221 221 221)'
+                                        color: 'white'
                                     }} className="item-icon"
                                         onClick={() => {
                                             handleFavouriteButtonClick(favouriteItems, item)
