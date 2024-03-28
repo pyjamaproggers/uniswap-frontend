@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 export default function ItemCard(props) {
 
     const navigate = useNavigate()
+    const backend = process.env.REACT_APP_BACKEND
 
     const item = props.item
 
@@ -30,10 +31,33 @@ export default function ItemCard(props) {
     // console.log(item.id, favouriteItems, favouriteItems.includes(item.id))
     // console.log(props)
 
-    const handleFavouriteButtonClick = (favouriteItems, item) => {
-        let itemIDToUpdate = item.id
-        handleFavouriteItemToggle(favouriteItems, itemIDToUpdate)
+    const handleFavouriteButtonClick = async (favouriteItems, item) => {
+        const itemIDToUpdate = item._id;
+        
+        try {
+            const response = await fetch(`${backend}/api/user/favorites`, {
+                method: 'POST', // or 'PATCH' depending on your preference
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include other headers as needed, such as for authentication
+                },
+                body: JSON.stringify({ itemId: itemIDToUpdate }),
+                credentials: 'include', // for cookies to be included
+            });
+            
+            const data = await response.json();
+            // Handle the response. For example, refresh the local favorites state
+            if (response.ok) {
+                handleFavouriteItemToggle(favouriteItems, itemIDToUpdate);
+            } else {
+                // Handle failure (e.g., item not found, user not authenticated)
+                console.error(data.message);
+            }
+        } catch (error) {
+            console.error('Failed to update favorite items:', error);
+        }
     }
+    
 
     function getTimeDifference(dateString) {
         const itemDate = new Date(dateString);
@@ -233,7 +257,7 @@ export default function ItemCard(props) {
                                 WhatsApp
                             </Button>
                             
-                            {/* {favouriteItems.includes(item.id) ?
+                            {favouriteItems.includes(item.id) ?
                                 <IoMdHeart size={24} style={{
                                     borderRadius: '12px',
                                     color: 'red'
@@ -248,7 +272,7 @@ export default function ItemCard(props) {
                                     onClick={() => {
                                         handleFavouriteButtonClick(favouriteItems, item)
                                     }} />
-                            } */}
+                            }
                         </Row>
                         :
                         <Row css={{
