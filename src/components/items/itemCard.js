@@ -33,7 +33,7 @@ export default function ItemCard(props) {
 
     const handleFavouriteButtonClick = async (favouriteItems, item) => {
         const itemIDToUpdate = item._id;
-        
+
         try {
             const response = await fetch(`${backend}/api/user/favorites`, {
                 method: 'POST', // or 'PATCH' depending on your preference
@@ -44,10 +44,11 @@ export default function ItemCard(props) {
                 body: JSON.stringify({ itemId: itemIDToUpdate }),
                 credentials: 'include', // for cookies to be included
             });
-            
+
             const data = await response.json();
             // Handle the response. For example, refresh the local favorites state
             if (response.ok) {
+                console.log('here')
                 handleFavouriteItemToggle(favouriteItems, itemIDToUpdate);
             } else {
                 // Handle failure (e.g., item not found, user not authenticated)
@@ -57,7 +58,7 @@ export default function ItemCard(props) {
             console.error('Failed to update favorite items:', error);
         }
     }
-    
+
 
     function getTimeDifference(dateString) {
         const itemDate = new Date(dateString);
@@ -129,7 +130,7 @@ export default function ItemCard(props) {
             }}>
                 <Row css={{
                     alignItems: 'center',
-                    padding: '0px 8px 12px 8px',
+                    padding: '0px 8px 4px 8px',
                     jc: 'space-between'
                 }}>
                     <Row css={{
@@ -149,7 +150,7 @@ export default function ItemCard(props) {
                                 fontSize: '$lg',
                             },
                             '@xsMax': {
-                                fontSize: '$lg'
+                                fontSize: '$sm'
                             },
                         }}>
                             <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.15' }}>
@@ -160,10 +161,10 @@ export default function ItemCard(props) {
                             </span>
                         </Text>
                     </Row>
-                    <Badge variant="flat" size={'lg'} color={badgeColor}>
+                    <Badge variant="flat" size={'sm'} color={badgeColor}>
                         {item.itemCategory.charAt(0).toUpperCase() + item.itemCategory.slice(1)}
                     </Badge>
-                    <Badge variant="flat" size={'lg'} color={"primary"}>
+                    <Badge variant="flat" size={'sm'} color={"primary"}>
                         ₹ {item.itemPrice}
                     </Badge>
                 </Row>
@@ -182,7 +183,6 @@ export default function ItemCard(props) {
                     borderColor: '$gray100',
                     borderWidth: '0px 0px 1px 0px'
                 }}
-                    expanded={type === 'user'}
                     divider={false}
                     title={
                         <Row css={{
@@ -200,7 +200,7 @@ export default function ItemCard(props) {
                                         fontSize: '$md'
                                     },
                                     paddingRight: '4px',
-                                    lineHeight: '1.25',
+                                    // lineHeight: '1.25',
                                 }}>
                                     {item.itemName}
                                 </Text>
@@ -211,13 +211,13 @@ export default function ItemCard(props) {
                                 <>
                                     {item.live === 'y' ?
                                         <>
-                                            <Badge variant="flat" size={'lg'} color={'success'}>
+                                            <Badge variant="flat" size={'sm'} color={'success'}>
                                                 • Live
                                             </Badge>
                                         </>
                                         :
                                         <>
-                                            <Badge variant="flat" size={'lg'} color={'error'}>
+                                            <Badge variant="flat" size={'sm'} color={'error'}>
                                                 • Not Live
                                             </Badge>
                                         </>
@@ -235,51 +235,79 @@ export default function ItemCard(props) {
                         '@xsMax': {
                             fontSize: '$md'
                         },
-                        padding: '0px 8px 4px 8px',
-                        color: '$gray800'
+                        padding: '0px 8px 8px 8px',
+                        color: '$gray800',
+                        lineHeight: '1.25'
                     }}>
                         {item.itemDescription}
                     </Text>
-                    {type === 'sale' ?
+                    {type === 'sale' &&
                         <Row css={{
                             padding: '4px 8px 0px 8px',
                             gap: 6,
                             alignItems: 'center'
                         }}>
                             <Button auto flat color={'success'}
-                            icon={<IoLogoWhatsapp size={'24px'} color={"#25D366"} onClick={() => {
-                                window.open(url)
-                            }} className="item-icon" />}
-                            css={{
-                                height: 'max-content',
-                                padding: '0px 12px'
-                            }}>
+                                icon={<IoLogoWhatsapp size={'24px'} color={"#25D366"} onClick={() => {
+                                    window.open(url)
+                                }} className="item-icon" />}
+                                css={{
+                                    height: 'max-content',
+                                    padding: '0px 12px'
+                                }}>
                                 WhatsApp
                             </Button>
-                            
+
                             {favouriteItems.includes(item.id) ?
-                                <IoMdHeart size={24} style={{
-                                    borderRadius: '12px',
-                                    color: 'red'
-                                }} className="item-icon"
-                                    onClick={() => {
-                                        handleFavouriteButtonClick(favouriteItems, item)
-                                    }} />
+                                <Button auto flat color={'error'}>
+                                    <IoMdHeart size={24} style={{
+                                        borderRadius: '12px',
+                                        color: 'red'
+                                    }} className="item-icon"
+                                        onClick={() => {
+                                            handleFavouriteButtonClick(favouriteItems, item)
+                                        }} />
+                                </Button>
                                 :
-                                <IoMdHeart size={24} style={{
-                                    borderRadius: '12px',
-                                }} className="item-icon"
-                                    onClick={() => {
-                                        handleFavouriteButtonClick(favouriteItems, item)
-                                    }} />
+                                <Button auto flat color={'error'}>
+                                    <IoMdHeart size={24} style={{
+                                        borderRadius: '12px',
+                                        color: 'white'
+                                    }} className="item-icon"
+                                        onClick={() => {
+                                            handleFavouriteButtonClick(favouriteItems, item)
+                                        }} />
+                                </Button>
+
                             }
                         </Row>
-                        :
+
+                    }
+                </Collapse>
+                <Row css={{
+                    jc: 'space-between',
+                    margin: '4px 0px 24px 0px',
+                    alignItems: 'normal'
+                }}>
+                    <Text css={{
+                        fontWeight: '$medium',
+                        '@xsMin': {
+                            fontSize: '$sm',
+                        },
+                        '@xsMax': {
+                            fontSize: '$xs'
+                        },
+                        color: '$gray600',
+                        paddingLeft: '8px'
+                    }}>
+                        {getTimeDifference(item.dateAdded)}
+                    </Text>
+                    {type === 'user' &&
                         <Row css={{
-                            jc: 'flex-end',
                             alignItems: 'center',
                             gap: 6,
-                            margin: '8px 0px 24px 0px'
+                            width: 'max-content',
+                            marginTop: '4px'
                         }}>
                             <Button auto flat color={'primary'}
                                 iconRight={<IoPencil size={16} />}
@@ -294,20 +322,7 @@ export default function ItemCard(props) {
                             </Button>
                         </Row>
                     }
-                </Collapse>
-                <Text css={{
-                    fontWeight: '$medium',
-                    '@xsMin': {
-                        fontSize: '$sm',
-                    },
-                    '@xsMax': {
-                        fontSize: '$xs'
-                    },
-                    color: '$gray600',
-                    paddingLeft: '8px'
-                }}>
-                    {getTimeDifference(item.dateAdded)}
-                </Text>
+                </Row>
             </Col>
         </Grid>
     );

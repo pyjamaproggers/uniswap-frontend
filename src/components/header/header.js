@@ -47,28 +47,6 @@ export default function Header() {
         { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
     ]
 
-    const handleLogin = (googleUserObject) => {
-        // check if user already exists in the DB
-        // if (userExists) { 
-            // get user details 
-            // localStorage.setItem('userEmail', JSON.stringify(user.userEmail))
-            // localStorage.setItem('userName', JSON.stringify(user.userName))
-            // localStorage.setItem('userPicture', JSON.stringify(user.userPicture))
-            // localStorage.setItem('favouriteItems', JSON.stringify(user.favouriteItems))
-            // localStorage.setItem('itemsPosted', JSON.stringify(user.itemsPosted))
-        // }
-        // else {
-            // post request to send user to db as it is a new user
-            // user = {
-                // userName: googleUserObject.name,
-                // userEmail: googleUserObject.email,
-                // userPicture: googleUserObject.picture,
-                // favouriteItems: [],
-                // itemsPosted: []
-            // }
-        // }
-    }
-
     // funciton to handle callback for google sign in
     function handleCallbackresponse(response) {
         var googleUserObject = jwt_decode(response.credential);
@@ -84,85 +62,87 @@ export default function Header() {
                 body: JSON.stringify({ token: response.credential }), // Send Google token to backend
                 credentials: 'include', // Necessary to include the cookie in requests
             })
-            .then(res => res.json()) // Adjusted to parse JSON body
-            .then(data => {
-                if (data.user) { // Assuming the backend sends back an object with a user property
-                    // Store user details for future use.
-                    console.log(data.user)
-                    localStorage.setItem('userEmail', data.user.userEmail);
-                    localStorage.setItem('userName', data.user.userName);
-                    localStorage.setItem('userPicture', data.user.userPicture);
-                    setRender((prev) => !prev);
-                    window.location.pathname = '/';
-                } else {
-                    throw new Error('Authentication failed');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Handle authentication error (e.g., show error message)
-            });
+                .then(res => res.json()) // Adjusted to parse JSON body
+                .then(data => {
+                    if (data.user) { // Assuming the backend sends back an object with a user property
+                        // Store user details for future use.
+                        console.log(data.user)
+                        localStorage.setItem('userEmail', data.user.userEmail);
+                        localStorage.setItem('userName', data.user.userName);
+                        localStorage.setItem('userPicture', data.user.userPicture);
+                        setRender((prev) => !prev);
+                        window.location.pathname = '/';
+                    } else {
+                        throw new Error('Authentication failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle authentication error (e.g., show error message)
+                });
         }
     }
 
     useEffect(() => {
         const fetchUserData = async () => {
-          if (localStorage.getItem('userEmail')) {
-            try {
-              const postedItemsResponse = await fetch(`${backend}/api/user/items`, { credentials: 'include' });
-              const postedItems = await postedItemsResponse.json();
-              localStorage.setItem('itemsPosted', JSON.stringify(postedItems));
-              const favoriteItemsResponse = await fetch('http://localhost:8080/api/user/favorites', { credentials: 'include' });
-              const favoriteItems = await favoriteItemsResponse.json();
-              localStorage.setItem('favouriteItems', JSON.stringify(favoriteItems));
-            } catch (error) {
-              console.error('Failed to fetch user-specific data:', error);
+            if (localStorage.getItem('userEmail')) {
+                try {
+                    const postedItemsResponse = await fetch(`${backend}/api/user/items`, { credentials: 'include' });
+                    const postedItems = await postedItemsResponse.json();
+                    localStorage.setItem('itemsPosted', JSON.stringify(postedItems));
+                    const favoriteItemsResponse = await fetch('http://localhost:8080/api/user/favorites', { credentials: 'include' });
+                    const favoriteItems = await favoriteItemsResponse.json();
+                    localStorage.setItem('favouriteItems', JSON.stringify(favoriteItems));
+                } catch (error) {
+                    console.error('Failed to fetch user-specific data:', error);
+                }
             }
-          }
         };
-      
+
         fetchUserData();
-      }, []);
-      
-    
+    }, []);
+
+
 
     function handleLogout() {
         fetch('http://localhost:8080/api/auth/logout', {
             method: 'POST',
             credentials: 'include', // Necessary to include the cookie in requests
         })
-        .then(res => {
-            if (res.ok) {
-                // Assuming the backend has now invalidated the session/cookie...
-    
-                // Clear client-side storage of user details
-                localStorage.removeItem('userEmail');
-                localStorage.removeItem('userName');
-                localStorage.removeItem('userPicture');
-                // Redirect user to the homepage or login page
-                navigate('/'); // Adjust the path as necessary for your application
-            } else {
-                throw new Error('Logout failed');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Optionally handle the error, maybe show a notification to the user
-        });
+            .then(res => {
+                if (res.ok) {
+                    // Assuming the backend has now invalidated the session/cookie...
+
+                    // Clear client-side storage of user details
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userPicture');
+                    localStorage.removeItem('itemsPosted');
+                    localStorage.removeItem('favouriteItems');
+                    // Redirect user to the homepage or login page
+                    navigate('/'); // Adjust the path as necessary for your application
+                } else {
+                    throw new Error('Logout failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Optionally handle the error, maybe show a notification to the user
+            });
     }
-    
+
     useEffect(() => {
         fetch('/api/auth/profile', {
             credentials: 'include',
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.isAuthenticated) {
-                // Update UI to reflect authenticated state
-            } else {
-                // User is not authenticated
-            }
-        });
+            .then(res => res.json())
+            .then(data => {
+                if (data.isAuthenticated) {
+                    // Update UI to reflect authenticated state
+                } else {
+                    // User is not authenticated
+                }
+            });
     }, []);
 
     useEffect(() => {
@@ -202,14 +182,14 @@ export default function Header() {
         <>
             <Navbar isBordered variant="sticky">
                 <Navbar.Toggle showIn={'xs'} />
-                <Navbar.Brand onClick={()=>{
-                    window.location.pathname='/'
+                <Navbar.Brand onClick={() => {
+                    window.location.pathname = '/'
                 }}
-                css={{
-                    '&:hover':{
-                        cursor: 'pointer'
-                    }
-                }}>
+                    css={{
+                        '&:hover': {
+                            cursor: 'pointer'
+                        }
+                    }}>
                     <Image
                         css={{
                             height: '24px',
@@ -218,7 +198,7 @@ export default function Header() {
                         src={AshokaLogo} />
                     <Text b color="inherit" css={{
                         padding: '0px 8px',
-                        '&:hover':{
+                        '&:hover': {
                             cursor: 'pointer',
                             textDecoration: 'underline'
                         }
@@ -254,8 +234,8 @@ export default function Header() {
                                 aria-label="Items Category"
                                 selectionMode="single"
                                 // selectedKeys={selected}
-                                onSelectionChange={(selection) => { 
-                                    navigate('/saleitems', { state: { category: `${selection.currentKey}` } }); 
+                                onSelectionChange={(selection) => {
+                                    navigate('/saleitems', { state: { category: `${selection.currentKey}` } });
                                 }}
                                 css={{
                                     $$dropdownMenuWidth: "340px",
@@ -333,13 +313,13 @@ export default function Header() {
                                 aria-label="User menu actions"
                                 color="error"
                                 onAction={(actionKey) => {
-                                    if(actionKey==='logout'){
+                                    if (actionKey === 'logout') {
                                         handleLogout()
                                     }
-                                    else if(actionKey==='useritems' || actionKey==='favourites' || actionKey=='createsale'){
-                                        window.location.pathname=`/${actionKey}`
+                                    else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
+                                        window.location.pathname = `/${actionKey}`
                                     }
-                                    else{
+                                    else {
                                         console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
                                     }
                                 }}
@@ -364,19 +344,19 @@ export default function Header() {
                                     </Text> */}
                                 </Dropdown.Item>
                                 <Dropdown.Item key="createsale" withDivider color=""
-                                icon={<FaPlus size={16} />}>
+                                    icon={<FaPlus size={16} />}>
                                     Create Sale
                                 </Dropdown.Item>
-                                <Dropdown.Item key="useritems"  color=""
-                                icon={<FaBagShopping size={16} />}>
+                                <Dropdown.Item key="useritems" color=""
+                                    icon={<FaBagShopping size={16} />}>
                                     My Sale Items
                                 </Dropdown.Item>
                                 <Dropdown.Item key="favourites" color=""
-                                icon={<IoMdHeart size={16} />}>
+                                    icon={<IoMdHeart size={16} />}>
                                     Favourites
                                 </Dropdown.Item>
                                 <Dropdown.Item key="logout" withDivider color="error"
-                                icon={<IoLogOut size={16} />}>
+                                    icon={<IoLogOut size={16} />}>
                                     Log Out
                                 </Dropdown.Item>
                             </Dropdown.Menu>

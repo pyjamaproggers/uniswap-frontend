@@ -132,7 +132,13 @@ export default function ItemsPage(props) {
 
     // this is fetched from the users DB in header.js (favouriteItems: array of (ObjectID()))
     let tempFavouriteItems = JSON.parse(localStorage.getItem('favouriteItems'))
-    const [favouriteItems, setFavouriteItems] = useState(tempFavouriteItems)
+    const [favouriteItems, setFavouriteItems] = useState(tempFavouriteItems ? tempFavouriteItems : [])
+
+    useEffect(()=>{
+        if(!JSON.parse(localStorage.getItem('favouriteItems'))){
+            localStorage.setItem('favouriteItems', JSON.stringify([]))
+        }
+    })
 
     const [priceFilters, setPriceFilters] = useState([
         { key: '1', value: '₹0-₹100', chosen: false },
