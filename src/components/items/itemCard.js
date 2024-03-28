@@ -135,7 +135,7 @@ export default function ItemCard(props) {
                 }}>
                     <Row css={{
                         alignItems: 'center',
-                        gap: 4,
+                        gap: 6,
                     }}>
                         <Avatar
                             color=""
@@ -150,21 +150,21 @@ export default function ItemCard(props) {
                                 fontSize: '$lg',
                             },
                             '@xsMax': {
-                                fontSize: '$sm'
+                                fontSize: '$md'
                             },
                         }}>
-                            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.15' }}>
+                            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.20' }}>
                                 {firstName}
                             </span>
-                            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.15' }}>
+                            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.20' }}>
                                 {lastName}
                             </span>
                         </Text>
                     </Row>
-                    <Badge variant="flat" size={'sm'} color={badgeColor}>
+                    <Badge variant="flat" size={'md'} color={badgeColor}>
                         {item.itemCategory.charAt(0).toUpperCase() + item.itemCategory.slice(1)}
                     </Badge>
-                    <Badge variant="flat" size={'sm'} color={"primary"}>
+                    <Badge variant="flat" size={'md'} color={"primary"}>
                         ₹ {item.itemPrice}
                     </Badge>
                 </Row>
@@ -211,13 +211,13 @@ export default function ItemCard(props) {
                                 <>
                                     {item.live === 'y' ?
                                         <>
-                                            <Badge variant="flat" size={'sm'} color={'success'}>
+                                            <Badge variant="flat" size={'md'} color={'success'}>
                                                 • Live
                                             </Badge>
                                         </>
                                         :
                                         <>
-                                            <Badge variant="flat" size={'sm'} color={'error'}>
+                                            <Badge variant="flat" size={'md'} color={'error'}>
                                                 • Not Live
                                             </Badge>
                                         </>
@@ -235,54 +235,12 @@ export default function ItemCard(props) {
                         '@xsMax': {
                             fontSize: '$md'
                         },
-                        padding: '0px 8px 8px 8px',
+                        padding: '0px 8px 4px 8px',
                         color: '$gray800',
                         lineHeight: '1.25'
                     }}>
                         {item.itemDescription}
                     </Text>
-                    {type === 'sale' &&
-                        <Row css={{
-                            padding: '4px 8px 0px 8px',
-                            gap: 6,
-                            alignItems: 'center'
-                        }}>
-                            <Button auto flat color={'success'}
-                                icon={<IoLogoWhatsapp size={'24px'} color={"#25D366"} onClick={() => {
-                                    window.open(url)
-                                }} className="item-icon" />}
-                                css={{
-                                    height: 'max-content',
-                                    padding: '0px 12px'
-                                }}>
-                                WhatsApp
-                            </Button>
-
-                            {favouriteItems.includes(item._id) ?
-                                <Button auto flat color={'error'}>
-                                    <IoMdHeart size={24} style={{
-                                        borderRadius: '12px',
-                                        color: 'red'
-                                    }} className="item-icon"
-                                        onClick={() => {
-                                            handleFavouriteButtonClick(favouriteItems, item)
-                                        }} />
-                                </Button>
-                                :
-                                <Button auto flat color={'error'}>
-                                    <IoMdHeart size={24} style={{
-                                        borderRadius: '12px',
-                                        color: 'white'
-                                    }} className="item-icon"
-                                        onClick={() => {
-                                            handleFavouriteButtonClick(favouriteItems, item)
-                                        }} />
-                                </Button>
-
-                            }
-                        </Row>
-
-                    }
                 </Collapse>
                 <Row css={{
                     jc: 'space-between',
@@ -292,17 +250,17 @@ export default function ItemCard(props) {
                     <Text css={{
                         fontWeight: '$medium',
                         '@xsMin': {
-                            fontSize: '$sm',
+                            fontSize: '$md',
                         },
                         '@xsMax': {
-                            fontSize: '$xs'
+                            fontSize: '$sm'
                         },
                         color: '$gray600',
                         paddingLeft: '8px'
                     }}>
                         {getTimeDifference(item.dateAdded)}
                     </Text>
-                    {type === 'user' &&
+                    {type === 'user' ?
                         <Row css={{
                             alignItems: 'center',
                             gap: 6,
@@ -320,6 +278,41 @@ export default function ItemCard(props) {
                                 iconRight={<MdDelete size={16} />}>
                                 Delete
                             </Button>
+                        </Row>
+                        :
+                        <Row css={{
+                            padding: '4px 8px 0px 8px',
+                            gap: 6,
+                            alignItems: 'center',
+                            width: 'max-content',
+                        }}>
+                            <Button auto flat color={'success'} className="collapse-buttons">
+                                <IoLogoWhatsapp size={'20px'} color={"#25D366"} onClick={() => {
+                                    window.open(url)
+                                }} className="item-icon" />
+                            </Button>
+
+                            {favouriteItems.includes(item._id) ?
+                                <Button auto flat color={'error'} className="collapse-buttons">
+                                    <IoMdHeart size={20} style={{
+                                        borderRadius: '12px',
+                                        color: 'red'
+                                    }} className="item-icon"
+                                        onClick={() => {
+                                            handleFavouriteButtonClick(favouriteItems, item)
+                                        }} />
+                                </Button>
+                                :
+                                <Button auto flat color={'error'} className="collapse-buttons">
+                                    <IoMdHeart size={20} style={{
+                                        borderRadius: '12px',
+                                        color: 'white'
+                                    }} className="item-icon"
+                                        onClick={() => {
+                                            handleFavouriteButtonClick(favouriteItems, item)
+                                        }} />
+                                </Button>
+                            }
                         </Row>
                     }
                 </Row>

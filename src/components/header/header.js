@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AshokaLogo from '../../assets/AshokaLogo.png'
-import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col } from "@nextui-org/react";
+import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col, Row } from "@nextui-org/react";
 import { icons } from "../icons/icons.js";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
@@ -16,7 +16,7 @@ import { FaBagShopping } from "react-icons/fa6";
 import { IoMdHeart } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
-
+import { MdOutlinePhoneIphone } from "react-icons/md";
 
 export default function Header() {
     const [render, setRender] = useState(false)
@@ -120,7 +120,7 @@ export default function Header() {
                     localStorage.removeItem('itemsPosted');
                     localStorage.removeItem('favouriteItems');
                     // Redirect user to the homepage or login page
-                    navigate('/'); // Adjust the path as necessary for your application
+                    window.location.pathname='/' // Adjust the path as necessary for your application
                 } else {
                     throw new Error('Logout failed');
                 }
@@ -354,6 +354,14 @@ export default function Header() {
                                 <Dropdown.Item key="favourites" color=""
                                     icon={<IoMdHeart size={16} />}>
                                     Favourites
+                                </Dropdown.Item>
+                                <Dropdown.Item key="mode" color=""
+                                    icon={<MdOutlinePhoneIphone size={16} />}>
+                                    <Row>
+                                        <Text>
+                                            Light/Dark Mode
+                                        </Text>
+                                    </Row>
                                 </Dropdown.Item>
                                 <Dropdown.Item key="logout" withDivider color="error"
                                     icon={<IoLogOut size={16} />}>

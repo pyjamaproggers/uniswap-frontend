@@ -9,3 +9,9 @@
 .nextui-c-fMAxGR{
     padding-bottom: 8px;
 }
+
+.collapse-buttons{
+    height: max-content !important;
+    width: max-content !important;
+    padding: 6px !important;
+}
