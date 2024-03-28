@@ -17,6 +17,8 @@ import { IoMdHeart } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import { MdOutlinePhoneIphone } from "react-icons/md";
+import { messaging } from "../../services/firebase.js";
+import { getToken } from "firebase/messaging";
 import './header.css'
 
 export default function Header(props) {
@@ -51,40 +53,66 @@ export default function Header(props) {
     ]
 
     // funciton to handle callback for google sign in
+    // Adjusted to call requestNotificationPermission after successful authentication
     function handleCallbackresponse(response) {
         var googleUserObject = jwt_decode(response.credential);
-        console.log(googleUserObject);
-        if (googleUserObject.email.split('@')[1] !== 'ashoka.edu.in') {
-            setShowAshokaOnlyModal(true);
-        } else {
-            fetch('http://localhost:8080/api/auth/google', {
+        if (googleUserObject.email.split('@')[1] === 'ashoka.edu.in') {
+            fetch(`${backend}/api/auth/google`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ token: response.credential }), // Send Google token to backend
-                credentials: 'include', // Necessary to include the cookie in requests
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: response.credential }),
+                credentials: 'include',
             })
-                .then(res => res.json()) // Adjusted to parse JSON body
-                .then(data => {
-                    if (data.user) { // Assuming the backend sends back an object with a user property
-                        // Store user details for future use.
-                        console.log(data.user)
-                        localStorage.setItem('userEmail', data.user.userEmail);
-                        localStorage.setItem('userName', data.user.userName);
-                        localStorage.setItem('userPicture', data.user.userPicture);
-                        setRender((prev) => !prev);
-                        window.location.pathname = '/';
-                    } else {
-                        throw new Error('Authentication failed');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Handle authentication error (e.g., show error message)
-                });
+            .then(res => res.json())
+            .then(data => {
+                if (data.user) {
+                    // Set user details in localStorage
+                    localStorage.setItem('userEmail', data.user.userEmail);
+                    localStorage.setItem('userName', data.user.userName);
+                    localStorage.setItem('userPicture', data.user.userPicture);
+    
+                    // Call to request notification permission should be here
+                    requestNotificationPermission();
+                    
+    
+                }
+            }).catch(error => console.error('Error:', error));
+        } else {
+            setShowAshokaOnlyModal(true);
         }
     }
+    
+
+// Function to request notification permission and get the token
+const requestNotificationPermission = () => {
+    Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+            getToken(messaging, { vapidKey: "BDiwlGg-uzE3Q5y94jyh_bSPo-b2v0A1thC9ePGnk7nt7E_3yuyGGf-Uqi4p6OSVG7tqdmhBU_T5CXOuoFJMACo" }).then((currentToken) => {
+                if (currentToken) {
+                    console.log("FCM Token:", currentToken);
+                    sendTokenToServer(currentToken);
+                }
+            }).catch((err) => console.log("An error occurred while retrieving token. ", err));
+        }
+        else{ setRender((prev) => !prev);
+            window.location.pathname = '/';}
+    });
+};
+
+const sendTokenToServer = (currentToken) => {
+    fetch(`${backend}/api/user/token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: currentToken }),
+        credentials: 'include',
+    })
+    .then(response => response.json())
+    .then(data =>{ setRender((prev) => !prev);
+                window.location.pathname = '/';})
+    .catch((error) => console.error("Error sending FCM token to server:", error));
+};
+
+    
 
     useEffect(() => {
         const fetchUserData = async () => {

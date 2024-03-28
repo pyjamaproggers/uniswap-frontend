@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getMessaging } from "firebase/messaging";
+import { getMessaging, getToken } from "firebase/messaging";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -17,7 +17,7 @@ var measurementId = process.env.REACT_APP_measurementId
 
 const firebaseConfig = {
   apiKey: apiKey,
-  authDomain: authDomain,
+  authDomain: authDomain, 
   projectId: projectId,
   storageBucket: storageBucket,
   messagingSenderId: messagingSenderId,
@@ -30,5 +30,4 @@ const app = initializeApp(firebaseConfig);
 
 
 // Initialize Firebase Cloud Messaging and get a reference to the service
-const messaging = getMessaging(app);
-getToken(messaging, {vapidKey: "BDiwlGg-uzE3Q5y94jyh_bSPo-b2v0A1thC9ePGnk7nt7E_3yuyGGf-Uqi4p6OSVG7tqdmhBU_T5CXOuoFJMACo"});
+export const messaging = getMessaging(app);
