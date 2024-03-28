@@ -12,6 +12,8 @@ import './createSalePage.css'
 import Grey from '../../assets/Grey.jpeg'
 import { IoLogoWhatsapp } from "react-icons/io";
 import { IoSendSharp } from "react-icons/io5";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 
@@ -19,7 +21,8 @@ export default function CreateSalePage() {
 
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
-    
+
+    const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
 
     const [item, setItem] = useState({
         userName: localStorage.getItem('userName'),
@@ -58,10 +61,14 @@ export default function CreateSalePage() {
     ]
 
     const checkForm = () => {
-        if (Object.values(itemsStatus).some(value => (value === 'default' || value === 'error')) ) {
+        setBackdropLoaderOpen(true)
+        if (Object.values(itemsStatus).some(value => (value === 'default' || value === 'error'))) {
             return false
         }
-        else return true
+        else {
+            setBackdropLoaderOpen(true)
+            return true
+        }
     }
 
     const postItemToBackend = async (itemData) => {
@@ -75,36 +82,40 @@ export default function CreateSalePage() {
                 credentials: 'include', // Include cookies in the request
                 body: JSON.stringify(itemData),
             });
-    
+
             if (response.ok) {
                 const responseData = await response.json();
                 console.log('Item posted successfully:', responseData);
+                setBackdropLoaderOpen(false)
+                window.location.pathname='/useritems'
                 // Here, you can redirect the user or show a success message
             } else {
                 // Handle the error if the server response was not OK.
                 const errorData = await response.json();
                 console.error('Failed to post item:', errorData);
+                setBackdropLoaderOpen(true)
                 // Show an error message to the user
             }
         } catch (error) {
             console.error('Error posting item to backend:', error);
+            setBackdropLoaderOpen(true)
             // Handle network errors or other errors outside the HTTP response
         }
     };
-    
+
 
     const sendItem = async () => {
         if (!checkForm()) {
             alert('Please fill in all required fields correctly.');
             return;
         }
-    
+
         try {
             // Get presigned URL from your backend
             const uploadResponse = await fetch(`${backend}/api/upload`, { credentials: 'include' });
             const uploadData = await uploadResponse.json();
             const { url, key } = uploadData; // Assuming your backend provides the key
-    
+
             // Upload the image to S3 using the presigned URL
             const putResponse = await fetch(url, {
                 method: 'PUT',
@@ -113,30 +124,32 @@ export default function CreateSalePage() {
                 },
                 body: imageFile, // Directly use the file as the body
             });
-    
+
             if (putResponse.ok) {
                 console.log('Image uploaded successfully.');
-    
+
                 // Construct the image URL from the key
                 const imageUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
-    
+
                 // Prepare item data, including the imageUrl
                 const itemData = {
                     ...item,
                     itemPicture: imageUrl,
                     dateAdded: new Date().toISOString(),
                 };
-    
+
                 // Send item data to your backend
                 await postItemToBackend(itemData);
             } else {
+                setBackdropLoaderOpen(false)
                 console.error('Failed to upload image:', await putResponse.text());
             }
         } catch (error) {
+            setBackdropLoaderOpen(false)
             console.error('Error:', error);
         }
     };
-    
+
 
     useEffect(() => {
         if (imageFile) {
@@ -163,6 +176,14 @@ export default function CreateSalePage() {
                 jc: 'center',
                 alignItems: 'center'
             }}>
+
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={backdropLoaderOpen}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
+
                 <Text css={{
                     '@xsMin': {
                         fontSize: '$2xl'
@@ -487,14 +508,14 @@ export default function CreateSalePage() {
                 <Button auto flat css={{
                     marginTop: '24px'
                 }}
-                onClick={()=>{
-                    if(checkForm()){
-                        sendItem()
-                    }
-                    else{
-                        window.alert('You seem to have missed something')
-                    }
-                }}>
+                    onClick={() => {
+                        if (checkForm()) {
+                            sendItem()
+                        }
+                        else {
+                            window.alert('You seem to have missed something')
+                        }
+                    }}>
                     <Row css={{
                         alignItems: 'center',
                         gap: 8

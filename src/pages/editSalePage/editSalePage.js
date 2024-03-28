@@ -19,7 +19,9 @@ export default function EditSalePage() {
 
     const location = useLocation()
 
-    const [item, setItem] = useState({...location.state})
+    const [item, setItem] = useState({ ...location.state })
+
+    const [originalItemPicture, setOriginalItemPicture] = useState(item.itemPicture);
 
     const [itemsStatus, setItemsStatus] = useState({
         itemName: 'success',
@@ -44,7 +46,7 @@ export default function EditSalePage() {
     ]
 
     const checkForm = () => {
-        if (Object.values(itemsStatus).some(value => (value === 'default' || value === 'error')) ) {
+        if (Object.values(itemsStatus).some(value => (value === 'default' || value === 'error'))) {
             return false
         }
         else return true
@@ -343,44 +345,58 @@ export default function EditSalePage() {
                 }}>
                     Item Picture
                 </Text>
-                {previewUrl === null ?
-                    <Image src={Grey} width={'300px'} height={'300px'} css={{
-                        borderRadius: '8px',
-                        opacity: '0.5'
-                    }} />
-                    :
-                    <Image src={previewUrl} width={'300px'} height={'300px'} css={{
-                        borderRadius: '8px',
-                        opacity: '1',
-                        objectFit: 'cover'
-                    }} />
-                }
-                <label className="custom-file-upload">
-                    <input
-                        onChange={(event) => {
-                            if (event.target.files && event.target.files[0]) {
-                                if (event.target.files[0].size > 2200000) {
-                                    window.alert('Maximum file size: 2mb!');
-                                } else {
-                                    setImageFile(event.target.files[0]);
-                                    setItemsStatus({
-                                        ...itemsStatus,
-                                        itemPicture: 'success'
-                                    })
-                                    console.log('Thank you for the correct image size');
-                                }
-                            } else {
-                                setImageFile(null); // Reset state if no file is selected
-                                setPreviewUrl(null); // Also reset the preview URL
-                            }
-                        }}
-                        className="photobtn" animated={'true'} type='file' accept="image/*" required />
-                    {imageFile === null ?
-                        "Upload Picture"
+
+                <div>
+                    {previewUrl === null ?
+                        <Image src={originalItemPicture} width={'300px'} height={'300px'} css={{
+                            borderRadius: '8px',
+                            opacity: '0.5'
+                        }} />
                         :
-                        `${imageFile.name} uploaded`
+                        <Image src={previewUrl} width={'300px'} height={'300px'} css={{
+                            borderRadius: '8px',
+                            opacity: '1',
+                            objectFit: 'cover'
+                        }} />
                     }
-                </label>
+                    <label className="custom-file-upload">
+                        <input
+                            onChange={(event) => {
+                                if (event.target.files && event.target.files[0]) {
+                                    if (event.target.files[0].size > 2200000) {
+                                        window.alert('Maximum file size: 2mb!');
+                                    } else {
+                                        setImageFile(event.target.files[0]);
+                                        setItemsStatus({
+                                            ...itemsStatus,
+                                            itemPicture: 'success'
+                                        });
+                                        console.log('Thank you for the correct image size');
+                                    }
+                                } else {
+                                    setImageFile(null); // Reset state if no file is selected
+                                    setPreviewUrl(null); // Also reset the preview URL
+                                }
+                            }}
+                            className="photobtn" animated={'true'} type='file' accept="image/*" required />
+                        {imageFile === null ?
+                            "Upload Picture"
+                            :
+                            `${imageFile.name} uploaded`
+                        }
+                    </label>
+                    {imageFile && (
+                        <button onClick={() => {
+                            setImageFile(null);
+                            setPreviewUrl(originalItemPicture); // Revert to the original picture
+                            setItemsStatus({
+                                ...itemsStatus,
+                                itemPicture: 'success'
+                            });
+                        }}>Revert to Original Picture</button>
+                    )}
+                </div>
+
                 <Text css={{
                     '@xsMin': {
                         fontSize: '$sm'
@@ -400,14 +416,14 @@ export default function EditSalePage() {
                 <Button auto flat css={{
                     marginTop: '24px'
                 }}
-                onClick={()=>{
-                    if(checkForm()){
-                        sendItem()
-                    }
-                    else{
-                        window.alert('You seem to have missed something')
-                    }
-                }}>
+                    onClick={() => {
+                        if (checkForm()) {
+                            sendItem()
+                        }
+                        else {
+                            window.alert('You seem to have missed something')
+                        }
+                    }}>
                     <Row css={{
                         alignItems: 'center',
                         gap: 8
