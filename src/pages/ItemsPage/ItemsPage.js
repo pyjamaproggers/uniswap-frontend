@@ -229,6 +229,7 @@ export default function ItemsPage(props) {
                 throw new Error('Network response was not ok');
             }
             const items = await response.json();
+            console.log(items)
             setAllItems(items); // Update your state with the fetched items
             setFilteredItems(items); // Assuming you want to initially display all items
             setFetchingAllItems(false)
