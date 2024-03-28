@@ -104,6 +104,26 @@ export default function Header() {
             });
         }
     }
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+          if (localStorage.getItem('userEmail')) {
+            try {
+              const postedItemsResponse = await fetch(`${backend}/api/user/items`, { credentials: 'include' });
+              const postedItems = await postedItemsResponse.json();
+              localStorage.setItem('itemsPosted', JSON.stringify(postedItems));
+              const favoriteItemsResponse = await fetch('http://localhost:8080/api/user/favorites', { credentials: 'include' });
+              const favoriteItems = await favoriteItemsResponse.json();
+              localStorage.setItem('favouriteItems', JSON.stringify(favoriteItems));
+            } catch (error) {
+              console.error('Failed to fetch user-specific data:', error);
+            }
+          }
+        };
+      
+        fetchUserData();
+      }, []);
+      
     
 
     function handleLogout() {
