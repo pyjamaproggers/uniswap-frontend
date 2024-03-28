@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AshokaLogo from '../../assets/AshokaLogo.png'
-import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col, Row } from "@nextui-org/react";
+import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col, Row, Switch } from "@nextui-org/react";
 import { icons } from "../icons/icons.js";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
@@ -17,14 +17,17 @@ import { IoMdHeart } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import { MdOutlinePhoneIphone } from "react-icons/md";
+import './header.css'
 
-export default function Header() {
+export default function Header(props) {
     const [render, setRender] = useState(false)
     const [loginLoader, setLoginLoader] = useState(true)
     const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
     const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
     const navigate = useNavigate();
+
+    const toggleMode = props.toggleMode
 
     const collapseItemsLoggedOut = [
         { key: 'about', value: "About" },
@@ -120,7 +123,7 @@ export default function Header() {
                     localStorage.removeItem('itemsPosted');
                     localStorage.removeItem('favouriteItems');
                     // Redirect user to the homepage or login page
-                    window.location.pathname='/' // Adjust the path as necessary for your application
+                    window.location.pathname = '/' // Adjust the path as necessary for your application
                 } else {
                     throw new Error('Logout failed');
                 }
@@ -355,14 +358,6 @@ export default function Header() {
                                     icon={<IoMdHeart size={16} />}>
                                     Favourites
                                 </Dropdown.Item>
-                                <Dropdown.Item key="mode" color=""
-                                    icon={<MdOutlinePhoneIphone size={16} />}>
-                                    <Row>
-                                        <Text>
-                                            Light/Dark Mode
-                                        </Text>
-                                    </Row>
-                                </Dropdown.Item>
                                 <Dropdown.Item key="logout" withDivider color="error"
                                     icon={<IoLogOut size={16} />}>
                                     Log Out
@@ -401,11 +396,26 @@ export default function Header() {
                                 }}
                             >
                                 {item.key === 'logout' ?
-                                    <Link href="" onClick={handleLogout} css={{
-                                        color: '$error'
-                                    }}>
-                                        {item.value}
-                                    </Link>
+                                    <Col >
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            gap: 12,
+                                            paddingBottom: '12px'
+                                        }}>
+                                            <Text css={{
+                                                fontSize: '18px',
+                                                fontWeight: '$regular'
+                                            }}>
+                                                Dark Mode
+                                            </Text>
+                                            <Switch size={'sm'} onChange={(event)=> {toggleMode(event.target.checked)} } />
+                                        </Row>
+                                        <Link href="" onClick={handleLogout} css={{
+                                            color: '$error'
+                                        }}>
+                                            {item.value}
+                                        </Link>
+                                    </Col>
                                     :
                                     <Link
                                         color="inherit"

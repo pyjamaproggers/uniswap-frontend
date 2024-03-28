@@ -8,15 +8,27 @@ import HomePage from './pages/homePage/homePage';
 import ItemsPage from './pages/ItemsPage/ItemsPage';
 import CreateSalePage from './pages/createSalePage/createSalePage';
 import EditSalePage from './pages/editSalePage/editSalePage';
+import { useState } from 'react';
 
 function App() {
 
+    const [mode, setMode] = useState(localStorage.getItem('mode') ? localStorage.getItem('mode') : 'light')
+    const [render, setRender] = useState(false)
+
+    const toggleMode = (userSelect) => {
+        // setMode(userSelect ? 'dark' : 'light')
+        localStorage.setItem('mode', JSON.stringify(userSelect))
+        setRender(prev => !prev)
+    }
+
     const theme = createTheme({
-        type: 'light',
+        type: mode,
         theme: {
             colors: {
                 white: '#ffffff',
                 black: '#000000',
+                // background: '#0c0c0c',
+                // text: '#f0f0f0'
             }
         }
     })
@@ -26,7 +38,7 @@ function App() {
         <>
             <NextUIProvider theme={theme}>
                 <Router>
-                <Header />
+                <Header toggleMode={toggleMode}/>
                     <Routes>
                         <Route exact path='/' element={<HomePage />} />
                         <Route exact path='/saleitems' element={<ItemsPage type={'sale'}/>} />

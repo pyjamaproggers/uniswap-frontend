@@ -141,6 +141,7 @@ export default function ItemCard(props) {
                             color=""
                             size="md"
                             src={item.userPicture}
+                            className="avatar"
                         />
                         <Text css={{
                             display: 'inline-block', // Allows the use of maxW
@@ -306,7 +307,7 @@ export default function ItemCard(props) {
                                 <Button auto flat color={'error'} className="collapse-buttons">
                                     <IoMdHeart size={20} style={{
                                         borderRadius: '12px',
-                                        color: 'white'
+                                        color: 'rgb(221 221 221)'
                                     }} className="item-icon"
                                         onClick={() => {
                                             handleFavouriteButtonClick(favouriteItems, item)

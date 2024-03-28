@@ -5,7 +5,6 @@ function Footer(){
     return(
         <Container fluid >
             <Col css={{
-                backgroundColor: '#ffffff'
             }}>
                 <Row      
                 css={{
