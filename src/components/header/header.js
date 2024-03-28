@@ -22,8 +22,8 @@ export default function Header() {
     const [render, setRender] = useState(false)
     const [loginLoader, setLoginLoader] = useState(true)
     const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
-    const bucket = process.env.REACT_APP_BACKEND
-    console.log(bucket)
+    const backend = process.env.REACT_APP_BACKEND
+    // console.log(backend)
     const navigate = useNavigate();
 
     const collapseItemsLoggedOut = [
@@ -88,6 +88,7 @@ export default function Header() {
             .then(data => {
                 if (data.user) { // Assuming the backend sends back an object with a user property
                     // Store user details for future use.
+                    console.log(data.user)
                     localStorage.setItem('userEmail', data.user.userEmail);
                     localStorage.setItem('userName', data.user.userName);
                     localStorage.setItem('userPicture', data.user.userPicture);

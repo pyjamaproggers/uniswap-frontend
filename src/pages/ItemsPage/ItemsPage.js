@@ -788,14 +788,6 @@ export default function ItemsPage(props) {
                         </>
                     }
 
-                    {type === 'sale' ?
-                        <>
-                        </>
-                        :
-                        <>
-                        </>
-                    }
-
                     {!fetchingAllItems && !backdropLoaderOpen &&
                         <>
                             {(filtersApplied.searched.length == 0 && filtersApplied.category.length == 0 && filtersApplied.price.length == 0) ? //filters applied or not

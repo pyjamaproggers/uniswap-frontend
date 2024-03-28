@@ -15,12 +15,14 @@ export default function ItemCard(props) {
     const navigate = useNavigate()
 
     const item = props.item
-    console.log("HIII")
+
+    const [firstName, lastName] = item.userName.split(' ');
+
     const URL = 'https://wa.me'
     // let number = item.contactNumber.replace(/[^\w\s]/gi, '').replace(/ /g, '')
     let number = item.contactNumber
-    console.log(number)
-    let message = `Hi, this is regarding the ${item.itemName} you put on the UniSwap™ website priced at ${item.itemPrice}...`
+
+    let message = `Hi ${firstName}, this is regarding the ${item.itemName} you put on the UniSwap™ website priced at ${item.itemPrice}...`
     let url = `${URL}/${number}?text=${encodeURI(message)}`;
 
     let favouriteItems = props.favouriteItems
@@ -31,6 +33,48 @@ export default function ItemCard(props) {
     const handleFavouriteButtonClick = (favouriteItems, item) => {
         let itemIDToUpdate = item.id
         handleFavouriteItemToggle(favouriteItems, itemIDToUpdate)
+    }
+
+    function getTimeDifference(dateString) {
+        const itemDate = new Date(dateString);
+        const now = new Date();
+        const differenceInSeconds = Math.floor((now - itemDate) / 1000);
+        const differenceInMinutes = Math.floor(differenceInSeconds / 60);
+        const differenceInHours = Math.floor(differenceInMinutes / 60);
+        const differenceInDays = Math.floor(differenceInHours / 24);
+
+        if (differenceInSeconds < 60) {
+            return `${differenceInSeconds} seconds ago`;
+        } else if (differenceInMinutes < 60) {
+            return `${differenceInMinutes} minutes ago`;
+        } else if (differenceInHours < 24) {
+            return `${differenceInHours} hours ago`;
+        } else if (differenceInDays < 7) {
+            return `${differenceInDays} days ago`;
+        } else {
+            return formatDate(itemDate);
+        }
+    }
+
+    function formatDate(date) {
+        const day = date.getDate();
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"];
+        const month = monthNames[date.getMonth()];
+        const year = date.getFullYear();
+        const ordinal = getOrdinalIndicator(day);
+
+        return `${day}${ordinal} ${month}, ${year}`;
+    }
+
+    function getOrdinalIndicator(day) {
+        if (day > 3 && day < 21) return 'th'; // For 4th to 20th
+        switch (day % 10) {
+            case 1: return "st";
+            case 2: return "nd";
+            case 3: return "rd";
+            default: return "th";
+        }
     }
 
     useEffect(() => {
@@ -74,36 +118,29 @@ export default function ItemCard(props) {
                             src={item.userPicture}
                         />
                         <Text css={{
-                            fontWeight: '$semibold',
+                            display: 'inline-block', // Allows the use of maxW
+                            maxW: '100px',
+                            fontWeight: '$medium',
                             '@xsMin': {
                                 fontSize: '$lg',
                             },
                             '@xsMax': {
                                 fontSize: '$lg'
                             },
-                            maxW: '100px',
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
                         }}>
-                            {item.userName}
-                        </Text>
-                        <Text css={{
-                            fontWeight: '$semibold',
-                            '@xsMin': {
-                                fontSize: '$base',
-                            },
-                            '@xsMax': {
-                                fontSize: '$md'
-                            },
-                            color: '$gray600'
-                        }}>
-                            • 5m
-                            {/* Here we need calculate the post time based on "dateAdded" variable of an item */}
+                            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.15' }}>
+                                {firstName}
+                            </span>
+                            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.15' }}>
+                                {lastName}
+                            </span>
                         </Text>
                     </Row>
                     <Badge variant="flat" size={'lg'} color={badgeColor}>
                         {item.itemCategory.charAt(0).toUpperCase() + item.itemCategory.slice(1)}
+                    </Badge>
+                    <Badge variant="flat" size={'lg'} color={"primary"}>
+                        ₹ {item.itemPrice}
                     </Badge>
                 </Row>
                 <Image src={item.itemPicture}
@@ -113,34 +150,39 @@ export default function ItemCard(props) {
                         // maxW: '330px',
                         width: '320px',
                         objectFit: 'cover',
-                        borderRadius: '8px'
+                        borderRadius: '4px'
                     }} />
                 <Collapse css={{
-                    width: '330px'
+                    width: '330px',
+                    borderStyle: 'solid',
+                    borderColor: '$gray100',
+                    borderWidth: '0px 0px 1px 0px'
                 }}
                     expanded={type === 'user'}
                     divider={false}
                     title={
                         <Row css={{
-                            alignItems: 'center',
+                            alignItems: 'baseline',
                             jc: 'start',
                         }}>
-                            <Text css={{
-                                fontWeight: '$semibold',
-                                '@xsMin': {
-                                    fontSize: '$xl'
-                                },
-                                '@xsMax': {
-                                    fontSize: '$xl'
-                                },
-                                paddingRight: '4px',
-                                lineHeight: '1.15',
-                            }}>
-                                {item.itemName}
-                            </Text>
-                            <Badge variant="flat" size={'lg'} color={"primary"}>
-                                ₹ {item.itemPrice}
-                            </Badge>
+                            <Col>
+
+                                <Text css={{
+                                    fontWeight: '$medium',
+                                    '@xsMin': {
+                                        fontSize: '$lg'
+                                    },
+                                    '@xsMax': {
+                                        fontSize: '$md'
+                                    },
+                                    paddingRight: '4px',
+                                    lineHeight: '1.25',
+                                }}>
+                                    {item.itemName}
+                                </Text>
+
+                            </Col>
+
                             {type === 'user' &&
                                 <>
                                     {item.live === 'y' ?
@@ -164,16 +206,13 @@ export default function ItemCard(props) {
                     <Text css={{
                         fontWeight: '$regular',
                         '@xsMin': {
-                            fontSize: '$lg'
+                            fontSize: '$base'
                         },
                         '@xsMax': {
-                            fontSize: '$lg'
+                            fontSize: '$md'
                         },
-                        padding: '4px 8px',
-                        lineHeight: '1.3',
-                        borderStyle: 'solid',
-                        borderColor: '$gray100',
-                        borderWidth: '1px 0px'
+                        padding: '0px 8px 4px 8px',
+                        color: '$gray800'
                     }}>
                         {item.itemDescription}
                     </Text>
@@ -183,9 +222,17 @@ export default function ItemCard(props) {
                             gap: 6,
                             alignItems: 'center'
                         }}>
-                            <IoLogoWhatsapp size={'24px'} color={"#25D366"} onClick={() => {
+                            <Button auto flat color={'success'}
+                            icon={<IoLogoWhatsapp size={'24px'} color={"#25D366"} onClick={() => {
                                 window.open(url)
-                            }} className="item-icon" />{number}
+                            }} className="item-icon" />}
+                            css={{
+                                height: 'max-content',
+                                padding: '0px 12px'
+                            }}>
+                                WhatsApp
+                            </Button>
+                            
                             {/* {favouriteItems.includes(item.id) ?
                                 <IoMdHeart size={24} style={{
                                     borderRadius: '12px',
@@ -212,9 +259,9 @@ export default function ItemCard(props) {
                         }}>
                             <Button auto flat color={'primary'}
                                 iconRight={<IoPencil size={16} />}
-                            onClick={()=>{
-                                navigate('/editsale', {state: item})
-                            }}>
+                                onClick={() => {
+                                    navigate('/editsale', { state: item })
+                                }}>
                                 Edit
                             </Button>
                             <Button auto flat color={'error'}
@@ -224,6 +271,19 @@ export default function ItemCard(props) {
                         </Row>
                     }
                 </Collapse>
+                <Text css={{
+                    fontWeight: '$medium',
+                    '@xsMin': {
+                        fontSize: '$sm',
+                    },
+                    '@xsMax': {
+                        fontSize: '$xs'
+                    },
+                    color: '$gray600',
+                    paddingLeft: '8px'
+                }}>
+                    {getTimeDifference(item.dateAdded)}
+                </Text>
             </Col>
         </Grid>
     );
