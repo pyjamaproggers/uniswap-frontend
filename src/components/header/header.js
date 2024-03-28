@@ -27,7 +27,7 @@ export default function Header(props) {
     // console.log(backend)
     const navigate = useNavigate();
 
-    const toggleMode = props.toggleMode
+    // const toggleMode = props.toggleMode
 
     const collapseItemsLoggedOut = [
         { key: 'about', value: "About" },
@@ -408,7 +408,7 @@ export default function Header(props) {
                                             }}>
                                                 Dark Mode
                                             </Text>
-                                            <Switch size={'sm'} onChange={(event)=> {toggleMode(event.target.checked)} } />
+                                            <Switch size={'sm'} onChange={(event)=> {} } />
                                         </Row>
                                         <Link href="" onClick={handleLogout} css={{
                                             color: '$error'

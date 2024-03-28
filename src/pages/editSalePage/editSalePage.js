@@ -13,7 +13,10 @@ import Grey from '../../assets/Grey.jpeg'
 import { IoLogoWhatsapp } from "react-icons/io";
 import { IoSendSharp } from "react-icons/io5";
 import { useLocation } from 'react-router-dom';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function EditSalePage() {
 
@@ -21,6 +24,8 @@ export default function EditSalePage() {
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
     const [item, setItem] = useState({ ...location.state })
+
+    const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
 
     const [originalItemPicture, setOriginalItemPicture] = useState(item.itemPicture);
 
@@ -48,25 +53,27 @@ export default function EditSalePage() {
 
     const checkForm = () => {
         if (Object.values(itemsStatus).some(value => (value === 'default' || value === 'error'))) {
+            setBackdropLoaderOpen(false)
             return false
         }
         else return true
     }
     const sendItem = async () => {
+        setBackdropLoaderOpen(true)
         if (!checkForm()) {
             alert('Please fill in all required fields correctly.');
             return;
         }
-    
+
         let imageUrl = originalItemPicture; // Default to the original picture URL
-    
+
         if (imageFile) {
             try {
                 // Obtain the pre-signed URL from your backend
                 const uploadResponse = await fetch(`${backend}/api/upload`, { credentials: 'include' });
                 const uploadData = await uploadResponse.json();
                 const { url, key } = uploadData;
-    
+
                 // Upload the image to S3 using the pre-signed URL
                 const putResponse = await fetch(url, {
                     method: 'PUT',
@@ -75,18 +82,18 @@ export default function EditSalePage() {
                     },
                     body: imageFile,
                 });
-    
+
                 if (!putResponse.ok) throw new Error('Failed to upload image to S3.');
-    
+
                 // Construct the image URL from the response
                 imageUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
-    
+
             } catch (error) {
                 console.error('Image upload error:', error);
                 return;
             }
         }
-    
+
         // Update the item with the new details, including the new image URL if applicable
         try {
             const itemUpdateResponse = await fetch(`${backend}/api/items/${item._id}`, {
@@ -95,17 +102,43 @@ export default function EditSalePage() {
                 body: JSON.stringify({ ...item, itemPicture: imageUrl }),
                 credentials: 'include',
             });
-    
+
             if (!itemUpdateResponse.ok) throw new Error('Failed to update item.');
-    
+            setBackdropLoaderOpen(false)
             console.log('Item updated successfully');
+            toast.success('Item updated!', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: "Flip",
+            });
+            window.setTimeout(() => {
+                window.location.pathname = '/useritems'
+            }, 2000)
             // Further actions on successful update, like redirecting or refreshing the item details
         } catch (error) {
+            setBackdropLoaderOpen(false)
             console.error('Error updating item:', error);
+            toast.error('Some error occured. Please try again.', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: 'Flip',
+            });
         }
     };
-    
-    
+
+
 
     useEffect(() => {
         if (imageFile) {
@@ -132,6 +165,25 @@ export default function EditSalePage() {
                 jc: 'center',
                 alignItems: 'center'
             }}>
+                <ToastContainer
+                    position="top-right"
+                    autoClose={2000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="colored"
+                    transition="Flip"
+                />
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={backdropLoaderOpen}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
                 <Text css={{
                     '@xsMin': {
                         fontSize: '$2xl'
@@ -389,7 +441,8 @@ export default function EditSalePage() {
                     {previewUrl === null ?
                         <Image src={originalItemPicture} width={'300px'} height={'300px'} css={{
                             borderRadius: '8px',
-                            opacity: '0.5'
+                            opacity: '0.5',
+                            objectFit: 'cover'
                         }} />
                         :
                         <Image src={previewUrl} width={'300px'} height={'300px'} css={{
