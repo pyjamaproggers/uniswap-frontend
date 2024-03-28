@@ -283,7 +283,7 @@ export default function ItemsPage(props) {
             let tempUserItems = filterItemsByEmail(userEmail)
             setUserItems(tempUserItems)
         }
-    }, [])
+    }, [allItems])
 
     useEffect(() => {
         console.log('Updated favourite items on allItemsPage')
