@@ -67,19 +67,25 @@ export default function ItemCard(props) {
         const differenceInMinutes = Math.floor(differenceInSeconds / 60);
         const differenceInHours = Math.floor(differenceInMinutes / 60);
         const differenceInDays = Math.floor(differenceInHours / 24);
-
+    
+        // Helper function to format the time string correctly
+        const formatTimeString = (value, unit) => {
+            return `${value} ${unit}${value > 1 ? 's' : ''} ago`;
+        };
+    
         if (differenceInSeconds < 60) {
-            return `${differenceInSeconds} seconds ago`;
+            return formatTimeString(differenceInSeconds, 'second');
         } else if (differenceInMinutes < 60) {
-            return `${differenceInMinutes} minutes ago`;
+            return formatTimeString(differenceInMinutes, 'minute');
         } else if (differenceInHours < 24) {
-            return `${differenceInHours} hours ago`;
+            return formatTimeString(differenceInHours, 'hour');
         } else if (differenceInDays < 7) {
-            return `${differenceInDays} days ago`;
+            return formatTimeString(differenceInDays, 'day');
         } else {
             return formatDate(itemDate);
         }
     }
+    
 
     function formatDate(date) {
         const day = date.getDate();
@@ -307,7 +313,8 @@ export default function ItemCard(props) {
                                 <Button auto flat color={'error'} className="collapse-buttons">
                                     <IoMdHeart size={20} style={{
                                         borderRadius: '12px',
-                                        color: 'white'
+                                        color: '#ffffff',
+                                        opacity: '0.6'
                                     }} className="item-icon"
                                         onClick={() => {
                                             handleFavouriteButtonClick(favouriteItems, item)

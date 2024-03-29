@@ -34,58 +34,45 @@ export default function CreateSalePage() {
         itemPrice: 0,
         itemCategory: '',
         itemPicture: '', //this has to be the url we obtain by uploading the user-uploaded picture to aws bucket
-        contactNumber: "",
+        contactNumber: "8104213125", //we have to now obtain from localstorage once we set it in cookie after taking it
         live: 'y',
         dateAdded: '' //today's date
-    })
-
-    console.log(item)
-    const [firstName, lastName] = item.userName.split(' ');
-
-    const categoryColors = {
-        apparel: 'error',
-        food: 'secondary',
-        tickets: 'primary',
-        stationery: 'success',
-        jewellry: 'warning',
-        lostandfound: 'neutral',
-    };
-
-    // Default to some color if item.category is not found in the mapping
-    const badgeColor = categoryColors[item.itemCategory] || 'neutral';
-
-    const [itemsStatus, setItemsStatus] = useState({
-        itemName: 'default',
-        itemDescription: 'default',
-        itemPrice: 'default',
-        itemCategory: 'default',
-        itemPicture: 'default',
-        contactNumber: 'default'
     })
 
     const [imageFile, setImageFile] = useState(null)
     const [previewUrl, setPreviewUrl] = useState(null)
 
-    const categoryItems = [
-        { key: 'apparel', value: 'Apparel', icon: <GiClothes size={24} color="#F31260" />, description: 'Tees, Shirts, Corsettes, Shorts, Cargos, Dresses, Footwear and more.' }, // Vibrant Pink
-        { key: 'food', value: 'Food', icon: <IoFastFoodSharp size={24} color="#7828C8" />, description: 'Fruits, Ramen, Masalas and more.' }, // Orange
-        { key: 'tickets', value: 'Tickets', icon: <IoTicket size={24} color="#0072F5" />, description: 'Concert, Show, Shuttle and more.' }, // Indigo
-        { key: 'stationery', value: 'Stationery', icon: <FaFilePen size={24} color="#17C964" />, description: 'Pens, Pencils, Erasers, Sharpeners, Notebooks, Highlighters and more.' }, // Green
-        { key: 'jewellry', value: 'Jewellry', icon: <GiJewelCrown size={24} color="#F5A524" />, description: 'Necklaces, Earrings, Nose Rings and more.' }, // Yellow
-        { key: 'lostandfound', value: 'Lost & Found', icon: <MdOutlineQuestionMark size={24} color="#889096" />, description: 'Anything and everything lost around campus.' }, // Grey
-        { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
-    ]
 
     const checkForm = () => {
-        setBackdropLoaderOpen(true)
-        if (Object.values(itemsStatus).some(value => (value === 'default' || value === 'error'))) {
-            setBackdropLoaderOpen(false)
-            return false
+        // itemName: Required and must be a non-empty string
+        if (!item.itemName || typeof item.itemName !== 'string' || item.itemName.trim().length === 0) {
+            alert('Item name is required.');
+            return false;
         }
-        else {
-            return true
+    
+        // itemPrice: Required and must be an integer
+        if (!Number.isInteger(item.itemPrice)) {
+            alert('Item price must be a number.');
+            return false;
         }
-    }
+    
+        // itemCategory: Required and must be a non-empty string
+        if (!item.itemCategory || typeof item.itemCategory !== 'string' || item.itemCategory.trim().length === 0) {
+            alert('Item category is required.');
+            return false;
+        }
+    
+        // contactNumber: Required and must be a non-empty string
+        // Additional validation can be added here, e.g., regex for phone numbers
+        if (!item.contactNumber || typeof item.contactNumber !== 'string' || item.contactNumber.trim().length === 0) {
+            alert('Contact number is required.');
+            return false;
+        }
+    
+        // If all checks pass
+        return true;
+    };
+    
 
     const postItemToBackend = async (itemData) => {
         console.log(`${backend}/api/items`)
@@ -156,6 +143,7 @@ export default function CreateSalePage() {
 
 
     const sendItem = async () => {
+        setBackdropLoaderOpen(true)
         if (!checkForm()) {
             alert('Please fill in all required fields correctly.');
             return;
@@ -275,257 +263,6 @@ export default function CreateSalePage() {
                 }}>
                     Complete your item, upload your sale and people will directly contact you - it's that simple!
                 </Text>
-
-                {/* <Grid css={{
-                    margin: '24px 24px'
-                }}>
-                    <Col css={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center'
-                    }}>
-                        <Row css={{
-                            alignItems: 'center',
-                            padding: '0px 8px 4px 8px',
-                            jc: 'space-between'
-                        }}>
-                            <Row css={{
-                                alignItems: 'center',
-                                gap: 6,
-                            }}>
-                                <Avatar
-                                    color=""
-                                    size="md"
-                                    src={item.userPicture}
-                                    className="avatar"
-                                />
-                                <Text css={{
-                                    display: 'inline-block', // Allows the use of maxW
-                                    maxW: '100px',
-                                    fontWeight: '$medium',
-                                    '@xsMin': {
-                                        fontSize: '$lg',
-                                    },
-                                    '@xsMax': {
-                                        fontSize: '$sm'
-                                    },
-                                }}>
-                                    <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.20' }}>
-                                        {firstName}
-                                    </span>
-                                    <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.20' }}>
-                                        {lastName}
-                                    </span>
-                                </Text>
-                            </Row>
-                            <Dropdown isBordered size={'sm'}>
-                                <Dropdown.Button flat color={badgeColor}
-                                    css={{
-                                        lineHeight: '1',
-                                        padding: '6px 0px'
-                                    }}>
-                                    {item.itemCategory === '' ? 'Category' : item.itemCategory.charAt(0).toUpperCase() + item.itemCategory.slice(1)}
-                                </Dropdown.Button>
-                                <Dropdown.Menu aria-label="Items Category"
-                                    selectionMode="single"
-                                    css={{
-                                        $$dropdownMenuWidth: "270px",
-                                        $$dropdownItemHeight: "60px",
-                                        "& .nextui-dropdown-item": {
-                                            py: "$2",
-                                            // dropdown item left icon
-                                            svg: {
-                                                color: "$secondary",
-                                                mr: "$2",
-                                            },
-                                            // dropdown item title
-                                            "& .nextui-dropdown-item-content": {
-                                                w: "100%",
-                                                fontWeight: "$semibold",
-                                            },
-                                        },
-                                    }}
-                                    onSelectionChange={(selection) => {
-                                        setItem({
-                                            ...item,
-                                            itemCategory: selection.currentKey
-                                        })
-                                        setItemsStatus({
-                                            ...itemsStatus,
-                                            itemCategory: 'success'
-                                        })
-                                    }}
-                                >
-                                    {categoryItems.map((category, index) => (
-                                        <Dropdown.Item
-                                            key={category.key}
-                                            icon={category.icon}
-                                            showFullDescription={false}
-                                            description={category.description}
-                                        >
-                                            <Text css={{
-                                                fontWeight: '$semibold'
-                                            }}>
-                                                {category.value}
-                                            </Text>
-                                        </Dropdown.Item>
-                                    ))}
-                                </Dropdown.Menu>
-                            </Dropdown>
-                            <div className="input-wrapper">
-                                <span className="currency-icon">₹</span>
-                                <input
-                                    required
-                                    className="sale-price-input"
-                                    placeholder="0"
-                                    maxLength={5}
-                                    onChange={(e) => {
-                                        setItem({
-                                            ...item,
-                                            itemPrice: parseInt(e.target.value, 10)
-                                        });
-                                    }}
-                                />
-                            </div>
-
-                        </Row>
-
-                        <div style={{ position: 'relative', width: '330px', height: '300px' }}>
-                            {previewUrl === null ?
-                                <Image src={Grey} width={'330px'} height={'300px'} css={{
-                                    borderRadius: '4px',
-                                    opacity: '0.5',
-                                    objectFit: 'cover'
-                                }} />
-                                :
-                                <Image src={previewUrl} width={'330px'} height={'300px'} css={{
-                                    borderRadius: '4px',
-                                    opacity: '1',
-                                    objectFit: 'cover'
-                                }} />
-                            }
-
-                            <label className="custom-file-upload" style={{
-                                position: 'absolute', // Position the label absolutely within the relative container
-                                bottom: '10px', // Position towards the bottom of the image
-                                left: '50%', // Center horizontally
-                                transform: 'translateX(-50%)', // Adjust for true centering
-                                fontSize: '12px',
-                                maxWidth: '150px',
-                                backgroundColor: '#cee4f3', // Optional: make label slightly opaque for better visibility
-                                color: '#0072f5',
-                                fontWeight: 500,
-                                padding: '6px 12px', // Add some padding around the text
-                                borderRadius: '12px', // Optional: round corners for the label
-                                textAlign: 'center',
-                                cursor: 'pointer', // Change cursor to pointer to indicate it's clickable
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                            }}>
-                                <input onChange={(event) => {
-                                    if (event.target.files && event.target.files[0]) {
-                                        if (event.target.files[0].size > 2200000) {
-                                            window.alert('Maximum file size: 2mb!');
-                                        } else {
-                                            setImageFile(event.target.files[0]);
-                                            setItemsStatus({
-                                                ...itemsStatus,
-                                                itemPicture: 'success'
-                                            });
-                                            // Assuming you have logic here to create a preview URL
-                                        }
-                                    } else {
-                                        setImageFile(null); // Reset state if no file is selected
-                                        setPreviewUrl(null); // Also reset the preview URL
-                                    }
-                                }} className="photobtn" type='file' accept="image/*" required style={{ display: 'none' }} />
-                                {imageFile === null ?
-                                    "Upload Picture +"
-                                    :
-                                    `Change Picture`
-                                }
-                            </label>
-                        </div>
-
-                        <input
-                            required
-                            className="sale-itemName-input"
-                            placeholder="Item name (Corset / Cargos / Necklace)"
-                            animated={false}
-                            status={itemsStatus.itemName}
-                            maxLength={40}
-                            onChange={(e) => {
-                                setItem({
-                                    ...item,
-                                    itemName: e.target.value
-                                })
-                            }}
-                        />
-
-                        <textarea
-                            required
-                            className="sale-itemDesc-input"
-                            placeholder="Item description? (Size M, blue colour, brand new)"
-                            animated={false}
-                            status={itemsStatus.itemName}
-                            cols={50}
-                            maxLength={150}
-                            onChange={(e) => {
-                                setItem({
-                                    ...item,
-                                    itemName: e.target.value
-                                })
-                            }}
-                        />
-
-                        <Row css={{
-                            jc: 'space-between',
-                            margin: '4px 0px 24px 0px',
-                            alignItems: 'normal'
-                        }}>
-                            <Text css={{
-                                fontWeight: '$medium',
-                                '@xsMin': {
-                                    fontSize: '$md',
-                                },
-                                '@xsMax': {
-                                    fontSize: '$sm'
-                                },
-                                color: '$gray600',
-                                paddingLeft: '8px'
-                            }}>
-                                { }
-                            </Text>
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                width: 'max-content'
-                            }}>
-                                <Row css={{
-                                    padding: '4px 8px 0px 8px',
-                                    gap: 6,
-                                    alignItems: 'center',
-                                    width: 'max-content',
-                                }}>
-                                    <Button auto flat color={'success'} className="sale-buttons"
-                                        icon={<IoLogoWhatsapp size={'20px'} color={"#25D366"} className="item-icon" />}
-                                        css={{
-                                            lineHeight: '1.2'
-                                        }}>
-                                        8104213125
-                                    </Button>
-                                </Row>
-                                <Link href='' css={{
-                                    fontSize: '12px'
-                                }}>
-                                    Change number?
-                                </Link>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Grid> */}
 
                 <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createSale'}/>
 

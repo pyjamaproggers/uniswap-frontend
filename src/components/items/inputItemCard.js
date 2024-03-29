@@ -14,6 +14,9 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FaCloud } from "react-icons/fa6";
+import { IoCloudOffline } from "react-icons/io5";
+
 
 export default function InputItemCard(props) {
 
@@ -25,6 +28,8 @@ export default function InputItemCard(props) {
 
     const previewUrl = props.previewUrl
     const setPreviewUrl = props.setImageFile
+
+    const type = props.type
 
     const [firstName, lastName] = item.userName.split(' ')
 
@@ -163,9 +168,9 @@ export default function InputItemCard(props) {
 
                 <div style={{ position: 'relative', width: '330px', height: '300px' }}>
                     {previewUrl === null ?
-                        <Image src={Grey} width={'330px'} height={'300px'} css={{
+                        <Image src={type==='createSale' ? Grey : item.itemPicture} width={'330px'} height={'300px'} css={{
                             borderRadius: '4px',
-                            opacity: '0.5',
+                            opacity: type==='createSale' ? '0.25' : '1',
                             objectFit: 'cover'
                         }} />
                         :
@@ -218,9 +223,9 @@ export default function InputItemCard(props) {
                 <input
                     required
                     className="sale-itemName-input"
-                    placeholder="Item name (Corset / Cargos / Necklace)"
-                    animated={false}
+                    placeholder="Corset / Cargos / Necklace..."
                     maxLength={40}
+                    value={item.itemName}
                     onChange={(e) => {
                         setItem({
                             ...item,
@@ -232,14 +237,14 @@ export default function InputItemCard(props) {
                 <textarea
                     required
                     className="sale-itemDesc-input"
-                    placeholder="Item description? (Size M, blue colour, brand new)"
-                    animated={false}
+                    placeholder="Size M, blue colour, brand new..."
                     cols={50}
                     maxLength={150}
+                    value={item.itemDescription}
                     onChange={(e) => {
                         setItem({
                             ...item,
-                            itemName: e.target.value
+                            itemDescription: e.target.value ? e.target.value : ''
                         })
                     }}
                 />
@@ -249,19 +254,6 @@ export default function InputItemCard(props) {
                     margin: '4px 0px 24px 0px',
                     alignItems: 'normal'
                 }}>
-                    <Text css={{
-                        fontWeight: '$medium',
-                        '@xsMin': {
-                            fontSize: '$md',
-                        },
-                        '@xsMax': {
-                            fontSize: '$sm'
-                        },
-                        color: '$gray600',
-                        paddingLeft: '8px'
-                    }}>
-                        { }
-                    </Text>
                     <Col css={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -277,7 +269,7 @@ export default function InputItemCard(props) {
                             <Button auto flat color={'success'} className="sale-buttons"
                                 icon={<IoLogoWhatsapp size={'20px'} color={"#25D366"} className="item-icon" />}
                                 css={{
-                                    lineHeight: '1.2'
+                                    lineHeight: '1.2',
                                 }}>
                                 8104213125
                             </Button>
@@ -288,6 +280,47 @@ export default function InputItemCard(props) {
                             Change number?
                         </Link>
                     </Col>
+
+                    {type === 'editSale' &&
+                        <>
+                            {item.live === 'y' ?
+                                <>
+                                    <Button auto flat color={'success'} className="sale-buttons"
+                                        icon={<FaCloud size={'20px'} color={"$green600"} className="item-icon" />}
+                                        css={{
+                                            lineHeight: '1.2',
+                                            marginTop: '4px'
+                                        }}
+                                        onClick={()=>{
+                                            setItem({
+                                                ...item,
+                                                live: 'n'
+                                            })
+                                        }}
+                                        >
+                                        Live
+                                    </Button>
+                                </>
+                                :
+                                <>
+                                    <Button auto flat color={'error'} className="sale-buttons"
+                                        icon={<IoCloudOffline size={'20px'} color={"$red600"} className="item-icon" />}
+                                        css={{
+                                            lineHeight: '1.2',
+                                            marginTop: '4px'
+                                        }}
+                                        onClick={()=>{
+                                            setItem({
+                                                ...item,
+                                                live: 'y'
+                                            })
+                                        }}
+                                        >
+                                        Not Live
+                                    </Button>
+                                </>
+                            }
+                        </>}
                 </Row>
             </Col>
         </Grid>

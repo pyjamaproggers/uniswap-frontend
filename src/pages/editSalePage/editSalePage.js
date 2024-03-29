@@ -17,6 +17,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import InputItemCard from "../../components/items/inputItemCard";
 
 export default function EditSalePage() {
 
@@ -29,35 +30,39 @@ export default function EditSalePage() {
 
     const [originalItemPicture, setOriginalItemPicture] = useState(item.itemPicture);
 
-    const [itemsStatus, setItemsStatus] = useState({
-        itemName: 'success',
-        itemDescription: 'success',
-        itemPrice: 'success',
-        itemCategory: 'success',
-        itemPicture: 'success',
-        contactNumber: 'success'
-    })
-
     const [imageFile, setImageFile] = useState(null)
     const [previewUrl, setPreviewUrl] = useState(null)
 
-    const categoryItems = [
-        { key: 'apparel', value: 'Apparel', icon: <GiClothes size={24} color="#F31260" />, description: 'Tees, Shirts, Corsettes, Shorts, Cargos, Dresses, Footwear and more.' }, // Vibrant Pink
-        { key: 'food', value: 'Food', icon: <IoFastFoodSharp size={24} color="#7828C8" />, description: 'Fruits, Ramen, Masalas and more.' }, // Orange
-        { key: 'tickets', value: 'Tickets', icon: <IoTicket size={24} color="#0072F5" />, description: 'Concert, Show, Shuttle and more.' }, // Indigo
-        { key: 'stationery', value: 'Stationery', icon: <FaFilePen size={24} color="#17C964" />, description: 'Pens, Pencils, Erasers, Sharpeners, Notebooks, Highlighters and more.' }, // Green
-        { key: 'jewellry', value: 'Jewellry', icon: <GiJewelCrown size={24} color="#F5A524" />, description: 'Necklaces, Earrings, Nose Rings and more.' }, // Yellow
-        { key: 'lostandfound', value: 'Lost & Found', icon: <MdOutlineQuestionMark size={24} color="#889096" />, description: 'Anything and everything lost around campus.' }, // Grey
-        { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
-    ]
-
     const checkForm = () => {
-        if (Object.values(itemsStatus).some(value => (value === 'default' || value === 'error'))) {
-            setBackdropLoaderOpen(false)
-            return false
+        // itemName: Required and must be a non-empty string
+        if (!item.itemName || typeof item.itemName !== 'string' || item.itemName.trim().length === 0) {
+            alert('Item name is required.');
+            return false;
         }
-        else return true
-    }
+    
+        // itemPrice: Required and must be an integer
+        if (!Number.isInteger(item.itemPrice)) {
+            alert('Item price must be a number.');
+            return false;
+        }
+    
+        // itemCategory: Required and must be a non-empty string
+        if (!item.itemCategory || typeof item.itemCategory !== 'string' || item.itemCategory.trim().length === 0) {
+            alert('Item category is required.');
+            return false;
+        }
+    
+        // contactNumber: Required and must be a non-empty string
+        // Additional validation can be added here, e.g., regex for phone numbers
+        if (!item.contactNumber || typeof item.contactNumber !== 'string' || item.contactNumber.trim().length === 0) {
+            alert('Contact number is required.');
+            return false;
+        }
+    
+        // If all checks pass
+        return true;
+    };
+
     const sendItem = async () => {
         setBackdropLoaderOpen(true)
         if (!checkForm()) {
@@ -138,8 +143,6 @@ export default function EditSalePage() {
         }
     };
 
-
-
     useEffect(() => {
         if (imageFile) {
             const url = URL.createObjectURL(imageFile);
@@ -184,6 +187,7 @@ export default function EditSalePage() {
                 >
                     <CircularProgress color="inherit" />
                 </Backdrop>
+
                 <Text css={{
                     '@xsMin': {
                         fontSize: '$2xl'
@@ -196,317 +200,12 @@ export default function EditSalePage() {
                 }}>
                     Edit Your Sale
                 </Text>
-                <Text css={{
-                    '@xsMin': {
-                        fontSize: '$md'
-                    },
-                    '@xsMax': {
-                        fontSize: '$sm'
-                    },
-                    fontWeight: '$medium',
-                    marginBottom: '8px',
-                    color: 'black',
-                    padding: '0px 12px',
-                    textAlign: 'center',
-                    lineHeight: '1.3',
-                    marginTop: '12px'
-                }}>
-                    Picture
-                </Text>
-                <Avatar size={'lg'} src={localStorage.getItem('userPicture')} />
-                <Input readOnly label="Name" width="300px" css={{ margin: '12px 0px 12px 0px' }}
-                    initialValue={localStorage.getItem('userName')}
-                    animated={false}
-                    status="success"
-                />
-                <Input readOnly label="Email" width="300px" css={{ margin: '16px 0px 8px 0px' }}
-                    initialValue={localStorage.getItem('userEmail')}
-                    animated={false}
-                    status="success"
-                />
-                <Input clearable label="Title" placeholder="Corsette / Cargo Pants / Necklace" width="300px" css={{ margin: '24px 0px' }}
-                    initialValue={item.itemName}
-                    helperText="Max. 40 characters"
-                    animated={false}
-                    status={itemsStatus.itemName}
-                    onChange={(e) => {
-                        if (e.target.value.length <= 40) {
-                            setItemsStatus({
-                                ...itemsStatus,
-                                itemName: 'success'
-                            })
-                            setItem({
-                                ...item,
-                                itemName: e.target.value
-                            })
-                        }
-                        else {
-                            setItemsStatus({
-                                ...itemsStatus,
-                                itemName: 'error'
-                            })
-                            setItem({
-                                ...item,
-                                itemName: ''
-                            })
-                        }
-                        if (e.target.value.length == 0) {
-                            setItemsStatus({
-                                ...itemsStatus,
-                                itemName: 'default'
-                            })
-                        }
-                    }} />
-                <Textarea
-                    label="Description"
-                    placeholder="Color, size, age..."
-                    width="300px"
-                    helperText="Max. 200 characters"
-                    css={{ margin: '24px 0px' }}
-                    animated={false}
-                    clearable
-                    initialValue={item.itemDescription}
-                    status={itemsStatus.itemDescription}
-                    onChange={(e) => {
-                        if (e.target.value.length <= 200) {
-                            setItemsStatus({
-                                ...itemsStatus,
-                                itemDescription: 'success'
-                            })
-                            setItem({
-                                ...item,
-                                itemDescription: e.target.value
-                            })
-                        }
-                        else {
-                            setItemsStatus({
-                                ...itemsStatus,
-                                itemDescription: 'error'
-                            })
-                            setItem({
-                                ...item,
-                                itemDescription: ''
-                            })
-                        }
-                        if (e.target.value.length == 0) {
-                            setItemsStatus({
-                                ...itemsStatus,
-                                itemDescription: 'default'
-                            })
-                        }
-                    }}
-                />
-                <Input clearable label="Price" placeholder="400" width="300px" css={{ margin: '24px 0px' }}
-                    labelLeft="₹"
-                    helperText="What are you listing this item at?"
-                    animated={false}
-                    status={itemsStatus.itemPrice}
-                    initialValue={item.itemPrice}
-                    onChange={(e) => {
-                        if (e.target.value.length !== 0 && /^[0-9]+$/.test(e.target.value)) {
-                            setItem({
-                                ...item,
-                                itemPrice: parseInt(e.target.value, 10)
-                            })
-                            setItemsStatus({
-                                ...itemsStatus,
-                                itemPrice: 'success'
-                            })
-                        }
-                        else {
-                            setItem({
-                                ...item,
-                                itemPrice: ''
-                            })
-                            setItemsStatus({
-                                ...itemsStatus,
-                                itemPrice: 'error'
-                            })
-                        }
-                        if (e.target.value.length == 0) {
-                            setItemsStatus({
-                                ...itemsStatus,
-                                itemPrice: 'default'
-                            })
-                        }
-                    }}
-                />
-                <Input clearable label="Phone" placeholder="9876543210" width="300px" css={{ margin: '24px 0px' }}
-                    initialValue={item.contactNumber}
-                    labelLeft={<IoLogoWhatsapp size={'20px'} color={"#25D366"} />}
-                    helperText="WhatsApp contact number!"
-                    animated={false}
-                    status={itemsStatus.contactNumber}
-                    onChange={(e) => {
-                        if (e.target.value.length !== 0 && /^\d{10}$/.test(e.target.value)) {
-                            setItem({
-                                ...item,
-                                contactNumber: parseInt(e.target.value, 10)
-                            })
-                            setItemsStatus({
-                                ...itemsStatus,
-                                contactNumber: 'success'
-                            })
-                        }
-                        else {
-                            setItem({
-                                ...item,
-                                contactNumber: ''
-                            })
-                            setItemsStatus({
-                                ...itemsStatus,
-                                contactNumber: 'error'
-                            })
-                        }
-                        if (e.target.value.length == 0) {
-                            setItemsStatus({
-                                ...itemsStatus,
-                                contactNumber: 'default'
-                            })
-                        }
-                    }}
-                />
-                <Grid css={{
-                    margin: '16px 12px'
-                }}>
-                    <Dropdown isBordered>
-                        <Dropdown.Button default flat color={itemsStatus.itemCategory}>
-                            {item.itemCategory === '' ? 'Category' : item.itemCategory.charAt(0).toUpperCase() + item.itemCategory.slice(1)}
-                        </Dropdown.Button>
-                        <Dropdown.Menu aria-label="Items Category"
-                            selectionMode="single"
-                            css={{
-                                $$dropdownMenuWidth: "270px",
-                                $$dropdownItemHeight: "60px",
-                                "& .nextui-dropdown-item": {
-                                    py: "$2",
-                                    // dropdown item left icon
-                                    svg: {
-                                        color: "$secondary",
-                                        mr: "$2",
-                                    },
-                                    // dropdown item title
-                                    "& .nextui-dropdown-item-content": {
-                                        w: "100%",
-                                        fontWeight: "$semibold",
-                                    },
-                                },
-                            }}
-                            onSelectionChange={(selection) => {
-                                setItem({
-                                    ...item,
-                                    itemCategory: selection.currentKey
-                                })
-                                setItemsStatus({
-                                    ...itemsStatus,
-                                    itemCategory: 'success'
-                                })
-                            }}
-                        >
-                            {categoryItems.map((category, index) => (
-                                <Dropdown.Item
-                                    key={category.key}
-                                    icon={category.icon}
-                                    showFullDescription={false}
-                                    description={category.description}
-                                >
-                                    <Text css={{
-                                        fontWeight: '$semibold'
-                                    }}>
-                                        {category.value}
-                                    </Text>
-                                </Dropdown.Item>
-                            ))}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Grid>
-                <Text css={{
-                    '@xsMin': {
-                        fontSize: '$lg'
-                    },
-                    '@xsMax': {
-                        fontSize: '$sm'
-                    },
-                    fontWeight: '$regular',
-                    marginBottom: '4px',
-                    marginTop: '12px',
-                    textAlign: 'left',
-                    justifySelf: 'flex-start',
-                    display: 'flex'
-                }}>
-                    Item Picture
-                </Text>
 
-                <div>
-                    {previewUrl === null ?
-                        <Image src={originalItemPicture} width={'300px'} height={'300px'} css={{
-                            borderRadius: '8px',
-                            opacity: '0.5',
-                            objectFit: 'cover'
-                        }} />
-                        :
-                        <Image src={previewUrl} width={'300px'} height={'300px'} css={{
-                            borderRadius: '8px',
-                            opacity: '1',
-                            objectFit: 'cover'
-                        }} />
-                    }
-                    <label className="custom-file-upload">
-                        <input
-                            onChange={(event) => {
-                                if (event.target.files && event.target.files[0]) {
-                                    if (event.target.files[0].size > 2200000) {
-                                        window.alert('Maximum file size: 2mb!');
-                                    } else {
-                                        setImageFile(event.target.files[0]);
-                                        setItemsStatus({
-                                            ...itemsStatus,
-                                            itemPicture: 'success'
-                                        });
-                                        console.log('Thank you for the correct image size');
-                                    }
-                                } else {
-                                    setImageFile(null); // Reset state if no file is selected
-                                    setPreviewUrl(null); // Also reset the preview URL
-                                }
-                            }}
-                            className="photobtn" animated={'true'} type='file' accept="image/*" required />
-                        {imageFile === null ?
-                            "Upload Picture"
-                            :
-                            `${imageFile.name} uploaded`
-                        }
-                    </label>
-                    {imageFile && (
-                        <button onClick={() => {
-                            setImageFile(null);
-                            setPreviewUrl(originalItemPicture); // Revert to the original picture
-                            setItemsStatus({
-                                ...itemsStatus,
-                                itemPicture: 'success'
-                            });
-                        }}>Revert to Original Picture</button>
-                    )}
-                </div>
+                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'editSale'}/>
 
-                <Text css={{
-                    '@xsMin': {
-                        fontSize: '$sm'
-                    },
-                    '@xsMax': {
-                        fontSize: '$sm'
-                    },
-                    fontWeight: '$regular',
-                    marginBottom: '12px',
-                    marginTop: '0px',
-                    textAlign: 'left',
-                    justifySelf: 'flex-start',
-                    display: 'flex'
-                }}>
-                    Max: 2mb
-                </Text>
                 <Button auto flat css={{
-                    marginTop: '24px'
+                    margin: '0px 0px 36px 0px',
+                    padding: '6px 0px'
                 }}
                     onClick={() => {
                         if (checkForm()) {
@@ -535,6 +234,7 @@ export default function EditSalePage() {
                         <IoSendSharp size={16} />
                     </Row>
                 </Button>
+                
             </Grid.Container>
         )
     }

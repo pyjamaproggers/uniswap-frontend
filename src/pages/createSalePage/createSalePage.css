@@ -28,7 +28,7 @@ input[type="file"] {
     max-width: 330px;
     min-width: 330px;
     max-height: 100px;
-    min-height: 60px;
+    min-height: 50px;
     font-weight: 600;
     font-size: 14px;
     border-width: 0px;

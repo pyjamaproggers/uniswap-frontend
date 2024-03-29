@@ -150,7 +150,7 @@ export default function ItemsPage(props) {
             }
             const items = await response.json();
             console.log(items)
-            setAllItems(items); // Update your state with the fetched items
+            setAllItems(items.reverse()); // Update your state with the fetched items
             setFilteredItems(items); // Assuming you want to initially display all items
             setFetchingAllItems(false)
         } catch (error) {
@@ -306,10 +306,12 @@ export default function ItemsPage(props) {
                             labelLeft={<IoSearchSharp size={'20px'} color={""} />}
                             animated={false}
                             onChange={(e) => {
-                                setFiltersApplied(prev => ({
-                                    ...prev,
-                                    searched: e.target.value
-                                }))
+                                window.setTimeout(()=>{
+                                    setFiltersApplied(prev => ({
+                                        ...prev,
+                                        searched: e.target.value
+                                    }))
+                                },1500)
                             }}
                         />
                     </Row>
