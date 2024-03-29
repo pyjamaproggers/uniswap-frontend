@@ -17,8 +17,8 @@ import { IoMdHeart } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import { MdOutlinePhoneIphone } from "react-icons/md";
-import { messaging } from "../../services/firebase.js";
-import { getToken } from "firebase/messaging";
+// import { messaging } from "../../services/firebase.js";
+// import { getToken } from "firebase/messaging";
 import './header.css'
 
 export default function Header(props) {
@@ -72,7 +72,7 @@ export default function Header(props) {
                     localStorage.setItem('userPicture', data.user.userPicture);
     
                     // Call to request notification permission should be here
-                    requestNotificationPermission();
+                    // requestNotificationPermission();
                     
     
                 }
@@ -84,20 +84,20 @@ export default function Header(props) {
     
 
 // Function to request notification permission and get the token
-const requestNotificationPermission = () => {
-    Notification.requestPermission().then((permission) => {
-        if (permission === "granted") {
-            getToken(messaging, { vapidKey: "BDiwlGg-uzE3Q5y94jyh_bSPo-b2v0A1thC9ePGnk7nt7E_3yuyGGf-Uqi4p6OSVG7tqdmhBU_T5CXOuoFJMACo" }).then((currentToken) => {
-                if (currentToken) {
-                    console.log("FCM Token:", currentToken);
-                    sendTokenToServer(currentToken);
-                }
-            }).catch((err) => console.log("An error occurred while retrieving token. ", err));
-        }
-        else{ setRender((prev) => !prev);
-            window.location.pathname = '/';}
-    });
-};
+// const requestNotificationPermission = () => {
+//     Notification.requestPermission().then((permission) => {
+//         if (permission === "granted") {
+//             getToken(messaging, { vapidKey: "BDiwlGg-uzE3Q5y94jyh_bSPo-b2v0A1thC9ePGnk7nt7E_3yuyGGf-Uqi4p6OSVG7tqdmhBU_T5CXOuoFJMACo" }).then((currentToken) => {
+//                 if (currentToken) {
+//                     console.log("FCM Token:", currentToken);
+//                     sendTokenToServer(currentToken);
+//                 }
+//             }).catch((err) => console.log("An error occurred while retrieving token. ", err));
+//         }
+//         else{ setRender((prev) => !prev);
+//             window.location.pathname = '/';}
+//     });
+// };
 
 const sendTokenToServer = (currentToken) => {
     fetch(`${backend}/api/user/token`, {
@@ -186,7 +186,7 @@ const sendTokenToServer = (currentToken) => {
 
             window.google.accounts.id.renderButton(
                 document.getElementById("GoogleButton"),
-                { theme: 'outlined', size: 'large', shape: 'circle', type: 'icon' }
+                { theme: 'filled_black', size: 'large', shape: 'circle', type: 'icon' }
             );
             setLoginLoader(false)
         }, 2000)

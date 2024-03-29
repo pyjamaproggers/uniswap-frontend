@@ -12,32 +12,45 @@ import { useEffect, useState } from 'react';
 
 function App() {
 
-    const [isLightMode, setIsLightMode] = useState(getPrefersColorScheme() ? 'light' : 'dark');
+    // const [isLightMode, setIsLightMode] = useState(getPrefersColorScheme() ? 'light' : 'dark');
 
-    function getPrefersColorScheme() {
-        return window.matchMedia('(prefers-color-scheme: light)').matches;
-    }
+    // function getPrefersColorScheme() {
+    //     return window.matchMedia('(prefers-color-scheme: light)').matches;
+    // }
 
-    useEffect(() => {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-        const handleChange = () => setIsLightMode(mediaQuery.matches ? 'light' : 'dark');
+    // useEffect(() => {
+    //     const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+    //     const handleChange = () => setIsLightMode(mediaQuery.matches ? 'light' : 'dark');
 
-        mediaQuery.addEventListener('change', handleChange);
+    //     mediaQuery.addEventListener('change', handleChange);
 
-        // Cleanup
-        return () => mediaQuery.removeEventListener('change', handleChange);
-    }, []);
+    //     // Cleanup
+    //     return () => mediaQuery.removeEventListener('change', handleChange);
+    // }, []);
 
+
+    // const theme = createTheme({
+    //     type: isLightMode ? 'light' : 'dark', // Adjusted this line
+    //     theme: {
+    //         colors: {
+    //             // Assuming these color configurations are correct; adjust as necessary.
+    //             white: isLightMode ? '#fff' : '#f0f0f0',
+    //             black: isLightMode ? '#000' : '#0c0c0c',
+    //             background: isLightMode ? '#fff' : '#0c0c0c',
+    //             text: isLightMode ? '#000' : '#f0f0f0'
+    //         }
+    //     }
+    // });
 
     const theme = createTheme({
-        type: isLightMode ? 'light' : 'dark', // Adjusted this line
+        type: 'dark', // Adjusted this line
         theme: {
             colors: {
                 // Assuming these color configurations are correct; adjust as necessary.
-                white: isLightMode ? '#fff' : '#f0f0f0',
-                black: isLightMode ? '#000' : '#0c0c0c',
-                background: isLightMode ? '#fff' : '#0c0c0c',
-                text: isLightMode ? '#000' : '#f0f0f0'
+                white: '#f0f0f0',
+                black: '#0c0c0c',
+                background: '#0c0c0c',
+                text: '#f0f0f0'
             }
         }
     });

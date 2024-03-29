@@ -10,12 +10,87 @@ input[type="file"] {
     display: none;
 }
 
+.sale-itemName-input{
+    width: 330px;
+    font-weight: 600;
+    font-size: 14px;
+    border-width: 0px 0px 0.5px 0px;
+    background-color: #0c0c0c;
+    padding: 8px 0px 8px 4px;
+}
+
+.sale-itemName-input::placeholder{
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.sale-itemDesc-input{
+    max-width: 330px;
+    min-width: 330px;
+    max-height: 100px;
+    min-height: 60px;
+    font-weight: 600;
+    font-size: 14px;
+    border-width: 0px;
+    background-color: #0c0c0c;
+    padding: 4px 0px 4px 4px;
+    margin: 4px 0px
+}
+
+.sale-itemDesc-input::placeholder{
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.sale-buttons{
+    padding: 6px 8px !important;
+}
+
 .custom-file-upload {
-    border: 1px solid #F1F3F5;
     display: inline-block;
     padding: 6px 12px;
     cursor: pointer;
     border-radius: 12px;
-    background-color: #F1F3F5;
-    color: 'gray'
 }
+
+.nextui-c-iWjDFM-gglxka-cv{
+    padding-left: 12px;
+    padding-right: 12px;
+    height: max-content;
+}
+
+.input-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-left: 4px;
+}
+
+.currency-icon {
+    position: absolute;
+    left: 8px; /* Adjust based on your padding */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0072f5;
+    font-weight: 600;
+}
+
+.sale-price-input {
+    width: 70px;
+    padding-left: 20px; /* Adjust so the text does not overlap the currency icon */
+    height: 28px;
+    border-radius: 12px;
+    border: none;
+    background-color: #CEE4FE;
+    color: #0072f5;
+    font-weight: 600;
+    font-size: 14px;
+    /* Remove the default webkit styles */
+    -webkit-appearance: none;
+}
+
+.sale-price-input::placeholder {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0072f5;
+}
+
