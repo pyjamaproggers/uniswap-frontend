@@ -274,7 +274,7 @@ export default function InputItemCard(props) {
                                 8104213125
                             </Button>
                         </Row>
-                        <Link href='' css={{
+                        <Link href='phoneAuth' css={{
                             fontSize: '12px'
                         }}>
                             Change number?

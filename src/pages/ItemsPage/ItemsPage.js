@@ -14,7 +14,7 @@ import { IoSearchSharp } from "react-icons/io5";
 import Drawer from '@mui/material/Drawer';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import Chip from '@mui/material/Chip';
-import './ItemsPage.css'
+import './itemsPage.css'
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useLocation } from 'react-router-dom';

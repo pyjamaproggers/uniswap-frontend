@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AshokaLogo from '../../assets/AshokaLogo.png'
-import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col, Row, Switch } from "@nextui-org/react";
+import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col, Row, Switch, Input, Grid, Button } from "@nextui-org/react";
 import { icons } from "../icons/icons.js";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
@@ -20,11 +20,16 @@ import { MdOutlinePhoneIphone } from "react-icons/md";
 // import { messaging } from "../../services/firebase.js";
 // import { getToken } from "firebase/messaging";
 import './header.css'
+import { FaPhone } from "react-icons/fa6";
+import { IoLogoWhatsapp } from "react-icons/io";
 
 export default function Header(props) {
     const [render, setRender] = useState(false)
     const [loginLoader, setLoginLoader] = useState(true)
     const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
+    const [showNumberModal, setShowNumberModal] = useState(false)
+    const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
+
     const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
     const navigate = useNavigate();
@@ -63,56 +68,63 @@ export default function Header(props) {
                 body: JSON.stringify({ token: response.credential }),
                 credentials: 'include',
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.user) {
-                    // Set user details in localStorage
-                    localStorage.setItem('userEmail', data.user.userEmail);
-                    localStorage.setItem('userName', data.user.userName);
-                    localStorage.setItem('userPicture', data.user.userPicture);
-    
-                    // Call to request notification permission should be here
-                    // requestNotificationPermission();
-                    
-    
-                }
-            }).catch(error => console.error('Error:', error));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.user) {
+                        // Set user details in localStorage
+                        localStorage.setItem('userEmail', data.user.userEmail);
+                        localStorage.setItem('userName', data.user.userName);
+                        localStorage.setItem('userPicture', data.user.userPicture);
+
+                        setShowNumberModal(true)
+                        // Call to request notification permission should be here
+                        // requestNotificationPermission();
+
+
+                    }
+                }).catch(error => console.error('Error:', error));
         } else {
             setShowAshokaOnlyModal(true);
         }
     }
-    
 
-// Function to request notification permission and get the token
-// const requestNotificationPermission = () => {
-//     Notification.requestPermission().then((permission) => {
-//         if (permission === "granted") {
-//             getToken(messaging, { vapidKey: "BDiwlGg-uzE3Q5y94jyh_bSPo-b2v0A1thC9ePGnk7nt7E_3yuyGGf-Uqi4p6OSVG7tqdmhBU_T5CXOuoFJMACo" }).then((currentToken) => {
-//                 if (currentToken) {
-//                     console.log("FCM Token:", currentToken);
-//                     sendTokenToServer(currentToken);
-//                 }
-//             }).catch((err) => console.log("An error occurred while retrieving token. ", err));
-//         }
-//         else{ setRender((prev) => !prev);
-//             window.location.pathname = '/';}
-//     });
-// };
+    function updateUserPhone () {
+        // update "contactNumber" variable in this User's data in Users collection.
+    }
 
-const sendTokenToServer = (currentToken) => {
-    fetch(`${backend}/api/user/token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: currentToken }),
-        credentials: 'include',
-    })
-    .then(response => response.json())
-    .then(data =>{ setRender((prev) => !prev);
-                window.location.pathname = '/';})
-    .catch((error) => console.error("Error sending FCM token to server:", error));
-};
 
-    
+    // Function to request notification permission and get the token
+    // const requestNotificationPermission = () => {
+    //     Notification.requestPermission().then((permission) => {
+    //         if (permission === "granted") {
+    //             getToken(messaging, { vapidKey: "BDiwlGg-uzE3Q5y94jyh_bSPo-b2v0A1thC9ePGnk7nt7E_3yuyGGf-Uqi4p6OSVG7tqdmhBU_T5CXOuoFJMACo" }).then((currentToken) => {
+    //                 if (currentToken) {
+    //                     console.log("FCM Token:", currentToken);
+    //                     sendTokenToServer(currentToken);
+    //                 }
+    //             }).catch((err) => console.log("An error occurred while retrieving token. ", err));
+    //         }
+    //         else{ setRender((prev) => !prev);
+    //             window.location.pathname = '/';}
+    //     });
+    // };
+
+    const sendTokenToServer = (currentToken) => {
+        fetch(`${backend}/api/user/token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: currentToken }),
+            credentials: 'include',
+        })
+            .then(response => response.json())
+            .then(data => {
+                setRender((prev) => !prev);
+                window.location.pathname = '/';
+            })
+            .catch((error) => console.error("Error sending FCM token to server:", error));
+    };
+
+
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -195,6 +207,9 @@ const sendTokenToServer = (currentToken) => {
 
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
+    const [number, setNumber] = useState('')
+    const [phoneStatus, setPhoneStatus] = useState('default')
+
     useEffect(() => {
         // Handler to call on window resize
         const handleResize = () => {
@@ -266,6 +281,7 @@ const sendTokenToServer = (currentToken) => {
                                 selectionMode="single"
                                 // selectedKeys={selected}
                                 onSelectionChange={(selection) => {
+                                    console.log(selection)
                                     navigate('/saleitems', { state: { category: `${selection.currentKey}` } });
                                 }}
                                 css={{
@@ -292,15 +308,15 @@ const sendTokenToServer = (currentToken) => {
                                         showFullDescription
                                         description={category.description}
                                         icon={category.icon}
+                                    // onClick={()=>{
+                                    //     navigate('/saleitems', {state: {
+                                    //         category: `${category.key}`
+                                    //     }})
+                                    // }}
                                     >
-                                        <Navbar.Link href={category.key} css={{
+                                        <Navbar.Link css={{
                                             fontWeight: '$semibold'
                                         }}
-                                        // onClick={()=>{
-                                        //     navigate('/saleitems', {state: {
-                                        //         category: `${category.key}`
-                                        //     }})
-                                        // }}
                                         >
                                             {category.value}
                                         </Navbar.Link>
@@ -350,6 +366,9 @@ const sendTokenToServer = (currentToken) => {
                                     else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
                                         window.location.pathname = `/${actionKey}`
                                     }
+                                    else if (actionKey === 'phoneAuth'){
+                                        setShowNumberUpdateModal(true)
+                                    }
                                     else {
                                         console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
                                     }
@@ -385,6 +404,10 @@ const sendTokenToServer = (currentToken) => {
                                 <Dropdown.Item key="favourites" color=""
                                     icon={<IoMdHeart size={16} />}>
                                     Favourites
+                                </Dropdown.Item>
+                                <Dropdown.Item key="phoneAuth" color=""
+                                    icon={<FaPhone size={16} />}>
+                                    Update Phone
                                 </Dropdown.Item>
                                 <Dropdown.Item key="logout" withDivider color="error"
                                     icon={<IoLogOut size={16} />}>
@@ -436,7 +459,7 @@ const sendTokenToServer = (currentToken) => {
                                             }}>
                                                 Dark Mode
                                             </Text>
-                                            <Switch size={'sm'} onChange={(event)=> {} } />
+                                            <Switch size={'sm'} onChange={(event) => { }} />
                                         </Row>
                                         <Link href="" onClick={handleLogout} css={{
                                             color: '$error'
@@ -500,6 +523,149 @@ const sendTokenToServer = (currentToken) => {
                     </Text>
                 </Modal.Body>
 
+            </Modal>
+
+            <Modal
+                open={showNumberModal}
+                preventClose
+            >
+                <Grid.Container css={{
+                    jc: 'center',
+                    alignItems: '',
+                    padding: '24px 0px',
+                }}>
+                    <Col css={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        width: 'max-content',
+                        gap: 24
+                    }}>
+                        <Text css={{
+                            '@xsMin': {
+                                fontSize: '$xl'
+                            },
+                            '@xsMax': {
+                                fontSize: '$lg'
+                            },
+                            fontWeight: '$semibold'
+                        }}>
+                            Update Phone Number
+                        </Text>
+
+                        <Input css={{
+                            width: '200px',
+                            background: '#697177'
+                        }}
+                            labelLeft={
+                                <IoLogoWhatsapp size={24} color="#25D366" />
+                            }
+                            animated={false}
+                            placeholder="9876512340"
+                            maxLength={12}
+                            status={phoneStatus}
+                            helperText="Whatsapp Contact Number!"
+                            onChange={(e) => {
+                                const inputVal = e.target.value;
+                                const numVal = parseInt(inputVal, 10);
+
+                                // Check if the input value is a number and its length
+                                if (!isNaN(numVal) && inputVal.length >= 10) {
+                                    setPhoneStatus('success');
+                                } else {
+                                    setPhoneStatus('error');
+                                }
+                                if (inputVal.length === 0) {
+                                    setPhoneStatus('default')
+                                }
+                            }}
+
+                        />
+
+                        <Button flat auto color={'primary'} css={{
+                            margin: '24px 0px'
+                        }}
+                        disabled={phoneStatus!=='success'}
+                        onClick={()=>{
+                            updateUserPhone()
+                        }}>
+                            Save
+                        </Button>
+                    </Col>
+                </Grid.Container>
+            </Modal>
+
+            <Modal
+                open={showNumberUpdateModal}
+                closeButton
+                onClose={()=>{
+                    setShowNumberUpdateModal(false)
+                }}
+            >
+                <Grid.Container css={{
+                    jc: 'center',
+                    alignItems: '',
+                    padding: '24px 0px',
+                }}>
+                    <Col css={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        width: 'max-content',
+                        gap: 24
+                    }}>
+                        <Text css={{
+                            '@xsMin': {
+                                fontSize: '$xl'
+                            },
+                            '@xsMax': {
+                                fontSize: '$lg'
+                            },
+                            fontWeight: '$semibold'
+                        }}>
+                            Update Phone Number
+                        </Text>
+
+                        <Input css={{
+                            width: '200px',
+                            backgroundColor: '#697177'
+                        }}
+                            labelLeft={
+                                <IoLogoWhatsapp size={24} color="#25D366" />
+                            }
+                            animated={false}
+                            placeholder="9876512340"
+                            maxLength={12}
+                            status={phoneStatus}
+                            helperText="Whatsapp Contact Number!"
+                            onChange={(e) => {
+                                const inputVal = e.target.value;
+                                const numVal = parseInt(inputVal, 10);
+
+                                // Check if the input value is a number and its length
+                                if (!isNaN(numVal) && inputVal.length >= 10) {
+                                    setPhoneStatus('success');
+                                } else {
+                                    setPhoneStatus('error');
+                                }
+                                if (inputVal.length === 0) {
+                                    setPhoneStatus('default')
+                                }
+                            }}
+
+                        />
+
+                        <Button flat auto color={'primary'} css={{
+                            margin: '24px 0px'
+                        }}
+                        disabled={phoneStatus!=='success'}
+                        onClick={()=>{
+                            updateUserPhone()
+                        }}>
+                            Save
+                        </Button>
+                    </Col>
+                </Grid.Container>
             </Modal>
 
         </>
