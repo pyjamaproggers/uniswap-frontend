@@ -9,7 +9,6 @@ import ItemsPage from './pages/itemsPage/itemsPage.js';
 import CreateSalePage from './pages/createSalePage/createSalePage';
 import EditSalePage from './pages/editSalePage/editSalePage';
 import { useEffect, useState } from 'react';
-import PhoneAuthPage from './pages/phoneAuthPage/phoneAuthPage';
 
 function App() {
 
@@ -69,7 +68,6 @@ function App() {
                         <Route exact path='/useritems' element={<ItemsPage type={'user'} />} />
                         <Route exact path='/createsale' element={<CreateSalePage />} />
                         <Route exact path='/editsale' element={<EditSalePage />} />
-                        <Route exact path='/phoneAuth' element={<PhoneAuthPage />} />
                     </Routes>
                 </Router>
                 <Footer />
