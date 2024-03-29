@@ -16,6 +16,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import InputItemCard from "../../components/items/inputItemCard";
 
 export default function CreateSalePage() {
 
@@ -38,6 +39,7 @@ export default function CreateSalePage() {
         dateAdded: '' //today's date
     })
 
+    console.log(item)
     const [firstName, lastName] = item.userName.split(' ');
 
     const categoryColors = {
@@ -274,7 +276,7 @@ export default function CreateSalePage() {
                     Complete your item, upload your sale and people will directly contact you - it's that simple!
                 </Text>
 
-                <Grid css={{
+                {/* <Grid css={{
                     margin: '24px 24px'
                 }}>
                     <Col css={{
@@ -523,7 +525,41 @@ export default function CreateSalePage() {
                             </Col>
                         </Row>
                     </Col>
-                </Grid>
+                </Grid> */}
+
+                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createSale'}/>
+
+                <Button auto flat css={{
+                    margin: '0px 0px 36px 0px',
+                    padding: '6px 0px'
+                }}
+                    onClick={() => {
+                        if (checkForm()) {
+                            sendItem()
+                        }
+                        else {
+                            window.alert('You seem to have missed something')
+                        }
+                    }}>
+                    <Row css={{
+                        alignItems: 'center',
+                        gap: 8
+                    }}>
+                        <Text css={{
+                            '@xsMin': {
+                                fontSize: '$md'
+                            },
+                            '@xsMax': {
+                                fontSize: '$sm'
+                            },
+                            fontWeight: '$regular',
+                            color: '$blue600'
+                        }}>
+                            Upload
+                        </Text>
+                        <IoSendSharp size={16} />
+                    </Row>
+                </Button>
 
             </Grid.Container>
         )

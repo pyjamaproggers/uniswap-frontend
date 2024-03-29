@@ -533,7 +533,6 @@ export default function EditSalePage() {
                             Upload
                         </Text>
                         <IoSendSharp size={16} />
-
                     </Row>
                 </Button>
             </Grid.Container>
