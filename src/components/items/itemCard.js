@@ -59,6 +59,48 @@ export default function ItemCard(props) {
         }
     }
 
+    
+    const toggleLiveStatus = async (itemId, currentStatus) => {
+        // Removed setBackdropLoaderOpen(true);
+        console.log('hi')
+        try {
+            const response = await fetch(`${backend}/api/items/${itemId}/live`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ live: currentStatus === "y" ? "n" : "y" }),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            // Parse the JSON response and update state accordingly
+            const data = await response.json();
+            console.log('Live status toggled:', data);
+    
+            // Here, you would need to inform the parent component to update its state
+            // This assumes that you have a prop function like props.onLiveStatusToggle
+            props.onLiveStatusToggle(itemId, data.live);
+    
+            // Removed toast success and error messages since `toast` is not defined
+    
+        } catch (error) {
+            console.error('Failed to toggle live status:', error);
+            // Removed toast error message since `toast` is not defined
+        } finally {
+            // Removed setBackdropLoaderOpen(false);
+        }
+    };
+    
+
+    const handleLiveStatusClick = () => {
+        if (window.confirm(`Are you sure you want to set this item as ${item.live === "y" ? "inactive" : "active"}?`)) {
+            toggleLiveStatus(item._id);
+        }
+    };
 
     function getTimeDifference(dateString) {
         const itemDate = new Date(dateString);
@@ -108,6 +150,34 @@ export default function ItemCard(props) {
         }
     }
 
+
+    const handleDeleteItem = async (itemId) => {
+        if (window.confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
+            try {
+                const response = await fetch(`${backend}/api/items/${itemId}`, {
+                    method: 'DELETE', // Using the DELETE method for the API request
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Add other headers like authorization if needed
+                    },
+                    credentials: 'include', // If your API requires credentials
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete the item.');
+                }
+
+                // Here you might want to update the state to remove the item from the list
+                console.log(`Item with ID ${itemId} deleted successfully.`);
+                // For example, you could call a prop function to refresh the items
+                props.onItemDeleted(itemId);
+                
+            } catch (error) {
+                console.error('Error deleting the item:', error);
+                alert('There was an error trying to delete the item.');
+            }
+        }
+    };
     useEffect(() => {
         console.log('Updated favouriteItems in ItemCard component')
     }, [favouriteItems])
@@ -268,21 +338,25 @@ export default function ItemCard(props) {
                         {getTimeDifference(item.dateAdded)}
                     </Text>
                     {type === 'user' ?
-                        <Row css={{
+                         <Row css={{
+                            justifyContent: 'space-between',
                             alignItems: 'center',
-                            gap: 6,
-                            width: 'max-content',
-                            marginTop: '4px'
+                            paddingTop: '8px',
                         }}>
-                            <Button auto flat color={'primary'}
-                                iconRight={<IoPencil size={16} />}
-                                onClick={() => {
-                                    navigate('/editsale', { state: item })
-                                }}>
+                            <Button auto flat color={item.live === "y" ? "error" : "success"}
+                                    onClick={handleLiveStatusClick}>
+                                {item.live === "y" ? "Set Inactive" : "Set Active"}
+                            </Button>
+        
+                            <Button auto flat color="primary"
+                                    onClick={() => navigate('/editsale', { state: item })}>
+                                <IoPencil size={16} />
                                 Edit
                             </Button>
-                            <Button auto flat color={'error'}
-                                iconRight={<MdDelete size={16} />}>
+        
+                            <Button auto flat color="error"
+                                    onClick={() => handleDeleteItem(item._id)}>
+                                <MdDelete size={16} />
                                 Delete
                             </Button>
                         </Row>

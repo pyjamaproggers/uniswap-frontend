@@ -54,6 +54,33 @@ export default function ItemsPage(props) {
         }
     })
 
+    const toggleLiveStatus = async (itemId) => {
+        try {
+            const response = await fetch(`${backend}/api/items/live/${itemId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Other necessary headers like authorization if needed
+                },
+                credentials: 'include',
+                // If you need to send additional data in the body, include it here
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            // Parse JSON response here if needed
+            const data = await response.json();
+
+            console.log('Live status toggled:', data);
+            // Update state or show a notification to the user based on the response
+        } catch (error) {
+            console.error('Failed to toggle live status:', error);
+            // Handle error by showing a message to the user
+        }
+    };
+
     const [priceFilters, setPriceFilters] = useState([
         { key: '1', value: '₹0-₹100', chosen: false },
         { key: '2', value: '₹100-₹500', chosen: false },
