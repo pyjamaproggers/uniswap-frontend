@@ -65,33 +65,42 @@ export default function Header(props) {
 
     const [googleUserObject, setGoogleUserObject] = useState()
 
-    const setCredentialsCookie = () => {
-        fetch(`${backend}/api/auth/google`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                token: googleUserObject,
-                contactNumber: number
-            }),
-            credentials: 'include',
+    const updatePhoneNumber = () => {
+        const updatedPhoneNumber = number.trim();
+    
+        if (!updatedPhoneNumber) {
+            console.error('No phone number provided');
+            return;
+        }
+    
+        fetch(`${backend}/api/user/updatePhoneNumber`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include', 
+            body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
         })
-            .then(res => res.json())
-            .then(data => {
-                if (data.user) {
-                    // Set user details in localStorage
-                    localStorage.setItem('userEmail', data.user.userEmail);
-                    localStorage.setItem('userName', data.user.userName);
-                    localStorage.setItem('userPicture', data.user.userPicture);
-                    localStorage.setItem('contactNumber', data.user.contactNumber)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update phone number');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Phone number updated successfully:', data);
+    
 
-                    // Call to request notification permission should be here
-                    requestNotificationPermission();
-
-
-                }
-            }).catch(error => console.error('Error:', error));
-    }
-
+            alert('Phone number updated successfully!');
+    
+            setShowNumberUpdateModal(false);
+        })
+        .catch(error => {
+            console.error('Error updating phone number:', error);
+            alert('Failed to update phone number. Please try again.');
+        });
+    };
+    
     function handleCallbackresponse(response) {
         var googleUserObject_ = jwt_decode(response.credential);
         console.log(googleUserObject_)
@@ -623,7 +632,7 @@ export default function Header(props) {
                         }}
                             disabled={phoneStatus !== 'success'}
                             onClick={() => {
-                                setCredentialsCookie()
+                                updatePhoneNumber()
                             }}>
                             Save
                         </Button>
@@ -698,7 +707,7 @@ export default function Header(props) {
                         }}
                             disabled={phoneStatus !== 'success'}
                             onClick={() => {
-                                setCredentialsCookie()
+                                updatePhoneNumber()
                             }}>
                             Save
                         </Button>

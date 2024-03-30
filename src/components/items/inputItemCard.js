@@ -22,7 +22,7 @@ export default function InputItemCard(props) {
 
     const item = props.item
     const setItem = props.setItem
-
+    const backend = process.env.REACT_APP_BACKEND
     const imageFile = props.imageFile
     const setImageFile = props.setImageFile
 
@@ -60,8 +60,40 @@ export default function InputItemCard(props) {
     ]
 
     const updateContactNumber = () => {
-        // 
-    }
+        // Assuming `number` contains the new phone number
+        const updatedPhoneNumber = number.trim();
+    
+        if (!updatedPhoneNumber) {
+            console.error('No phone number provided');
+            return;
+        }
+    
+        fetch(`${backend}/api/user/updatePhoneNumber`, {
+            method: 'PATCH', // or 'POST', depending on your backend setup
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include', // to ensure cookies are sent with the request
+            body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update phone number');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Phone number updated successfully:', data);
+            alert('Phone number updated successfully!');
+    
+            setShowNumberUpdateModal(false);
+        })
+        .catch(error => {
+            console.error('Error updating phone number:', error);
+            alert('Failed to update phone number. Please try again.');
+        });
+    };
+    
 
 
     return (
