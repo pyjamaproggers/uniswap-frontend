@@ -33,6 +33,8 @@ export default function Header(props) {
     const [showNumberModal, setShowNumberModal] = useState(false)
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
 
+    const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
+
     const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
     const navigate = useNavigate();
@@ -112,7 +114,7 @@ export default function Header(props) {
                 // Possibly update UI to reflect user is logged in
             } else {
                 // User does not have a contact number, show modal to add one
-                console.log("User does not have a contact number, showing modal.", data.user);
+                console.log("User does not have a contact number, showing modal.",);
                 setShowNumberModal(true);
             }
         })
@@ -157,6 +159,21 @@ export default function Header(props) {
             alert('Failed to update phone number. Please try again.');
         });
     };
+
+
+    function handleCallbackresponse(response) {
+        var googleUserObject_ = jwt_decode(response.credential);
+        console.log(googleUserObject_)
+        setGoogleUserObject(response.credential)
+
+        if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
+
+            setShowNumberModal(true)
+
+        } else {
+            setShowAshokaOnlyModal(true);
+        }
+    }
 
     // Function to request notification permission and get the token
     const requestNotificationPermission = () => {

@@ -211,7 +211,7 @@ export default function CreateSalePage() {
             <Grid.Container css={{
                 display: 'flex',
                 flexDirection: 'column',
-                padding: '16px 12px 24px',
+                padding: '16px 0px 24px',
                 jc: 'center',
                 alignItems: 'center'
             }}>
