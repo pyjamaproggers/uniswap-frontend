@@ -683,6 +683,7 @@ export default function Header(props) {
                                 // Check if the input value is a number and its length
                                 if (!isNaN(numVal) && inputVal.length >= 10) {
                                     setPhoneStatus('success');
+                                    setNumber(e.target.value)
                                 } else {
                                     setPhoneStatus('error');
                                 }
@@ -707,7 +708,7 @@ export default function Header(props) {
             </Modal>
 
 
-            <Grid.Container css={{
+            {/* <Grid.Container css={{
                 '@xsMin': {
                     display: 'none'
                 },
@@ -791,7 +792,7 @@ export default function Header(props) {
                         </Row>
                     </BottomNavigation>
                 </Paper>
-            </Grid.Container>
+            </Grid.Container> */}
 
         </>
     );

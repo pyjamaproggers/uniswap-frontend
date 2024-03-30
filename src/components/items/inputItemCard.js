@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, Link, Badge, Collapse } from "@nextui-org/react";
+import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, Link, Badge, Collapse, Modal } from "@nextui-org/react";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
 import { IoTicket } from "react-icons/io5";
@@ -33,6 +33,10 @@ export default function InputItemCard(props) {
 
     const [firstName, lastName] = item.userName.split(' ')
 
+    const [number, setNumber] = useState('')
+    const [phoneStatus, setPhoneStatus] = useState('default')
+    const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
+
     const categoryColors = {
         apparel: 'error',
         food: 'secondary',
@@ -54,6 +58,11 @@ export default function InputItemCard(props) {
         { key: 'lostandfound', value: 'Lost & Found', icon: <MdOutlineQuestionMark size={24} color="#889096" />, description: 'Anything and everything lost around campus.' }, // Grey
         { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
     ]
+
+    const updateContactNumber = () => {
+        // 
+    }
+
 
     return (
         <Grid css={{
@@ -271,11 +280,14 @@ export default function InputItemCard(props) {
                                 css={{
                                     lineHeight: '1.2',
                                 }}>
-                                8104213125
+                                {item.contactNumber}
                             </Button>
                         </Row>
-                        <Link href='phoneAuth' css={{
+                        <Link css={{
                             fontSize: '12px'
+                        }}
+                        onClick={()=>{
+                            setShowNumberUpdateModal(true)
                         }}>
                             Change number?
                         </Link>
@@ -323,6 +335,81 @@ export default function InputItemCard(props) {
                         </>}
                 </Row>
             </Col>
+
+            <Modal
+                    open={showNumberUpdateModal}
+                    closeButton
+                    onClose={() => {
+                        setShowNumberUpdateModal(false)
+                    }}
+                >
+                    <Grid.Container css={{
+                        jc: 'center',
+                        alignItems: '',
+                        padding: '24px 0px',
+                    }}>
+                        <Col css={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            width: 'max-content',
+                            gap: 24
+                        }}>
+                            <Text css={{
+                                '@xsMin': {
+                                    fontSize: '$xl'
+                                },
+                                '@xsMax': {
+                                    fontSize: '$lg'
+                                },
+                                fontWeight: '$semibold'
+                            }}>
+                                Update Phone Number
+                            </Text>
+
+                            <Input css={{
+                                width: '200px',
+                                backgroundColor: '#697177'
+                            }}
+                                labelLeft={
+                                    <IoLogoWhatsapp size={24} color="#25D366" />
+                                }
+                                animated={false}
+                                placeholder="9876512340"
+                                maxLength={12}
+                                status={phoneStatus}
+                                helperText="Whatsapp Contact Number!"
+                                onChange={(e) => {
+                                    const inputVal = e.target.value;
+                                    const numVal = parseInt(inputVal, 10);
+                                    setNumber(numVal)
+
+                                    // Check if the input value is a number and its length
+                                    if (!isNaN(numVal) && inputVal.length >= 10) {
+                                        setPhoneStatus('success');
+                                        setNumber(e.target.value)
+                                    } else {
+                                        setPhoneStatus('error');
+                                    }
+                                    if (inputVal.length === 0) {
+                                        setPhoneStatus('default')
+                                    }
+                                }}
+
+                            />
+
+                            <Button flat auto color={'primary'} css={{
+                                margin: '24px 0px'
+                            }}
+                                disabled={phoneStatus !== 'success'}
+                                onClick={() => {
+                                    updateContactNumber()
+                                }}>
+                                Save
+                            </Button>
+                        </Col>
+                    </Grid.Container>
+                </Modal>
         </Grid>
     )
 }

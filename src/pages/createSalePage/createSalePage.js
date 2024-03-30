@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
-import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, Link, Badge, Collapse } from "@nextui-org/react";
+import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, Link, Badge, Collapse, Modal } from "@nextui-org/react";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
 import { IoTicket } from "react-icons/io5";
@@ -23,6 +23,7 @@ export default function CreateSalePage() {
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
 
+
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
 
     const [item, setItem] = useState({
@@ -34,7 +35,7 @@ export default function CreateSalePage() {
         itemPrice: 0,
         itemCategory: '',
         itemPicture: '', //this has to be the url we obtain by uploading the user-uploaded picture to aws bucket
-        contactNumber: "8104213125", //we have to now obtain from localstorage once we set it in cookie after taking it
+        contactNumber: localStorage.getItem('contactNumber'), //we have to now obtain from localstorage once we set it in cookie after taking it
         live: 'y',
         dateAdded: '' //today's date
     })
@@ -42,37 +43,36 @@ export default function CreateSalePage() {
     const [imageFile, setImageFile] = useState(null)
     const [previewUrl, setPreviewUrl] = useState(null)
 
-
     const checkForm = () => {
         // itemName: Required and must be a non-empty string
         if (!item.itemName || typeof item.itemName !== 'string' || item.itemName.trim().length === 0) {
             alert('Item name is required.');
             return false;
         }
-    
+
         // itemPrice: Required and must be an integer
         if (!Number.isInteger(item.itemPrice)) {
             alert('Item price must be a number.');
             return false;
         }
-    
+
         // itemCategory: Required and must be a non-empty string
         if (!item.itemCategory || typeof item.itemCategory !== 'string' || item.itemCategory.trim().length === 0) {
             alert('Item category is required.');
             return false;
         }
-    
+
         // contactNumber: Required and must be a non-empty string
         // Additional validation can be added here, e.g., regex for phone numbers
         if (!item.contactNumber || typeof item.contactNumber !== 'string' || item.contactNumber.trim().length === 0) {
             alert('Contact number is required.');
             return false;
         }
-    
+
         // If all checks pass
         return true;
     };
-    
+
 
     const postItemToBackend = async (itemData) => {
         console.log(`${backend}/api/items`)
@@ -264,7 +264,7 @@ export default function CreateSalePage() {
                     Complete your item, upload your sale and people will directly contact you - it's that simple!
                 </Text>
 
-                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createSale'}/>
+                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createSale'} />
 
                 <Button auto flat css={{
                     margin: '0px 0px 36px 0px',
@@ -297,6 +297,8 @@ export default function CreateSalePage() {
                         <IoSendSharp size={16} />
                     </Row>
                 </Button>
+
+                
 
             </Grid.Container>
         )
