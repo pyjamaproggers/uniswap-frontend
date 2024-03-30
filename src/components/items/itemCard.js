@@ -18,7 +18,9 @@ export default function ItemCard(props) {
 
     const [render, setRender] = useState(false)
 
-    const [item, setItem] = useState({ ...props.item })
+    // const [item, setItem] = useState({ ...props.item })
+
+    const item = props.item
 
     const [firstName, lastName] = item.userName.split(' ');
 
@@ -32,6 +34,7 @@ export default function ItemCard(props) {
     let favouriteItems = props.favouriteItems
     let handleFavouriteItemToggle = props.handleFavouriteItemToggle
     let handleLiveToggle = props.handleLiveToggle
+    let onItemDeleted = props.onItemDeleted
     // console.log(item.id, favouriteItems, favouriteItems.includes(item.id))
     // console.log(props)
 
@@ -52,7 +55,7 @@ export default function ItemCard(props) {
             const data = await response.json();
             // Handle the response. For example, refresh the local favorites state
             if (response.ok) {
-                console.log('here')
+                console.log('updating favs itemcard')
                 handleFavouriteItemToggle(favouriteItems, itemIDToUpdate);
             } else {
                 // Handle failure (e.g., item not found, user not authenticated)
@@ -76,19 +79,20 @@ export default function ItemCard(props) {
                 credentials: 'include',
                 body: JSON.stringify({ live: currentStatus === "y" ? "n" : "y" }),
             });
+            // Parse the JSON response and update state accordingly
+            const data = await response.json();
+            console.log('Live status toggled:', data);
 
             if (response.ok) {
-                console.log('here')
-                handleLiveToggle(itemId, currentStatus)
+                console.log('updating live status itemcard')
+                handleLiveToggle(itemId, data.live)
+
             } else {
                 // Handle failure (e.g., item not found, user not authenticated)
                 console.error(data.message);
             }
 
-            // Parse the JSON response and update state accordingly
-            const data = await response.json();
-            console.log('Live status toggled:', data);
-            
+
             // Removed toast success and error messages since `toast` is not defined
 
         } catch (error) {
@@ -175,7 +179,7 @@ export default function ItemCard(props) {
                 // Here you might want to update the state to remove the item from the list
                 console.log(`Item with ID ${itemId} deleted successfully.`);
                 // For example, you could call a prop function to refresh the items
-                props.onItemDeleted(itemId);
+                onItemDeleted();
 
             } catch (error) {
                 console.error('Error deleting the item:', error);
@@ -328,8 +332,9 @@ export default function ItemCard(props) {
                 </Collapse>
                 <Row css={{
                     jc: 'space-between',
-                    margin: '4px 0px 24px 0px',
-                    alignItems: 'normal'
+                    marginTop: '4px',
+                    alignItems: 'normal',
+                    marginBottom: type==='sale' ? '24px' : '0px'
                 }}>
                     <Text css={{
                         fontWeight: '$medium',
@@ -344,38 +349,7 @@ export default function ItemCard(props) {
                     }}>
                         {getTimeDifference(item.dateAdded)}
                     </Text>
-                    {type === 'user' ?
-                        <Row css={{
-                            justifyContent: 'flex-end',
-                            alignItems: 'center',
-                            paddingTop: '8px',
-                            gap: 4
-                        }}>
-                            {item.live === 'y' ?
-                                <Button auto flat color={"success"}
-                                icon={<FaCloud size={16} />}
-                                    onClick={() => { toggleLiveStatus(item._id) }}>
-                                    Live
-                                </Button>
-                                :
-                                <Button auto flat color={"error"}
-                                icon={<IoCloudOffline size={16}/>}
-                                    onClick={() => { toggleLiveStatus(item._id) }}>
-                                    Not Live
-                                </Button>
-                            }
-                            <Button auto flat color="primary"
-                                onClick={() => navigate('/editsale', { state: item })}>
-                                <IoPencil size={14} />
-                                Edit
-                            </Button>
-                            <Button auto flat color="error"
-                                onClick={() => handleDeleteItem(item._id)}>
-                                <MdDelete size={16} />
-                                Delete
-                            </Button>
-                        </Row>
-                        :
+                    {type === 'sale' &&
                         <Row css={{
                             padding: '4px 8px 0px 8px',
                             gap: 6,
@@ -387,7 +361,6 @@ export default function ItemCard(props) {
                                     window.open(url)
                                 }} className="item-icon" />
                             </Button>
-
                             {favouriteItems.includes(item._id) ?
                                 <Button auto flat color={'error'} className="collapse-buttons">
                                     <IoMdHeart size={20} style={{
@@ -413,6 +386,51 @@ export default function ItemCard(props) {
                         </Row>
                     }
                 </Row>
+                {type === 'user' &&
+                    <Row css={{
+                        justifyContent: 'flex-end',
+                        alignItems: 'center',
+                        paddingTop: '8px',
+                        gap: 4,
+                        marginBottom: '24px'
+                    }}>
+                        {item.live === 'y' ?
+                            <Button auto flat color={"success"}
+                                icon={<FaCloud size={16} style={{}}/>}
+                                onClick={() => { toggleLiveStatus(item._id) }}
+                                css={{
+                                    lineHeight: '2.2'
+                                }}>
+                                Live
+                            </Button>
+                            :
+                            <Button auto flat color={"error"}
+                                icon={<IoCloudOffline size={16} />}
+                                onClick={() => { toggleLiveStatus(item._id) }}
+                                css={{
+                                    lineHeight: '2.2'
+                                }}>
+                                Not Live
+                            </Button>
+                        }
+                        <Button auto flat color="primary"
+                        icon={<IoPencil size={16}/>}
+                            onClick={() => navigate('/editsale', { state: item })}
+                            css={{
+                                lineHeight: '2.2'
+                            }}>
+                            Edit
+                        </Button>
+                        <Button auto flat color="error"
+                            onClick={() => handleDeleteItem(item._id)}
+                            css={{
+                                lineHeight: '2.2'
+                            }}>
+                            <MdDelete size={16} />
+                            Delete
+                        </Button>
+                    </Row>
+                }
             </Col>
         </Grid>
     );

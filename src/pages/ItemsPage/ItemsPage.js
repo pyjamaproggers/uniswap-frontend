@@ -201,38 +201,33 @@ export default function ItemsPage(props) {
     const handleFavouriteItemToggle = (favouriteItems, itemIDToUpdate) => {
         // to toggle favourite iteam (like instagram "save" option)
         let updatedFavItems = favouriteItems
-        // console.log('Function to handle when clicked on favourite: ', updatedFavItems, itemIDToUpdate)
-        // console.log('ItemId clicked on: ', itemIDToUpdate)
-        // console.log('Favourite Items array: ', updatedFavItems)
-        // console.log(updatedFavItems.includes(itemIDToUpdate))
         if (updatedFavItems.includes(itemIDToUpdate)) {
             updatedFavItems = updatedFavItems.filter(itemID => itemID !== itemIDToUpdate)
         }
         else {
             updatedFavItems.push(itemIDToUpdate)
         }
-        // console.log('Previous Favourite Items: ', favouriteItems)
-        // console.log('New Favourite Items: ', updatedFavItems)
         setFavouriteItems(updatedFavItems)
         localStorage.setItem('favouriteItems', JSON.stringify(updatedFavItems))
-        console.log(localStorage)
         sendNewFavouriteItemsToDB(updatedFavItems)
         setRender((prev) => (!prev))
     }
 
-    const handleLiveToggle = (itemIDToUpdate) => {
+    const handleLiveToggle = (itemIDToUpdate, newStatus) => {
         var newUserItems = userItems.map((userItem) => {
             if (userItem._id === itemIDToUpdate) {
-                return { ...userItem, live: userItem.live === 'y' ? 'n' : 'y' };
+                return { ...userItem, live: newStatus };
             }
             return userItem;
-        });
-        console.log(userItems)
-        console.log(newUserItems)
+        })
 
         setUserItems(newUserItems)
         setRender((prev) => (!prev))
     };
+
+    const onItemDeleted = () => {
+        window.location.pathname = '/useritems'
+    }
 
 
     function filterItemsByEmail(email) {
@@ -771,7 +766,7 @@ export default function ItemsPage(props) {
                                         :
                                         <>
                                             {userItems.map((item, index) => (
-                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} />
+                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} onItemDeleted={onItemDeleted}/>
                                             ))}
                                         </>
                                     }
@@ -784,7 +779,7 @@ export default function ItemsPage(props) {
                                             {
                                                 filteredItems.map((item, index) => {
                                                     return (
-                                                        <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} />
+                                                        <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} onItemDeleted={onItemDeleted} />
                                                     )
                                                 })}
                                         </>
