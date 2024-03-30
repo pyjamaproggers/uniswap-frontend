@@ -27,6 +27,8 @@ import { GoHomeFill } from "react-icons/go";
 import BottomNavigation from '@mui/material/BottomNavigation';
 
 export default function Header(props) {
+
+    const backend = process.env.REACT_APP_BACKEND
     const [render, setRender] = useState(false)
     const [loginLoader, setLoginLoader] = useState(true)
     const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
@@ -157,7 +159,7 @@ export default function Header(props) {
                     const postedItemsResponse = await fetch(`${backend}/api/user/items`, { credentials: 'include' });
                     const postedItems = await postedItemsResponse.json();
                     localStorage.setItem('itemsPosted', JSON.stringify(postedItems));
-                    const favoriteItemsResponse = await fetch('http://localhost:8080/api/user/favorites', { credentials: 'include' });
+                    const favoriteItemsResponse = await fetch(`${backend}/api/user/favorites`, { credentials: 'include' });
                     const favoriteItems = await favoriteItemsResponse.json();
                     localStorage.setItem('favouriteItems', JSON.stringify(favoriteItems));
                 } catch (error) {
@@ -172,7 +174,7 @@ export default function Header(props) {
 
 
     function handleLogout() {
-        fetch('http://localhost:8080/api/auth/logout', {
+        fetch(`${backend}/api/auth/logout`, {
             method: 'POST',
             credentials: 'include', // Necessary to include the cookie in requests
         })
