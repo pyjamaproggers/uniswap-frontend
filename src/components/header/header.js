@@ -35,7 +35,6 @@ export default function Header(props) {
     const [showNumberModal, setShowNumberModal] = useState(false)
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
 
-    const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
     const navigate = useNavigate();
 
