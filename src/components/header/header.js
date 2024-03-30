@@ -17,8 +17,8 @@ import { IoMdHeart } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import { MdOutlinePhoneIphone } from "react-icons/md";
-// import { messaging } from "../../services/firebase.js";
-// import { getToken } from "firebase/messaging";
+import { messaging } from "../../services/firebase.js";
+import { getToken } from "firebase/messaging";
 import './header.css'
 import { FaPhone } from "react-icons/fa6";
 import { IoLogoWhatsapp } from "react-icons/io";
@@ -59,39 +59,48 @@ export default function Header(props) {
 
     // funciton to handle callback for google sign in
     // Adjusted to call requestNotificationPermission after successful authentication
+
+    const [googleUserObject, setGoogleUserObject] = useState()
+
+    const setCredentialsCookie = () => {
+        fetch(`${backend}/api/auth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                token: googleUserObject,
+                contactNumber: number
+            }),
+            credentials: 'include',
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.user) {
+                    // Set user details in localStorage
+                    localStorage.setItem('userEmail', data.user.userEmail);
+                    localStorage.setItem('userName', data.user.userName);
+                    localStorage.setItem('userPicture', data.user.userPicture);
+                    localStorage.setItem('contactNumber', data.user.contactNumber)
+
+                    // Call to request notification permission should be here
+                    requestNotificationPermission();
+
+
+                }
+            }).catch(error => console.error('Error:', error));
+    }
+
     function handleCallbackresponse(response) {
-        var googleUserObject = jwt_decode(response.credential);
-        if (googleUserObject.email.split('@')[1] === 'ashoka.edu.in') {
-            fetch(`${backend}/api/auth/google`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token: response.credential }),
-                credentials: 'include',
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.user) {
-                        // Set user details in localStorage
-                        localStorage.setItem('userEmail', data.user.userEmail);
-                        localStorage.setItem('userName', data.user.userName);
-                        localStorage.setItem('userPicture', data.user.userPicture);
+        // var googleUserObject = jwt_decode(response.credential);
+        setGoogleUserObject(jwt_decode(response.credential))
 
-                        setShowNumberModal(true)
-                        // Call to request notification permission should be here
-                        requestNotificationPermission();
+        if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
 
+            setShowNumberModal(true)
 
-                    }
-                }).catch(error => console.error('Error:', error));
         } else {
             setShowAshokaOnlyModal(true);
         }
     }
-
-    function updateUserPhone () {
-        // update "contactNumber" variable in this User's data in Users collection.
-    }
-
 
     // Function to request notification permission and get the token
     const requestNotificationPermission = () => {
@@ -104,8 +113,10 @@ export default function Header(props) {
                     }
                 }).catch((err) => console.log("An error occurred while retrieving token. ", err));
             }
-            else{ setRender((prev) => !prev);
-                window.location.pathname = '/';}
+            else {
+                setRender((prev) => !prev);
+                window.location.pathname = '/';
+            }
         });
     };
 
@@ -162,6 +173,7 @@ export default function Header(props) {
                     localStorage.removeItem('userPicture');
                     localStorage.removeItem('itemsPosted');
                     localStorage.removeItem('favouriteItems');
+                    localStorage.clear()
                     // Redirect user to the homepage or login page
                     window.location.pathname = '/' // Adjust the path as necessary for your application
                 } else {
@@ -227,7 +239,9 @@ export default function Header(props) {
     return (
         <>
             <Navbar isBordered variant="sticky">
+                
                 <Navbar.Toggle showIn={'xs'} />
+
                 <Navbar.Brand onClick={() => {
                     window.location.pathname = '/'
                 }}
@@ -252,6 +266,7 @@ export default function Header(props) {
                         UniSwap™
                     </Text>
                 </Navbar.Brand>
+
                 {Object.keys(localStorage).length >= 2 &&
                     <Navbar.Content
                         enableCursorHighlight
@@ -259,6 +274,7 @@ export default function Header(props) {
                         hideIn="xs"
                         variant="underline"
                     >
+                        {Object.keys(localStorage).length}
                         <Navbar.Link href="/saleitems" >Sale Items</Navbar.Link>
                         <Dropdown isBordered>
                             <Navbar.Item>
@@ -366,7 +382,7 @@ export default function Header(props) {
                                     else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
                                         window.location.pathname = `/${actionKey}`
                                     }
-                                    else if (actionKey === 'phoneAuth'){
+                                    else if (actionKey === 'phoneAuth') {
                                         setShowNumberUpdateModal(true)
                                     }
                                     else {
@@ -417,6 +433,7 @@ export default function Header(props) {
                         </Dropdown>
                     }
                 </Navbar.Content>
+
                 {Object.keys(localStorage).length <= 2 ?
                     <Navbar.Collapse>
                         {collapseItemsLoggedOut.map((item, index) => (
@@ -539,18 +556,33 @@ export default function Header(props) {
                         flexDirection: 'column',
                         alignItems: 'center',
                         width: 'max-content',
-                        gap: 24
+                        gap: 12
                     }}>
                         <Text css={{
                             '@xsMin': {
-                                fontSize: '$xl'
+                                fontSize: '$2xl'
                             },
                             '@xsMax': {
                                 fontSize: '$lg'
                             },
                             fontWeight: '$semibold'
                         }}>
-                            Update Phone Number
+                            Save Phone Number
+                        </Text>
+
+                        <Text css={{
+                            '@xsMin': {
+                                fontSize: '$md'
+                            },
+                            '@xsMax': {
+                                fontSize: '$sm'
+                            },
+                            fontWeight: '$regular',
+                            marginBottom: '24px',
+                            padding: '0px 48px',
+                            lineHeight: '1.3'
+                        }}>
+                            Since this is your first time logging in, we need to save your number so you don't have to ever again.
                         </Text>
 
                         <Input css={{
@@ -585,10 +617,10 @@ export default function Header(props) {
                         <Button flat auto color={'primary'} css={{
                             margin: '24px 0px'
                         }}
-                        disabled={phoneStatus!=='success'}
-                        onClick={()=>{
-                            updateUserPhone()
-                        }}>
+                            disabled={phoneStatus !== 'success'}
+                            onClick={() => {
+                                setCredentialsCookie()
+                            }}>
                             Save
                         </Button>
                     </Col>
@@ -598,7 +630,7 @@ export default function Header(props) {
             <Modal
                 open={showNumberUpdateModal}
                 closeButton
-                onClose={()=>{
+                onClose={() => {
                     setShowNumberUpdateModal(false)
                 }}
             >
@@ -658,10 +690,10 @@ export default function Header(props) {
                         <Button flat auto color={'primary'} css={{
                             margin: '24px 0px'
                         }}
-                        disabled={phoneStatus!=='success'}
-                        onClick={()=>{
-                            updateUserPhone()
-                        }}>
+                            disabled={phoneStatus !== 'success'}
+                            onClick={() => {
+                                setCredentialsCookie()
+                            }}>
                             Save
                         </Button>
                     </Col>

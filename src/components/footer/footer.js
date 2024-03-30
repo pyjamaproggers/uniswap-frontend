@@ -15,13 +15,13 @@ function Footer(){
                     borderColor: '$gray600',
                     borderWidth: '0px 0px 0px 0px'
                 }}>
-                    <Text
+                    {/* <Text
                     css={{
                         padding: '1% 0.35%',
                         fontSize: '$normal'
                     }}>
                         Made with 🤍
-                    </Text>
+                    </Text> */}
                     {/* <Text showIn={'xs'}
                     css={{
                         padding: '1%',
@@ -62,7 +62,7 @@ function Footer(){
                     textAlign: 'center',
                     padding: '10px 0px',
                     borderStyle: 'solid',
-                    borderColor: '$gray700',
+                    borderColor: '$gray400',
                     borderWidth: '1px 0px 0px 0px',
                     '@xsMax':{
                         fontSize: '$xs'

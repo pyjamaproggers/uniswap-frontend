@@ -9,6 +9,8 @@ import ItemsPage from './pages/itemsPage/itemsPage.js';
 import CreateSalePage from './pages/createSalePage/createSalePage';
 import EditSalePage from './pages/editSalePage/editSalePage';
 import { useEffect, useState } from 'react';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 function App() {
 
@@ -42,6 +44,29 @@ function App() {
     //     }
     // });
 
+    const [scriptLoaded, setScriptLoaded] = useState(false);
+
+    useEffect(() => {
+        const script = document.getElementById('GoogleSignin');
+
+        const handleScriptLoad = () => {
+            setScriptLoaded(true);
+            // After this line, you can call `window.google.accounts.id.initialize` and `window.google.accounts.id.renderButton`
+        };
+
+        script.addEventListener('load', handleScriptLoad);
+
+        // If the script is already loaded (e.g., when navigating back to the component), initialize immediately
+        if (scriptLoaded || window.google) {
+            handleScriptLoad();
+        }
+
+        // Cleanup the event listener
+        return () => {
+            script.removeEventListener('load', handleScriptLoad);
+        };
+    }, []);
+
     const theme = createTheme({
         type: 'dark', // Adjusted this line
         theme: {
@@ -59,19 +84,32 @@ function App() {
 
     return (
         <>
-            <NextUIProvider theme={theme}>
-                <Router>
-                    <Header />
-                    <Routes>
-                        <Route exact path='/' element={<HomePage />} />
-                        <Route exact path='/saleitems' element={<ItemsPage type={'sale'} />} />
-                        <Route exact path='/useritems' element={<ItemsPage type={'user'} />} />
-                        <Route exact path='/createsale' element={<CreateSalePage />} />
-                        <Route exact path='/editsale' element={<EditSalePage />} />
-                    </Routes>
-                </Router>
-                <Footer />
-            </NextUIProvider>
+            {scriptLoaded ?
+                <>
+                    <NextUIProvider theme={theme}>
+                        <Router>
+                            <Header />
+                            <Routes>
+                                <Route exact path='/' element={<HomePage />} />
+                                <Route exact path='/saleitems' element={<ItemsPage type={'sale'} />} />
+                                <Route exact path='/useritems' element={<ItemsPage type={'user'} />} />
+                                <Route exact path='/createsale' element={<CreateSalePage />} />
+                                <Route exact path='/editsale' element={<EditSalePage />} />
+                            </Routes>
+                        </Router>
+                        <Footer />
+                    </NextUIProvider>
+                </>
+                :
+                <>
+                    <Backdrop
+                        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                        open={!scriptLoaded}
+                    >
+                        <CircularProgress color="inherit" />
+                    </Backdrop>
+                </>
+            }
         </>
     );
 }
