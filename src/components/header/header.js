@@ -27,14 +27,13 @@ import { GoHomeFill } from "react-icons/go";
 import BottomNavigation from '@mui/material/BottomNavigation';
 
 export default function Header(props) {
-
-    const backend = process.env.REACT_APP_BACKEND
     const [render, setRender] = useState(false)
     const [loginLoader, setLoginLoader] = useState(true)
     const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
     const [showNumberModal, setShowNumberModal] = useState(false)
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
 
+    const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
     const navigate = useNavigate();
 
@@ -61,86 +60,103 @@ export default function Header(props) {
         { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
     ]
 
-    const submitPhoneNumber = (phoneNumber) => {
-        const url = `${backend}/api/user/registerOrUpdate`; // Assuming you have an endpoint that handles both registration and updating user details including phone number
-        const payload = {
-          googleToken: googleUserObject, // The token you received from Google sign-in
-          phoneNumber, // The phone number the user entered
-        };
-      
-        fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          credentials: 'include', // Necessary for cookies to be sent and received
-        })
-        .then(response => response.json())
-        .then(data => {
-          // Handle successful registration/update
-          console.log('Success:', data);
-          setShowNumberModal(false); // Hide the modal on successful operation
-          // Perform any additional actions required upon successful registration/update
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-          // Handle errors, such as displaying a notification to the user
-        });
-      };
-      
-
     // funciton to handle callback for google sign in
     // Adjusted to call requestNotificationPermission after successful authentication
 
     const [googleUserObject, setGoogleUserObject] = useState()
 
-    const updatePhoneNumber = () => {
-        // Assuming `googleUserObject` holds the Google token received upon sign-in.
-        const token = googleUserObject; // This needs to be stored when the user logs in with Google
-        const contactNumber = number.trim(); // Trim the phone number input from the user
-        
-        if (!contactNumber) {
+    const setCredentialsCookie = () => {
+        fetch(`${backend}/api/auth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                token: googleUserObject,
+                contactNumber: number
+            }),
+            credentials: 'include',
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.user) {
+                    // Set user details in localStorage
+                    localStorage.setItem('userEmail', data.user.userEmail);
+                    localStorage.setItem('userName', data.user.userName);
+                    localStorage.setItem('userPicture', data.user.userPicture);
+                    localStorage.setItem('contactNumber', data.user.contactNumber)
+
+                    // Call to request notification permission should be here
+                    requestNotificationPermission();
+
+
+                }
+            }).catch(error => console.error('Error:', error));
+    }
+    function handleCallbackresponse(response) {
+        var googleUserObject_ = jwt_decode(response.credential);
+        console.log(googleUserObject_);
+        setGoogleUserObject(response.credential); // This should be the actual token, not decoded object
+    
+        // Call backend to verify token and check user's contact number status
+        fetch(`${backend}/api/auth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: response.credential }),
+            credentials: 'include',
+        })
+        .then(res => res.json())
+        .then(data => {
+            // Assuming backend response includes user object with contactNumber
+            if (data.user && data.user.contactNumber) {
+                // User exists and has a contact number, proceed as logged in
+                console.log("User already has a contact number.");
+                // Possibly update UI to reflect user is logged in
+            } else {
+                // User does not have a contact number, show modal to add one
+                console.log("User does not have a contact number, showing modal.", data.user);
+                setShowNumberModal(true);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle error, e.g., show a message to the user
+        });
+    }
+    
+
+    const updateContactNumber = () => {
+        // Assuming `number` contains the new phone number
+        const updatedPhoneNumber = number.trim();
+    
+        if (!updatedPhoneNumber) {
             console.error('No phone number provided');
             return;
         }
-        
-        fetch(`${backend}/api/user/registerOrUpdate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include', // Necessary for cookies to be sent and received
-            body: JSON.stringify({ token, contactNumber }),
+    
+        fetch(`${backend}/api/user/updatePhoneNumber`, {
+            method: 'PATCH', // or 'POST', depending on your backend setup
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include', // to ensure cookies are sent with the request
+            body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Failed to update or register user');
+                throw new Error('Failed to update phone number');
             }
             return response.json();
         })
         .then(data => {
-            console.log('User updated successfully:', data);
-            // Handle the UI update here, such as closing the modal and showing a success message
-            setShowNumberModal(false); // Assuming this is the method to close the phone number modal
-            // Optionally, refresh user data or re-fetch from the server if necessary
+            console.log('Phone number updated successfully:', data);
+            alert('Phone number updated successfully!');
+    
+            setShowNumberUpdateModal(false);
         })
         .catch(error => {
-            console.error('Error updating user:', error);
-            // Handle error, show error message to the user
+            console.error('Error updating phone number:', error);
+            alert('Failed to update phone number. Please try again.');
         });
     };
-    
-    
-    function handleCallbackresponse(response) {
-        var googleUserObject_ = jwt_decode(response.credential);
-        console.log(googleUserObject_)
-        setGoogleUserObject(response.credential)
-
-        if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
-
-            setShowNumberModal(true)
-
-        } else {
-            setShowAshokaOnlyModal(true);
-        }
-    }
 
     // Function to request notification permission and get the token
     const requestNotificationPermission = () => {
@@ -226,19 +242,19 @@ export default function Header(props) {
             });
     }
 
-    // useEffect(() => {
-    //     fetch('/api/auth/profile', {
-    //         credentials: 'include',
-    //     })
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             if (data.isAuthenticated) {
-    //                 // Update UI to reflect authenticated state
-    //             } else {
-    //                 // User is not authenticated
-    //             }
-    //         });
-    // }, []);
+    useEffect(() => {
+        fetch('/api/auth/profile', {
+            credentials: 'include',
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.isAuthenticated) {
+                    // Update UI to reflect authenticated state
+                } else {
+                    // User is not authenticated
+                }
+            });
+    }, []);
 
     useEffect(() => {
         setLoginLoader(true)
@@ -314,6 +330,7 @@ export default function Header(props) {
                         hideIn="xs"
                         variant="underline"
                     >
+                        {Object.keys(localStorage).length}
                         <Navbar.Link href="/saleitems" >Sale Items</Navbar.Link>
                         <Dropdown isBordered>
                             <Navbar.Item>
@@ -659,7 +676,7 @@ export default function Header(props) {
                         }}
                             disabled={phoneStatus !== 'success'}
                             onClick={() => {
-                                updatePhoneNumber()
+                                setCredentialsCookie()
                             }}>
                             Save
                         </Button>
@@ -734,7 +751,7 @@ export default function Header(props) {
                         }}
                             disabled={phoneStatus !== 'success'}
                             onClick={() => {
-                                updatePhoneNumber()
+                                updateContactNumber()
                             }}>
                             Save
                         </Button>
