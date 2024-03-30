@@ -25,23 +25,17 @@ import { IoLogoWhatsapp } from "react-icons/io";
 import Paper from '@mui/material/Paper';
 import { GoHomeFill } from "react-icons/go";
 import BottomNavigation from '@mui/material/BottomNavigation';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import CircularProgress from '@mui/material/CircularProgress';
-import Backdrop from '@mui/material/Backdrop';
-
 
 export default function Header(props) {
-
-    const backend = process.env.REACT_APP_BACKEND
     const [render, setRender] = useState(false)
     const [loginLoader, setLoginLoader] = useState(true)
     const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
     const [showNumberModal, setShowNumberModal] = useState(false)
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
-
+    const [number, setNumber] = useState(0)
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
 
+    const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
     const navigate = useNavigate();
     const location = useLocation();
@@ -76,123 +70,130 @@ export default function Header(props) {
         { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
     ]
 
-    const submitPhoneNumber = (phoneNumber) => {
-        const url = `${backend}/api/user/registerOrUpdate`; // Assuming you have an endpoint that handles both registration and updating user details including phone number
-        const payload = {
-            googleToken: googleUserObject, // The token you received from Google sign-in
-            phoneNumber, // The phone number the user entered
-        };
-
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            credentials: 'include', // Necessary for cookies to be sent and received
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Handle successful registration/update
-                console.log('Success:', data);
-                setShowNumberModal(false); // Hide the modal on successful operation
-                // Perform any additional actions required upon successful registration/update
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                // Handle errors, such as displaying a notification to the user
-            });
-    };
-
-
     // funciton to handle callback for google sign in
     // Adjusted to call requestNotificationPermission after successful authentication
 
     const [googleUserObject, setGoogleUserObject] = useState()
 
-    const updatePhoneNumber = () => {
-        // Assuming `googleUserObject` holds the Google token received upon sign-in.
-        const token = googleUserObject; // This needs to be stored when the user logs in with Google
-        const contactNumber = number.trim(); // Trim the phone number input from the user
-
-        if (!contactNumber) {
+    const setCredentialsCookie = () => {
+        const numberToSend = number.trim()
+    
+        if (!numberToSend) {
             console.error('No phone number provided');
             return;
         }
-
-        setBackdropLoaderOpen(true)
-
-        fetch(`${backend}/api/user/registerOrUpdate`, {
+        alert(numberToSend)
+        fetch(`${backend}/api/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'include', // Necessary for cookies to be sent and received
-            body: JSON.stringify({ token, contactNumber }),
+            body: JSON.stringify({
+                token: googleUserObject,
+                contactNumber: numberToSend
+            }),
+            credentials: 'include',
         })
-            .then(response => {
-                if (!response.ok) {
-                    setBackdropLoaderOpen(false)
-                    toast.error('Some error... please try again.', {
-                        position: "top-center",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "colored",
-                        transition: 'Flip',
-                    });
-                }
-                return response.json();
-            })
+            .then(res => res.json())
             .then(data => {
-                console.log('User updated successfully:', data);
-                setBackdropLoaderOpen(false)
-                toast.success('Number updated!', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: "Flip",
-                });
-                // Handle the UI update here, such as closing the modal and showing a success message
-                setShowNumberModal(false); // Assuming this is the method to close the phone number modal
-                // Optionally, refresh user data or re-fetch from the server if necessary
-            })
-            .catch(error => {
-                console.error('Error updating user:', error);
-                setBackdropLoaderOpen(false)
-                toast.error('Image upload failed', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
-                // Handle error, show error message to the user
-            });
+                if (data.user) {
+                    // Set user details in localStorage
+                    localStorage.setItem('userEmail', data.user.userEmail);
+                    localStorage.setItem('userName', data.user.userName);
+                    localStorage.setItem('userPicture', data.user.userPicture);
+                    localStorage.setItem('contactNumber', data.user.contactNumber)
+
+                    // Call to request notification permission should be here
+                    requestNotificationPermission();
+
+
+                }
+            }).catch(error => console.error('Error:', error));
+    }
+    function handleCallbackresponse(response) {
+        var googleUserObject_ = jwt_decode(response.credential);
+        console.log(googleUserObject_);
+        setGoogleUserObject(response.credential); // This should be the actual token, not decoded object
+    
+        // Call backend to verify token and check user's contact number status
+        fetch(`${backend}/api/auth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: response.credential }),
+            credentials: 'include',
+        })
+        .then(res => res.json())
+        .then(data => {
+            // Assuming backend response includes user object with contactNumber
+            if (data.user && data.user.contactNumber) {
+                   // Set user details in localStorage
+                   localStorage.setItem('userEmail', data.user.userEmail);
+                   localStorage.setItem('userName', data.user.userName);
+                   localStorage.setItem('userPicture', data.user.userPicture);
+                   localStorage.setItem('contactNumber', data.user.contactNumber)
+
+                   // Call to request notification permission should be here
+                   requestNotificationPermission();
+            } else {
+                // User does not have a contact number, show modal to add one
+                console.log("User does not have a contact number, showing modal.",);
+                setShowNumberModal(true);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle error, e.g., show a message to the user
+        });
+    }
+    
+
+    const updateContactNumber = () => {
+        // Assuming `number` contains the new phone number
+        const updatedPhoneNumber = number.trim();
+    
+        if (!updatedPhoneNumber) {
+            console.error('No phone number provided');
+            return;
+        }
+    
+        fetch(`${backend}/api/user/updatePhoneNumber`, {
+            method: 'PATCH', // or 'POST', depending on your backend setup
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include', // to ensure cookies are sent with the request
+            body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update phone number');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Phone number updated successfully:', data);
+            alert('Phone number updated successfully!');
+    
+            setShowNumberUpdateModal(false);
+        })
+        .catch(error => {
+            console.error('Error updating phone number:', error);
+            alert('Failed to update phone number. Please try again.');
+        });
     };
 
 
-    function handleCallbackresponse(response) {
-        var googleUserObject_ = jwt_decode(response.credential);
-        console.log(googleUserObject_)
-        setGoogleUserObject(response.credential)
+    // function handleCallbackresponse(response) {
+    //     var googleUserObject_ = jwt_decode(response.credential);
+    //     console.log(googleUserObject_)
+    //     setGoogleUserObject(response.credential)
 
-        if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
-            
-            setShowNumberModal(true)
+    //     if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
 
-        } else {
-            setShowAshokaOnlyModal(true);
-        }
-    }
+    //         setShowNumberModal(true)
+
+    //     } else {
+    //         setShowAshokaOnlyModal(true);
+    //     }
+    // }
 
     // Function to request notification permission and get the token
     const requestNotificationPermission = () => {
@@ -278,19 +279,19 @@ export default function Header(props) {
             });
     }
 
-    // useEffect(() => {
-    //     fetch('/api/auth/profile', {
-    //         credentials: 'include',
-    //     })
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             if (data.isAuthenticated) {
-    //                 // Update UI to reflect authenticated state
-    //             } else {
-    //                 // User is not authenticated
-    //             }
-    //         });
-    // }, []);
+    useEffect(() => {
+        fetch('/api/auth/profile', {
+            credentials: 'include',
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.isAuthenticated) {
+                    // Update UI to reflect authenticated state
+                } else {
+                    // User is not authenticated
+                }
+            });
+    }, []);
 
     useEffect(() => {
         setLoginLoader(true)
@@ -311,7 +312,6 @@ export default function Header(props) {
 
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-    const [number, setNumber] = useState('')
     const [phoneStatus, setPhoneStatus] = useState('default')
 
     useEffect(() => {
@@ -330,7 +330,7 @@ export default function Header(props) {
 
     return (
         <>
-            <Navbar isBordered variant="static">
+            <Navbar isBordered variant="sticky">
 
                 <Navbar.Toggle showIn={'xs'} />
 
@@ -555,7 +555,20 @@ export default function Header(props) {
                                 }}
                             >
                                 {item.key === 'logout' ?
-                                    <Col>
+                                    <Col >
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            gap: 12,
+                                            paddingBottom: '12px'
+                                        }}>
+                                            <Text css={{
+                                                fontSize: '18px',
+                                                fontWeight: '$regular'
+                                            }}>
+                                                Dark Mode
+                                            </Text>
+                                            <Switch size={'sm'} onChange={(event) => { }} />
+                                        </Row>
                                         <Link href="" onClick={handleLogout} css={{
                                             color: '$error'
                                         }}>
@@ -679,6 +692,7 @@ export default function Header(props) {
                                 const inputVal = e.target.value;
                                 const numVal = parseInt(inputVal, 10);
                                 setNumber(numVal)
+                                console.log(number)
                                 // Check if the input value is a number and its length
                                 if (!isNaN(numVal) && inputVal.length >= 10) {
                                     setPhoneStatus('success');
@@ -698,7 +712,8 @@ export default function Header(props) {
                         }}
                             disabled={phoneStatus !== 'success'}
                             onClick={() => {
-                                updatePhoneNumber()
+                                console.log(number)
+                                setCredentialsCookie()
                             }}>
                             Save
                         </Button>
@@ -773,7 +788,7 @@ export default function Header(props) {
                         }}
                             disabled={phoneStatus !== 'success'}
                             onClick={() => {
-                                updatePhoneNumber()
+                                updateContactNumber()
                             }}>
                             Update
                         </Button>
@@ -879,12 +894,6 @@ export default function Header(props) {
                 </>
             }
 
-            <Backdrop
-                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                open={backdropLoaderOpen}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
         </>
     );
 }
