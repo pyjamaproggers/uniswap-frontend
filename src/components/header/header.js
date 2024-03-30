@@ -93,8 +93,9 @@ export default function Header(props) {
     }
 
     function handleCallbackresponse(response) {
-        // var googleUserObject = jwt_decode(response.credential);
-        setGoogleUserObject(jwt_decode(response.credential))
+        var googleUserObject_ = jwt_decode(response.credential);
+        console.log(googleUserObject_)
+        setGoogleUserObject(response.credential)
 
         if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
 
@@ -603,7 +604,7 @@ export default function Header(props) {
                             onChange={(e) => {
                                 const inputVal = e.target.value;
                                 const numVal = parseInt(inputVal, 10);
-
+                                setNumber(numVal)
                                 // Check if the input value is a number and its length
                                 if (!isNaN(numVal) && inputVal.length >= 10) {
                                     setPhoneStatus('success');
@@ -677,6 +678,7 @@ export default function Header(props) {
                             onChange={(e) => {
                                 const inputVal = e.target.value;
                                 const numVal = parseInt(inputVal, 10);
+                                setNumber(numVal)
 
                                 // Check if the input value is a number and its length
                                 if (!isNaN(numVal) && inputVal.length >= 10) {
