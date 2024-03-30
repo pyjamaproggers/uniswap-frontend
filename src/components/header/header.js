@@ -22,6 +22,9 @@ import { getToken } from "firebase/messaging";
 import './header.css'
 import { FaPhone } from "react-icons/fa6";
 import { IoLogoWhatsapp } from "react-icons/io";
+import Paper from '@mui/material/Paper';
+import { GoHomeFill } from "react-icons/go";
+import BottomNavigation from '@mui/material/BottomNavigation';
 
 export default function Header(props) {
     const [render, setRender] = useState(false)
@@ -239,7 +242,7 @@ export default function Header(props) {
     return (
         <>
             <Navbar isBordered variant="sticky">
-                
+
                 <Navbar.Toggle showIn={'xs'} />
 
                 <Navbar.Brand onClick={() => {
@@ -604,6 +607,7 @@ export default function Header(props) {
                                 // Check if the input value is a number and its length
                                 if (!isNaN(numVal) && inputVal.length >= 10) {
                                     setPhoneStatus('success');
+                                    setNumber(e.target.value)
                                 } else {
                                     setPhoneStatus('error');
                                 }
@@ -699,6 +703,93 @@ export default function Header(props) {
                     </Col>
                 </Grid.Container>
             </Modal>
+
+
+            <Grid.Container css={{
+                '@xsMin': {
+                    display: 'none'
+                },
+                '@xsMax': {
+                    display: 'flex'
+                },
+                zIndex: '10',
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0
+            }}>
+                <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={10}>
+                    <BottomNavigation style={{
+                        backgroundColor: '#0c0c0c',
+                        width: '100vw',
+                        height: 'max-content'
+                    }}>
+                        <Row css={{
+                            maxW: '330px',
+                            justifyContent: 'space-around',
+                            padding: '8px 0px 36px 0px',
+                            alignItems: 'center'
+                        }}>
+                            {window.location.pathname === '/' ?
+                                <GoHomeFill size={24} color={'gray'} />
+                                :
+                                <GoHomeFill size={24} color={'#f0f0f0'} />
+                            }
+                            <FaBagShopping size={24} color={'#f0f0f0'} />
+                            <FaPlus size={24} color={'#f0f0f0'} />
+                            <IoMdHeart size={24} color={'#f0f0f0'} />
+                            <Dropdown placement="bottom-right">
+                                <Dropdown.Trigger>
+                                    <Avatar
+                                        bordered
+                                        as="button"
+                                        color=""
+                                        size="sm"
+                                        // src={`https://api.multiavatar.com/${localStorage.getItem('userEmail')}.png?apikey=Bvjs0QyHcCxZNe`}
+                                        src={localStorage.getItem('userPicture')}
+                                    />
+                                </Dropdown.Trigger>
+                                <Dropdown.Menu
+                                    aria-label="User menu actions"
+                                    color="error"
+                                    onAction={(actionKey) => {
+                                        if (actionKey === 'logout') {
+                                            handleLogout()
+                                        }
+                                        else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
+                                            window.location.pathname = `/${actionKey}`
+                                        }
+                                        else if (actionKey === 'phoneAuth') {
+                                            setShowNumberUpdateModal(true)
+                                        }
+                                        else {
+                                            console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
+                                        }
+                                    }}
+                                >
+                                    <Dropdown.Item key="profile" css={{ height: "$22", }}>
+                                        <Text b color="$gray600" css={{ d: "flex", fontSize: '$xs' }}>
+                                            Signed in as
+                                        </Text>
+                                        <Text b color="inherit" css={{ d: "flex", fontSize: '$base' }}>
+                                            {localStorage.getItem('userName')}
+                                        </Text>
+                                    </Dropdown.Item>
+
+                                    <Dropdown.Item key="phoneAuth" color=""
+                                        icon={<FaPhone size={16} />}>
+                                        Update Phone
+                                    </Dropdown.Item>
+                                    <Dropdown.Item key="logout" withDivider color="error"
+                                        icon={<IoLogOut size={16} />}>
+                                        Log Out
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </Row>
+                    </BottomNavigation>
+                </Paper>
+            </Grid.Container>
 
         </>
     );
