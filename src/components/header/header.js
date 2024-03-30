@@ -32,7 +32,7 @@ export default function Header(props) {
     const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
     const [showNumberModal, setShowNumberModal] = useState(false)
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
-
+    const [number, setNumber] = useState(0)
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
 
     const backend = process.env.REACT_APP_BACKEND
@@ -68,12 +68,19 @@ export default function Header(props) {
     const [googleUserObject, setGoogleUserObject] = useState()
 
     const setCredentialsCookie = () => {
+        const numberToSend = number.trim()
+    
+        if (!numberToSend) {
+            console.error('No phone number provided');
+            return;
+        }
+        alert(numberToSend)
         fetch(`${backend}/api/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 token: googleUserObject,
-                contactNumber: number
+                contactNumber: numberToSend
             }),
             credentials: 'include',
         })
@@ -109,9 +116,14 @@ export default function Header(props) {
         .then(data => {
             // Assuming backend response includes user object with contactNumber
             if (data.user && data.user.contactNumber) {
-                // User exists and has a contact number, proceed as logged in
-                console.log("User already has a contact number.");
-                // Possibly update UI to reflect user is logged in
+                   // Set user details in localStorage
+                   localStorage.setItem('userEmail', data.user.userEmail);
+                   localStorage.setItem('userName', data.user.userName);
+                   localStorage.setItem('userPicture', data.user.userPicture);
+                   localStorage.setItem('contactNumber', data.user.contactNumber)
+
+                   // Call to request notification permission should be here
+                   requestNotificationPermission();
             } else {
                 // User does not have a contact number, show modal to add one
                 console.log("User does not have a contact number, showing modal.",);
@@ -161,19 +173,19 @@ export default function Header(props) {
     };
 
 
-    function handleCallbackresponse(response) {
-        var googleUserObject_ = jwt_decode(response.credential);
-        console.log(googleUserObject_)
-        setGoogleUserObject(response.credential)
+    // function handleCallbackresponse(response) {
+    //     var googleUserObject_ = jwt_decode(response.credential);
+    //     console.log(googleUserObject_)
+    //     setGoogleUserObject(response.credential)
 
-        if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
+    //     if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
 
-            setShowNumberModal(true)
+    //         setShowNumberModal(true)
 
-        } else {
-            setShowAshokaOnlyModal(true);
-        }
-    }
+    //     } else {
+    //         setShowAshokaOnlyModal(true);
+    //     }
+    // }
 
     // Function to request notification permission and get the token
     const requestNotificationPermission = () => {
@@ -292,7 +304,6 @@ export default function Header(props) {
 
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-    const [number, setNumber] = useState('')
     const [phoneStatus, setPhoneStatus] = useState('default')
 
     useEffect(() => {
@@ -347,7 +358,6 @@ export default function Header(props) {
                         hideIn="xs"
                         variant="underline"
                     >
-                        {Object.keys(localStorage).length}
                         <Navbar.Link href="/saleitems" >Sale Items</Navbar.Link>
                         <Dropdown isBordered>
                             <Navbar.Item>
@@ -674,6 +684,7 @@ export default function Header(props) {
                                 const inputVal = e.target.value;
                                 const numVal = parseInt(inputVal, 10);
                                 setNumber(numVal)
+                                console.log(number)
                                 // Check if the input value is a number and its length
                                 if (!isNaN(numVal) && inputVal.length >= 10) {
                                     setPhoneStatus('success');
@@ -693,6 +704,7 @@ export default function Header(props) {
                         }}
                             disabled={phoneStatus !== 'success'}
                             onClick={() => {
+                                console.log(number)
                                 setCredentialsCookie()
                             }}>
                             Save
