@@ -37,6 +37,8 @@ export default function InputItemCard(props) {
     const [phoneStatus, setPhoneStatus] = useState('default')
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
 
+    const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
+
     const categoryColors = {
         apparel: 'error',
         food: 'secondary',
@@ -62,12 +64,14 @@ export default function InputItemCard(props) {
     const updateContactNumber = () => {
         // Assuming `number` contains the new phone number
         const updatedPhoneNumber = number.trim();
-    
+
         if (!updatedPhoneNumber) {
             console.error('No phone number provided');
             return;
         }
-    
+
+        setBackdropLoaderOpen(true)
+
         fetch(`${backend}/api/user/updatePhoneNumber`, {
             method: 'PATCH', // or 'POST', depending on your backend setup
             headers: {
@@ -76,24 +80,57 @@ export default function InputItemCard(props) {
             credentials: 'include', // to ensure cookies are sent with the request
             body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to update phone number');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Phone number updated successfully:', data);
-            alert('Phone number updated successfully!');
-    
-            setShowNumberUpdateModal(false);
-        })
-        .catch(error => {
-            console.error('Error updating phone number:', error);
-            alert('Failed to update phone number. Please try again.');
-        });
+            .then(response => {
+                if (!response.ok) {
+                    setBackdropLoaderOpen(false)
+                    toast.error('Error updating phone... please try again.', {
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        transition: 'Flip',
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Phone number updated successfully:', data);
+                setBackdropLoaderOpen(false)
+                toast.success('Number updated!', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: "Flip",
+                });
+
+                setShowNumberUpdateModal(false);
+            })
+            .catch(error => {
+                console.error('Error updating phone number:', error);
+                setBackdropLoaderOpen(false)
+                toast.error('Image upload failed', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
+            });
     };
-    
+
 
 
     return (
@@ -193,6 +230,7 @@ export default function InputItemCard(props) {
                         <span className="currency-icon">₹</span>
                         <input
                             required
+                            value={item.itemPrice}
                             className="sale-price-input"
                             placeholder="0"
                             maxLength={5}
@@ -209,9 +247,9 @@ export default function InputItemCard(props) {
 
                 <div style={{ position: 'relative', width: '330px', height: '300px' }}>
                     {previewUrl === null ?
-                        <Image src={type==='createSale' ? Grey : item.itemPicture} width={'330px'} height={'300px'} css={{
+                        <Image src={type === 'createSale' ? Grey : item.itemPicture} width={'330px'} height={'300px'} css={{
                             borderRadius: '4px',
-                            opacity: type==='createSale' ? '0.25' : '1',
+                            opacity: type === 'createSale' ? '0.25' : '1',
                             objectFit: 'cover'
                         }} />
                         :
@@ -318,130 +356,96 @@ export default function InputItemCard(props) {
                         <Link css={{
                             fontSize: '12px'
                         }}
-                        onClick={()=>{
-                            setShowNumberUpdateModal(true)
-                        }}>
+                            onClick={() => {
+                                setShowNumberUpdateModal(true)
+                            }}>
                             Change number?
                         </Link>
                     </Col>
-
-                    {type === 'editSale' &&
-                        <>
-                            {item.live === 'y' ?
-                                <>
-                                    <Button auto flat color={'success'} className="sale-buttons"
-                                        icon={<FaCloud size={'20px'} color={"$green600"} className="item-icon" />}
-                                        css={{
-                                            lineHeight: '1.2',
-                                            marginTop: '4px'
-                                        }}
-                                        onClick={()=>{
-                                            setItem({
-                                                ...item,
-                                                live: 'n'
-                                            })
-                                        }}
-                                        >
-                                        Live
-                                    </Button>
-                                </>
-                                :
-                                <>
-                                    <Button auto flat color={'error'} className="sale-buttons"
-                                        icon={<IoCloudOffline size={'20px'} color={"$red600"} className="item-icon" />}
-                                        css={{
-                                            lineHeight: '1.2',
-                                            marginTop: '4px'
-                                        }}
-                                        onClick={()=>{
-                                            setItem({
-                                                ...item,
-                                                live: 'y'
-                                            })
-                                        }}
-                                        >
-                                        Not Live
-                                    </Button>
-                                </>
-                            }
-                        </>}
                 </Row>
             </Col>
 
             <Modal
-                    open={showNumberUpdateModal}
-                    closeButton
-                    onClose={() => {
-                        setShowNumberUpdateModal(false)
-                    }}
-                >
-                    <Grid.Container css={{
-                        jc: 'center',
-                        alignItems: '',
-                        padding: '24px 0px',
+                open={showNumberUpdateModal}
+                closeButton
+                onClose={() => {
+                    setShowNumberUpdateModal(false)
+                }}
+            >
+                <Grid.Container css={{
+                    jc: 'center',
+                    alignItems: '',
+                    padding: '24px 0px',
+                }}>
+                    <Col css={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        width: 'max-content',
+                        gap: 24
                     }}>
-                        <Col css={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            width: 'max-content',
-                            gap: 24
+                        <Text css={{
+                            '@xsMin': {
+                                fontSize: '$xl'
+                            },
+                            '@xsMax': {
+                                fontSize: '$lg'
+                            },
+                            fontWeight: '$semibold'
                         }}>
-                            <Text css={{
-                                '@xsMin': {
-                                    fontSize: '$xl'
-                                },
-                                '@xsMax': {
-                                    fontSize: '$lg'
-                                },
-                                fontWeight: '$semibold'
-                            }}>
-                                Update Phone Number
-                            </Text>
+                            Update Phone Number
+                        </Text>
 
-                            <Input css={{
-                                width: '200px',
-                                backgroundColor: '#697177'
-                            }}
-                                labelLeft={
-                                    <IoLogoWhatsapp size={24} color="#25D366" />
+                        <Input css={{
+                            width: '200px',
+                            backgroundColor: '#697177'
+                        }}
+                            labelLeft={
+                                <IoLogoWhatsapp size={24} color="#25D366" />
+                            }
+                            animated={false}
+                            placeholder="9876512340"
+                            maxLength={12}
+                            status={phoneStatus}
+                            helperText="Whatsapp Contact Number!"
+                            onChange={(e) => {
+                                const inputVal = e.target.value;
+                                const numVal = parseInt(inputVal, 10);
+                                setNumber(numVal)
+
+                                // Check if the input value is a number and its length
+                                if (!isNaN(numVal) && inputVal.length >= 10) {
+                                    setPhoneStatus('success');
+                                    setNumber(e.target.value)
+                                } else {
+                                    setPhoneStatus('error');
                                 }
-                                animated={false}
-                                placeholder="9876512340"
-                                maxLength={12}
-                                status={phoneStatus}
-                                helperText="Whatsapp Contact Number!"
-                                onChange={(e) => {
-                                    const inputVal = e.target.value;
-                                    const numVal = parseInt(inputVal, 10);
-                                    setNumber(numVal)
-
-                                    // Check if the input value is a number and its length
-                                    if (!isNaN(numVal) && inputVal.length >= 10) {
-                                        setPhoneStatus('success');
-                                        setNumber(e.target.value)
-                                    } else {
-                                        setPhoneStatus('error');
-                                    }
-                                    if (inputVal.length === 0) {
-                                        setPhoneStatus('default')
-                                    }
-                                }}
-
-                            />
-
-                            <Button flat auto color={'primary'} css={{
-                                margin: '24px 0px'
+                                if (inputVal.length === 0) {
+                                    setPhoneStatus('default')
+                                }
                             }}
-                                disabled={phoneStatus !== 'success'}
-                                onClick={() => {
-                                    updateContactNumber()
-                                }}>
-                                Save
-                            </Button>
-                        </Col>
-                    </Grid.Container>
-                </Modal>
+
+                        />
+
+                        <Button flat auto color={'primary'} css={{
+                            margin: '24px 0px'
+                        }}
+                            disabled={phoneStatus !== 'success'}
+                            onClick={() => {
+                                updateContactNumber()
+                            }}>
+                            Update
+                        </Button>
+                    </Col>
+                </Grid.Container>
+            </Modal>
+
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={backdropLoaderOpen}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </Grid>
     )
 }

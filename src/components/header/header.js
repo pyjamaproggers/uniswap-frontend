@@ -25,6 +25,11 @@ import { IoLogoWhatsapp } from "react-icons/io";
 import Paper from '@mui/material/Paper';
 import { GoHomeFill } from "react-icons/go";
 import BottomNavigation from '@mui/material/BottomNavigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import CircularProgress from '@mui/material/CircularProgress';
+import Backdrop from '@mui/material/Backdrop';
+
 
 export default function Header(props) {
 
@@ -34,6 +39,8 @@ export default function Header(props) {
     const [showAshokaOnlyModal, setShowAshokaOnlyModal] = useState(false)
     const [showNumberModal, setShowNumberModal] = useState(false)
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
+
+    const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
 
     // console.log(backend)
     const navigate = useNavigate();
@@ -64,29 +71,29 @@ export default function Header(props) {
     const submitPhoneNumber = (phoneNumber) => {
         const url = `${backend}/api/user/registerOrUpdate`; // Assuming you have an endpoint that handles both registration and updating user details including phone number
         const payload = {
-          googleToken: googleUserObject, // The token you received from Google sign-in
-          phoneNumber, // The phone number the user entered
+            googleToken: googleUserObject, // The token you received from Google sign-in
+            phoneNumber, // The phone number the user entered
         };
-      
+
         fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          credentials: 'include', // Necessary for cookies to be sent and received
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            credentials: 'include', // Necessary for cookies to be sent and received
         })
-        .then(response => response.json())
-        .then(data => {
-          // Handle successful registration/update
-          console.log('Success:', data);
-          setShowNumberModal(false); // Hide the modal on successful operation
-          // Perform any additional actions required upon successful registration/update
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-          // Handle errors, such as displaying a notification to the user
-        });
-      };
-      
+            .then(response => response.json())
+            .then(data => {
+                // Handle successful registration/update
+                console.log('Success:', data);
+                setShowNumberModal(false); // Hide the modal on successful operation
+                // Perform any additional actions required upon successful registration/update
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                // Handle errors, such as displaying a notification to the user
+            });
+    };
+
 
     // funciton to handle callback for google sign in
     // Adjusted to call requestNotificationPermission after successful authentication
@@ -97,37 +104,74 @@ export default function Header(props) {
         // Assuming `googleUserObject` holds the Google token received upon sign-in.
         const token = googleUserObject; // This needs to be stored when the user logs in with Google
         const contactNumber = number.trim(); // Trim the phone number input from the user
-        
+
         if (!contactNumber) {
             console.error('No phone number provided');
             return;
         }
-        
+
+        setBackdropLoaderOpen(true)
+
         fetch(`${backend}/api/user/registerOrUpdate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include', // Necessary for cookies to be sent and received
             body: JSON.stringify({ token, contactNumber }),
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to update or register user');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('User updated successfully:', data);
-            // Handle the UI update here, such as closing the modal and showing a success message
-            setShowNumberModal(false); // Assuming this is the method to close the phone number modal
-            // Optionally, refresh user data or re-fetch from the server if necessary
-        })
-        .catch(error => {
-            console.error('Error updating user:', error);
-            // Handle error, show error message to the user
-        });
+            .then(response => {
+                if (!response.ok) {
+                    setBackdropLoaderOpen(false)
+                    toast.error('Some error... please try again.', {
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        transition: 'Flip',
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('User updated successfully:', data);
+                setBackdropLoaderOpen(false)
+                toast.success('Number updated!', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: "Flip",
+                });
+                // Handle the UI update here, such as closing the modal and showing a success message
+                setShowNumberModal(false); // Assuming this is the method to close the phone number modal
+                // Optionally, refresh user data or re-fetch from the server if necessary
+            })
+            .catch(error => {
+                console.error('Error updating user:', error);
+                setBackdropLoaderOpen(false)
+                toast.error('Image upload failed', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
+                // Handle error, show error message to the user
+            });
     };
-    
-    
+
+
     function handleCallbackresponse(response) {
         var googleUserObject_ = jwt_decode(response.credential);
         console.log(googleUserObject_)
@@ -278,7 +322,7 @@ export default function Header(props) {
 
     return (
         <>
-            <Navbar isBordered variant="sticky">
+            <Navbar isBordered variant="static">
 
                 <Navbar.Toggle showIn={'xs'} />
 
@@ -503,20 +547,7 @@ export default function Header(props) {
                                 }}
                             >
                                 {item.key === 'logout' ?
-                                    <Col >
-                                        <Row css={{
-                                            alignItems: 'center',
-                                            gap: 12,
-                                            paddingBottom: '12px'
-                                        }}>
-                                            <Text css={{
-                                                fontSize: '18px',
-                                                fontWeight: '$regular'
-                                            }}>
-                                                Dark Mode
-                                            </Text>
-                                            <Switch size={'sm'} onChange={(event) => { }} />
-                                        </Row>
+                                    <Col>
                                         <Link href="" onClick={handleLogout} css={{
                                             color: '$error'
                                         }}>
@@ -742,93 +773,117 @@ export default function Header(props) {
                 </Grid.Container>
             </Modal>
 
-
-            {/* <Grid.Container css={{
-                '@xsMin': {
-                    display: 'none'
-                },
-                '@xsMax': {
-                    display: 'flex'
-                },
-                zIndex: '10',
-                position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0
-            }}>
-                <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={10}>
-                    <BottomNavigation style={{
-                        backgroundColor: '#0c0c0c',
-                        width: '100vw',
-                        height: 'max-content'
-                    }}>
-                        <Row css={{
-                            maxW: '330px',
-                            justifyContent: 'space-around',
-                            padding: '8px 0px 36px 0px',
-                            alignItems: 'center'
+            {window.location.pathname != 'createsale' || window.location.pathname != 'editsale' ?
+                <>
+                </>
+                :
+                <Grid.Container css={{
+                    '@xsMin': {
+                        display: 'none'
+                    },
+                    '@xsMax': {
+                        display: 'flex'
+                    },
+                    zIndex: '1000',
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0
+                }}>
+                    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={100}>
+                        <BottomNavigation style={{
+                            backgroundColor: '#000',
+                            width: '100vw',
+                            height: 'max-content'
                         }}>
-                            {window.location.pathname === '/' ?
-                                <GoHomeFill size={24} color={'gray'} />
-                                :
-                                <GoHomeFill size={24} color={'#f0f0f0'} />
-                            }
-                            <FaBagShopping size={24} color={'#f0f0f0'} />
-                            <FaPlus size={24} color={'#f0f0f0'} />
-                            <IoMdHeart size={24} color={'#f0f0f0'} />
-                            <Dropdown placement="bottom-right">
-                                <Dropdown.Trigger>
-                                    <Avatar
-                                        bordered
-                                        as="button"
-                                        color=""
-                                        size="sm"
-                                        // src={`https://api.multiavatar.com/${localStorage.getItem('userEmail')}.png?apikey=Bvjs0QyHcCxZNe`}
-                                        src={localStorage.getItem('userPicture')}
-                                    />
-                                </Dropdown.Trigger>
-                                <Dropdown.Menu
-                                    aria-label="User menu actions"
-                                    color="error"
-                                    onAction={(actionKey) => {
-                                        if (actionKey === 'logout') {
-                                            handleLogout()
-                                        }
-                                        else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
-                                            window.location.pathname = `/${actionKey}`
-                                        }
-                                        else if (actionKey === 'phoneAuth') {
-                                            setShowNumberUpdateModal(true)
-                                        }
-                                        else {
-                                            console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
-                                        }
-                                    }}
-                                >
-                                    <Dropdown.Item key="profile" css={{ height: "$22", }}>
-                                        <Text b color="$gray600" css={{ d: "flex", fontSize: '$xs' }}>
-                                            Signed in as
-                                        </Text>
-                                        <Text b color="inherit" css={{ d: "flex", fontSize: '$base' }}>
-                                            {localStorage.getItem('userName')}
-                                        </Text>
-                                    </Dropdown.Item>
+                            <Row css={{
+                                maxW: '330px',
+                                justifyContent: 'space-around',
+                                padding: '10px 0px 36px 0px',
+                                alignItems: 'center'
+                            }}>
+                                {window.location.pathname === '/' ?
+                                    <GoHomeFill size={24} color={'#F31260'} onClick={() => { window.location.pathname = '/' }} />
+                                    :
+                                    <GoHomeFill size={24} color={'gray'} onClick={() => { window.location.pathname = '/' }} />
+                                }
+                                {window.location.pathname === '/saleitems' ?
+                                    <FaBagShopping size={24} color={'#F31260'} onClick={() => { window.location.pathname = '/saleitems' }} />
+                                    :
+                                    <FaBagShopping size={24} color={'gray'} onClick={() => { window.location.pathname = '/saleitems' }} />
+                                }
+                                {window.location.pathname === '/createsale' ?
+                                    <FaPlus size={24} color={'#F31260'} onClick={() => { window.location.pathname = '/createsale' }} />
+                                    :
+                                    <FaPlus size={24} color={'gray'} onClick={() => { window.location.pathname = '/createsale' }} />
+                                }
+                                {window.location.pathname === '/favourites' ?
+                                    <IoMdHeart size={24} color={'#F31260'} onClick={() => { window.location.pathname = '/favourites' }} />
+                                    :
+                                    <IoMdHeart size={24} color={'gray'} onClick={() => { window.location.pathname = '/favourites' }} />
+                                }
+                                <Dropdown placement="top-right">
+                                    <Dropdown.Trigger>
+                                        <Avatar
+                                            // as="button"
+                                            color=""
+                                            size="sm"
+                                            // src={`https://api.multiavatar.com/${localStorage.getItem('userEmail')}.png?apikey=Bvjs0QyHcCxZNe`}
+                                            src={localStorage.getItem('userPicture')}
+                                        />
+                                    </Dropdown.Trigger>
+                                    <Dropdown.Menu
+                                        aria-label="User menu actions"
+                                        color="error"
+                                        onAction={(actionKey) => {
+                                            if (actionKey === 'logout') {
+                                                handleLogout()
+                                            }
+                                            else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
+                                                window.location.pathname = `/${actionKey}`
+                                            }
+                                            else if (actionKey === 'phoneAuth') {
+                                                setShowNumberUpdateModal(true)
+                                            }
+                                            else {
+                                                console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
+                                            }
+                                        }}
+                                    >
+                                        <Dropdown.Item key="profile" css={{ height: "$22", }}>
+                                            <Text b color="$gray600" css={{ d: "flex", fontSize: '$xs' }}>
+                                                Signed in as
+                                            </Text>
+                                            <Text b color="inherit" css={{ d: "flex", fontSize: '$base' }}>
+                                                {localStorage.getItem('userName')}
+                                            </Text>
+                                            <Text b color="inherit" css={{ d: "flex", fontSize: '$sm' }}>
+                                                {localStorage.getItem('contactNumber')}
+                                            </Text>
+                                        </Dropdown.Item>
 
-                                    <Dropdown.Item key="phoneAuth" color=""
-                                        icon={<FaPhone size={16} />}>
-                                        Update Phone
-                                    </Dropdown.Item>
-                                    <Dropdown.Item key="logout" withDivider color="error"
-                                        icon={<IoLogOut size={16} />}>
-                                        Log Out
-                                    </Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </Row>
-                    </BottomNavigation>
-                </Paper>
-            </Grid.Container> */}
+                                        <Dropdown.Item key="phoneAuth" withDivider color=""
+                                            icon={<FaPhone size={16} />}>
+                                            Update Phone
+                                        </Dropdown.Item>
+                                        <Dropdown.Item key="logout" withDivider color="error"
+                                            icon={<IoLogOut size={16} />}>
+                                            Log Out
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </Row>
+                        </BottomNavigation>
+                    </Paper>
+                </Grid.Container>
+            }
 
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={backdropLoaderOpen}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </>
     );
 }

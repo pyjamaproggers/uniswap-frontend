@@ -807,6 +807,7 @@ export default function ItemsPage(props) {
                         </>
                     }
                 </Grid.Container>
+
             </Grid.Container>
         )
     }

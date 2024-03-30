@@ -30,7 +30,7 @@ export default function EditSalePage() {
 
     const [originalItemPicture, setOriginalItemPicture] = useState(item.itemPicture);
 
-    const [imageFile, setImageFile] = useState(null)
+    const [imageFile, setImageFile] = useState(item.itemPicture)
     const [previewUrl, setPreviewUrl] = useState(null)
 
     const checkForm = () => {
@@ -144,7 +144,7 @@ export default function EditSalePage() {
     };
 
     useEffect(() => {
-        if (imageFile) {
+        if (typeof(imageFile)=='object') {
             const url = URL.createObjectURL(imageFile);
             // console.log(url)
             setPreviewUrl(url);
