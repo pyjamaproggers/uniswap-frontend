@@ -66,7 +66,8 @@ function Footer(){
                     borderWidth: '1px 0px 0px 0px',
                     '@xsMax':{
                         fontSize: '$xs'
-                    }
+                    },
+                    marginBottom: '72px'
                 }}>
                     © 2024 UniSwap™ @Ashoka University. All Rights Reserved.
                 </Text>

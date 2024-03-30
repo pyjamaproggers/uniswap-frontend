@@ -15,7 +15,7 @@ import { FaPlus } from "react-icons/fa";
 import { FaBagShopping } from "react-icons/fa6";
 import { IoMdHeart } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlinePhoneIphone } from "react-icons/md";
 import { messaging } from "../../services/firebase.js";
 import { getToken } from "firebase/messaging";
@@ -44,8 +44,16 @@ export default function Header(props) {
 
     // console.log(backend)
     const navigate = useNavigate();
+    const location = useLocation();
 
     // const toggleMode = props.toggleMode
+
+    const navigationItems = [
+        { path: '/', icon: GoHomeFill },
+        { path: '/saleitems', icon: FaBagShopping },
+        { path: '/createsale', icon: FaPlus },
+        { path: '/favourites', icon: IoMdHeart }
+    ];
 
     const collapseItemsLoggedOut = [
         { key: 'about', value: "About" },
@@ -178,7 +186,7 @@ export default function Header(props) {
         setGoogleUserObject(response.credential)
 
         if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
-
+            
             setShowNumberModal(true)
 
         } else {
@@ -767,16 +775,13 @@ export default function Header(props) {
                             onClick={() => {
                                 updatePhoneNumber()
                             }}>
-                            Save
+                            Update
                         </Button>
                     </Col>
                 </Grid.Container>
             </Modal>
 
-            {window.location.pathname != 'createsale' || window.location.pathname != 'editsale' ?
-                <>
-                </>
-                :
+            {!(window.location.pathname === '/createsale' || window.location.pathname === '/editsale') ?
                 <Grid.Container css={{
                     '@xsMin': {
                         display: 'none'
@@ -802,26 +807,19 @@ export default function Header(props) {
                                 padding: '10px 0px 36px 0px',
                                 alignItems: 'center'
                             }}>
-                                {window.location.pathname === '/' ?
-                                    <GoHomeFill size={24} color={'#F31260'} onClick={() => { window.location.pathname = '/' }} />
-                                    :
-                                    <GoHomeFill size={24} color={'gray'} onClick={() => { window.location.pathname = '/' }} />
-                                }
-                                {window.location.pathname === '/saleitems' ?
-                                    <FaBagShopping size={24} color={'#F31260'} onClick={() => { window.location.pathname = '/saleitems' }} />
-                                    :
-                                    <FaBagShopping size={24} color={'gray'} onClick={() => { window.location.pathname = '/saleitems' }} />
-                                }
-                                {window.location.pathname === '/createsale' ?
-                                    <FaPlus size={24} color={'#F31260'} onClick={() => { window.location.pathname = '/createsale' }} />
-                                    :
-                                    <FaPlus size={24} color={'gray'} onClick={() => { window.location.pathname = '/createsale' }} />
-                                }
-                                {window.location.pathname === '/favourites' ?
-                                    <IoMdHeart size={24} color={'#F31260'} onClick={() => { window.location.pathname = '/favourites' }} />
-                                    :
-                                    <IoMdHeart size={24} color={'gray'} onClick={() => { window.location.pathname = '/favourites' }} />
-                                }
+                                {navigationItems.map(navItem => {
+                                    const IconComponent = navItem.icon;
+                                    const isSelected = location.pathname === navItem.path;
+
+                                    return (
+                                        <IconComponent
+                                            key={navItem.path}
+                                            size={24}
+                                            color={isSelected ? '#F31260' : 'gray'}
+                                            onClick={() => navigate(navItem.path)}
+                                        />
+                                    );
+                                })}
                                 <Dropdown placement="top-right">
                                     <Dropdown.Trigger>
                                         <Avatar
@@ -876,6 +874,9 @@ export default function Header(props) {
                         </BottomNavigation>
                     </Paper>
                 </Grid.Container>
+                :
+                <>
+                </>
             }
 
             <Backdrop

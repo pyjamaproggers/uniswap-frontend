@@ -8,6 +8,7 @@ import HomePage from './pages/homePage/homePage';
 import Itemspage from './pages/ItemsPage/ItemsPage'
 import CreateSalePage from './pages/createSalePage/createSalePage';
 import EditSalePage from './pages/editSalePage/editSalePage';
+import OutletsPage from './pages/outletsPage/outletsPage';
 import { useEffect, useState } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -95,6 +96,7 @@ function App() {
                                 <Route exact path='/useritems' element={<Itemspage type={'user'} />} />
                                 <Route exact path='/createsale' element={<CreateSalePage />} />
                                 <Route exact path='/editsale' element={<EditSalePage />} />
+                                <Route exact path='/outlets' element={<OutletsPage />} />
                             </Routes>
                         </Router>
                         <Footer />
