@@ -278,7 +278,6 @@ export default function Header(props) {
                         hideIn="xs"
                         variant="underline"
                     >
-                        {Object.keys(localStorage).length}
                         <Navbar.Link href="/saleitems" >Sale Items</Navbar.Link>
                         <Dropdown isBordered>
                             <Navbar.Item>

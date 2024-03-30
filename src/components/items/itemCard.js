@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Badge, Col, Grid, Avatar, Text, Image, Row, Collapse, Button } from "@nextui-org/react";
 import './itemCard.css'
 import { IoLogoWhatsapp } from "react-icons/io";
@@ -8,14 +8,17 @@ import { IoMdHeart } from "react-icons/io";
 import { IoPencil } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
-
+import { FaCloud } from "react-icons/fa6";
+import { IoCloudOffline } from "react-icons/io5";
 
 export default function ItemCard(props) {
 
     const navigate = useNavigate()
     const backend = process.env.REACT_APP_BACKEND
 
-    const item = props.item
+    const [render, setRender] = useState(false)
+
+    const [item, setItem] = useState({ ...props.item })
 
     const [firstName, lastName] = item.userName.split(' ');
 
@@ -28,6 +31,7 @@ export default function ItemCard(props) {
 
     let favouriteItems = props.favouriteItems
     let handleFavouriteItemToggle = props.handleFavouriteItemToggle
+    let handleLiveToggle = props.handleLiveToggle
     // console.log(item.id, favouriteItems, favouriteItems.includes(item.id))
     // console.log(props)
 
@@ -59,7 +63,7 @@ export default function ItemCard(props) {
         }
     }
 
-    
+
     const toggleLiveStatus = async (itemId, currentStatus) => {
         // Removed setBackdropLoaderOpen(true);
         console.log('hi')
@@ -72,21 +76,21 @@ export default function ItemCard(props) {
                 credentials: 'include',
                 body: JSON.stringify({ live: currentStatus === "y" ? "n" : "y" }),
             });
-    
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+
+            if (response.ok) {
+                console.log('here')
+                handleLiveToggle(itemId, currentStatus)
+            } else {
+                // Handle failure (e.g., item not found, user not authenticated)
+                console.error(data.message);
             }
-    
+
             // Parse the JSON response and update state accordingly
             const data = await response.json();
             console.log('Live status toggled:', data);
-    
-            // Here, you would need to inform the parent component to update its state
-            // This assumes that you have a prop function like props.onLiveStatusToggle
-            props.onLiveStatusToggle(itemId, data.live);
-    
+            
             // Removed toast success and error messages since `toast` is not defined
-    
+
         } catch (error) {
             console.error('Failed to toggle live status:', error);
             // Removed toast error message since `toast` is not defined
@@ -94,13 +98,14 @@ export default function ItemCard(props) {
             // Removed setBackdropLoaderOpen(false);
         }
     };
-    
 
-    const handleLiveStatusClick = () => {
-        if (window.confirm(`Are you sure you want to set this item as ${item.live === "y" ? "inactive" : "active"}?`)) {
-            toggleLiveStatus(item._id);
-        }
-    };
+
+    // const handleLiveStatusClick = () => {
+    //     if (window.confirm(`Are you sure you want to set this item as ${item.live === "y" ? "inactive" : "active"}?`)) {
+    //         toggleLiveStatus(item._id);
+    //     }
+    // };
+
 
     function getTimeDifference(dateString) {
         const itemDate = new Date(dateString);
@@ -109,12 +114,12 @@ export default function ItemCard(props) {
         const differenceInMinutes = Math.floor(differenceInSeconds / 60);
         const differenceInHours = Math.floor(differenceInMinutes / 60);
         const differenceInDays = Math.floor(differenceInHours / 24);
-    
+
         // Helper function to format the time string correctly
         const formatTimeString = (value, unit) => {
             return `${value} ${unit}${value > 1 ? 's' : ''} ago`;
         };
-    
+
         if (differenceInSeconds < 60) {
             return formatTimeString(differenceInSeconds, 'second');
         } else if (differenceInMinutes < 60) {
@@ -127,7 +132,7 @@ export default function ItemCard(props) {
             return formatDate(itemDate);
         }
     }
-    
+
 
     function formatDate(date) {
         const day = date.getDate();
@@ -171,7 +176,7 @@ export default function ItemCard(props) {
                 console.log(`Item with ID ${itemId} deleted successfully.`);
                 // For example, you could call a prop function to refresh the items
                 props.onItemDeleted(itemId);
-                
+
             } catch (error) {
                 console.error('Error deleting the item:', error);
                 alert('There was an error trying to delete the item.');
@@ -284,23 +289,25 @@ export default function ItemCard(props) {
 
                             </Col>
 
-                            {type === 'user' &&
+                            {/* {type === 'user' &&
                                 <>
                                     {item.live === 'y' ?
                                         <>
-                                            <Badge variant="flat" size={'md'} color={'success'}>
+                                            <Badge variant="flat" size={'md'} color={'success'}
+                                                onClick={() => { toggleLiveStatus(item._id) }}>
                                                 • Live
                                             </Badge>
                                         </>
                                         :
                                         <>
-                                            <Badge variant="flat" size={'md'} color={'error'}>
+                                            <Badge variant="flat" size={'md'} color={'error'}
+                                                onClick={() => { toggleLiveStatus(item._id) }}>
                                                 • Not Live
                                             </Badge>
                                         </>
                                     }
                                 </>
-                            }
+                            } */}
                         </Row>
                     }
                 >
@@ -338,24 +345,32 @@ export default function ItemCard(props) {
                         {getTimeDifference(item.dateAdded)}
                     </Text>
                     {type === 'user' ?
-                         <Row css={{
-                            justifyContent: 'space-between',
+                        <Row css={{
+                            justifyContent: 'flex-end',
                             alignItems: 'center',
                             paddingTop: '8px',
+                            gap: 4
                         }}>
-                            <Button auto flat color={item.live === "y" ? "error" : "success"}
-                                    onClick={handleLiveStatusClick}>
-                                {item.live === "y" ? "Set Inactive" : "Set Active"}
-                            </Button>
-        
+                            {item.live === 'y' ?
+                                <Button auto flat color={"success"}
+                                icon={<FaCloud size={16} />}
+                                    onClick={() => { toggleLiveStatus(item._id) }}>
+                                    Live
+                                </Button>
+                                :
+                                <Button auto flat color={"error"}
+                                icon={<IoCloudOffline size={16}/>}
+                                    onClick={() => { toggleLiveStatus(item._id) }}>
+                                    Not Live
+                                </Button>
+                            }
                             <Button auto flat color="primary"
-                                    onClick={() => navigate('/editsale', { state: item })}>
-                                <IoPencil size={16} />
+                                onClick={() => navigate('/editsale', { state: item })}>
+                                <IoPencil size={14} />
                                 Edit
                             </Button>
-        
                             <Button auto flat color="error"
-                                    onClick={() => handleDeleteItem(item._id)}>
+                                onClick={() => handleDeleteItem(item._id)}>
                                 <MdDelete size={16} />
                                 Delete
                             </Button>

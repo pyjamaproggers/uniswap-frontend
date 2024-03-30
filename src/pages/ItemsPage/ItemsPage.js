@@ -36,7 +36,7 @@ export default function ItemsPage(props) {
         searched: ''
     })
 
-    const[allItems, setAllItems] = useState([])
+    const [allItems, setAllItems] = useState([])
 
     const [userItems, setUserItems] = useState([])
 
@@ -48,8 +48,8 @@ export default function ItemsPage(props) {
     let tempFavouriteItems = JSON.parse(localStorage.getItem('favouriteItems'))
     const [favouriteItems, setFavouriteItems] = useState(tempFavouriteItems ? tempFavouriteItems : [])
 
-    useEffect(()=>{
-        if(!JSON.parse(localStorage.getItem('favouriteItems'))){
+    useEffect(() => {
+        if (!JSON.parse(localStorage.getItem('favouriteItems'))) {
             localStorage.setItem('favouriteItems', JSON.stringify([]))
         }
     })
@@ -146,13 +146,13 @@ export default function ItemsPage(props) {
                 });
             }
             var final = []
-            result.forEach(item=>{
+            result.forEach(item => {
                 final.push(item)
             })
 
-            
+
             setFilteredItems(final);
-            console.log({favouriteItems})
+            console.log({ favouriteItems })
             setBackdropLoaderOpen(false)
         }, 1000)
     }
@@ -190,7 +190,7 @@ export default function ItemsPage(props) {
     useEffect(() => {
         fetchAllItems();
     }, []);
-    
+
 
     const sendNewFavouriteItemsToDB = (newFavouriteItems) => {
         console.log('New Favourite Items to save: ', newFavouriteItems)
@@ -220,6 +220,21 @@ export default function ItemsPage(props) {
         setRender((prev) => (!prev))
     }
 
+    const handleLiveToggle = (itemIDToUpdate) => {
+        var newUserItems = userItems.map((userItem) => {
+            if (userItem._id === itemIDToUpdate) {
+                return { ...userItem, live: userItem.live === 'y' ? 'n' : 'y' };
+            }
+            return userItem;
+        });
+        console.log(userItems)
+        console.log(newUserItems)
+
+        setUserItems(newUserItems)
+        setRender((prev) => (!prev))
+    };
+
+
     function filterItemsByEmail(email) {
         return allItems.filter(item => item.userEmail === email);
     }
@@ -231,6 +246,10 @@ export default function ItemsPage(props) {
             setUserItems(tempUserItems)
         }
     }, [allItems])
+
+    useEffect(() => {
+        console.log("User's items updated")
+    }, [userItems])
 
     useEffect(() => {
         console.log('Updated favourite items on allItemsPage')
@@ -333,12 +352,12 @@ export default function ItemsPage(props) {
                             labelLeft={<IoSearchSharp size={'20px'} color={""} />}
                             animated={false}
                             onChange={(e) => {
-                                window.setTimeout(()=>{
+                                window.setTimeout(() => {
                                     setFiltersApplied(prev => ({
                                         ...prev,
                                         searched: e.target.value
                                     }))
-                                },1500)
+                                }, 1500)
                             }}
                         />
                     </Row>
@@ -752,7 +771,7 @@ export default function ItemsPage(props) {
                                         :
                                         <>
                                             {userItems.map((item, index) => (
-                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} />
+                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} />
                                             ))}
                                         </>
                                     }
@@ -763,11 +782,11 @@ export default function ItemsPage(props) {
                                         <>
                                             {/* If filters applied and there are filtered items */}
                                             {
-                                            filteredItems.map((item, index) =>{
-                                                console.log("whatsup") 
-                                                return (
-                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} />
-                                            )})}
+                                                filteredItems.map((item, index) => {
+                                                    return (
+                                                        <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} />
+                                                    )
+                                                })}
                                         </>
                                     }
                                     {filteredItems && filteredItems.length == 0 &&
