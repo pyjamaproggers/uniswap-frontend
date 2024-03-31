@@ -62,75 +62,67 @@ export default function InputItemCard(props) {
     ]
 
     const updateContactNumber = () => {
-        // Assuming `number` contains the new phone number
         const updatedPhoneNumber = number.trim();
-
+    
         if (!updatedPhoneNumber) {
             console.error('No phone number provided');
             return;
         }
-
-        setBackdropLoaderOpen(true)
-
+    
+        setBackdropLoaderOpen(true);
+    
         fetch(`${backend}/api/user/updatePhoneNumber`, {
-            method: 'PATCH', // or 'POST', depending on your backend setup
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include', // to ensure cookies are sent with the request
+            credentials: 'include',
             body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
         })
-            .then(response => {
-                if (!response.ok) {
-                    setBackdropLoaderOpen(false)
-                    toast.error('Error updating phone... please try again.', {
-                        position: "top-center",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "colored",
-                        transition: 'Flip',
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Phone number updated successfully:', data);
-                setBackdropLoaderOpen(false)
-                toast.success('Number updated!', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: "Flip",
-                });
-
-                setShowNumberUpdateModal(false);
-            })
-            .catch(error => {
-                console.error('Error updating phone number:', error);
-                setBackdropLoaderOpen(false)
-                toast.error('Image upload failed', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error updating phone number');
+            }
+            return response.json();
+        })
+        .then(() => {
+            console.log('Phone number updated successfully');
+            // Update the item state with the new contact number
+            setItem(prevItem => ({
+                ...prevItem,
+                contactNumber: updatedPhoneNumber
+            }));
+            setShowNumberUpdateModal(false);
+            setBackdropLoaderOpen(false);
+            toast.success('Number updated!', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: "Flip",
             });
+        })
+        .catch(error => {
+            console.error('Error updating phone number:', error);
+            setBackdropLoaderOpen(false);
+            toast.error('Failed to update phone number. Please try again.', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: 'Flip',
+            });
+        });
     };
-
+    
 
 
     return (
@@ -230,26 +222,20 @@ export default function InputItemCard(props) {
                         <span className="currency-icon">₹</span>
                         <input
                             required
-                            value={number} // Here lies a potential issue
                             className="sale-price-input"
                             placeholder="0"
-                            maxLength={5}
+                            maxLength={10}
+                            value={item.itemPrice.toString()} // Convert to string for input value
                             onChange={(e) => {
-                                const inputVal = e.target.value;
-                                const cleanedInput = inputVal.replace(/\D/g, '');
-                                
-                                // Update the local state to control the input display
-                                setNumber(cleanedInput);
-                                
-                                // Update the parent component's state with the new price
-                                setItem(prev => ({
-                                    ...prev,
-                                    itemPrice: cleanedInput ? parseInt(cleanedInput, 10) : 0 // Convert cleaned input to number; default to 0 if empty
+                                // Directly update itemPrice with the new value, or fallback to 0 if not a number
+                                const value = parseInt(e.target.value, 10);
+                                setItem(prevItem => ({
+                                    ...prevItem,
+                                    itemPrice: isNaN(value) ? 0 : value
                                 }));
                             }}
-                            
-                            
                         />
+
                     </div>
 
                 </Row>
