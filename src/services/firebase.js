@@ -16,13 +16,13 @@ var appId = process.env.REACT_APP_appId
 var measurementId = process.env.REACT_APP_measurementId
 
 const firebaseConfig = {
-    apiKey: apiKey,
-    authDomain: authDomain,
-    projectId: projectId,
-    storageBucket: storageBucket,
-    messagingSenderId: messagingSenderId,
-    appId: appId,
-    measurementId: measurementId
+  apiKey: "AIzaSyAawNBBBRIkCbRzbs4Sxu5-O_M_shnW0Ok",
+  authDomain: "uniswap-418221.firebaseapp.com",
+  projectId: "uniswap-418221",
+  storageBucket: "uniswap-418221.appspot.com",
+  messagingSenderId: "84838878723",
+  appId: "1:84838878723:web:b5dfbaf9ef13e213384836",
+  measurementId: "G-SWGZLGYCE1"
 };
 
 // Initialize Firebase

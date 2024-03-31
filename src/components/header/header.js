@@ -80,55 +80,6 @@ export default function Header(props) {
 
     const [googleUserObject, setGoogleUserObject] = useState()
 
-    const setCredentialsCookie = () => {
-        setBackdropLoaderOpen(true)
-        // const numberToSend = number.trim()
-        const numberToSend = number
-
-        if (!numberToSend) {
-            setBackdropLoaderOpen(false)
-            console.error('No phone number provided');
-            toast.error('No phone number... try again', {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                transition: 'Flip',
-            });
-            return;
-        }
-        // alert(numberToSend)
-        fetch(`${backend}/api/auth/google`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contactNumber: numberToSend,
-                test: 'TEST VARIABLE BBABAAYBYABYABYABYAYYYYY',
-                // token: googleUserObject,
-            }),
-            credentials: 'include',
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.user) {
-                    // Set user details in localStorage
-                    localStorage.setItem('userEmail', data.user.userEmail);
-                    localStorage.setItem('userName', data.user.userName);
-                    localStorage.setItem('userPicture', data.user.userPicture);
-                    localStorage.setItem('contactNumber', data.user.contactNumber)
-                    setBackdropLoaderOpen(false)
-
-                    // Call to request notification permission should be here
-                    requestNotificationPermission();
-
-
-                }
-            }).catch(error => console.error('Error:', error));
-    }
 
     function handleCallbackresponse(response) {
         var googleUserObject_ = jwt_decode(response.credential);
@@ -178,80 +129,90 @@ export default function Header(props) {
             });
     }
 
-
     const updateContactNumber = () => {
-        // Assuming `number` contains the new phone number
-        // const updatedPhoneNumber = number.trim();
-        const updatedPhoneNumber = number
-        setBackdropLoaderOpen(true)
-
+        const updatedPhoneNumber = number; // Assuming `number` contains the new phone number
+        setBackdropLoaderOpen(true);
+    
         if (!updatedPhoneNumber) {
             console.error('No phone number provided');
             return;
         }
-
+    
+        // First, update the user's phone number
         fetch(`${backend}/api/user/updatePhoneNumber`, {
-            method: 'PATCH', // or 'POST', depending on your backend setup
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
             credentials: 'include', // to ensure cookies are sent with the request
             body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
         })
-            .then(response => {
-                if (!response.ok) {
-                    setBackdropLoaderOpen(false)
-                    toast.error('Failed to update number', {
-                        position: "top-center",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "colored",
-                        transition: 'Flip',
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Phone number updated successfully:', data);
-                setBackdropLoaderOpen(false)
-                // alert('Phone number updated successfully!');
-                toast.success('Number updated successfully.', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
-
-                setShowNumberUpdateModal(false);
-            })
-            .catch(error => {
-                setBackdropLoaderOpen(false)
-                console.error('Error updating phone number:', error);
-                // alert('Failed to update phone number. Please try again.');
-                toast.error('Error updating phone number', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update number');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Phone number updated successfully:', data);
+    
+            // Now, verify the user to get a new token with updated info
+            return fetch(`${backend}/api/auth/verify`, {
+                method: 'GET',
+                credentials: 'include', // Important to include cookies
             });
+        })
+        .then(verifyResponse => {
+            if (!verifyResponse.ok) {
+                throw new Error('Failed to verify user');
+            }
+            return verifyResponse.json();
+        })
+        .then(verifyData => {
+            console.log('User verified, and cookie updated:', verifyData);
+            toast.success('Number updated and user verified successfully.', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: 'Flip',
+            });
+    
+            // Optionally update local storage or UI based on verified user data
+            // Assuming verifyData.user contains the updated user info
+            localStorage.setItem('userEmail', verifyData.user.userEmail);
+            localStorage.setItem('userName', verifyData.user.userName);
+            localStorage.setItem('userPicture', verifyData.user.userPicture);
+            localStorage.setItem('contactNumber', verifyData.user.contactNumber);
+    
+            setBackdropLoaderOpen(false);
+            setShowNumberUpdateModal(false);
+            setShowNumberModal(false);
+    
+            // Continue with any further actions, like requesting notification permissions
+            requestNotificationPermission();
+        })
+        .catch(error => {
+            setBackdropLoaderOpen(false);
+            console.error('Error:', error);
+            toast.error(error.message, {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: 'Flip',
+            });
+        });
     };
-
-
+    
     // function handleCallbackresponse(response) {
     //     var googleUserObject_ = jwt_decode(response.credential);
     //     console.log(googleUserObject_)
@@ -771,8 +732,7 @@ export default function Header(props) {
                         }}
                             disabled={phoneStatus !== 'success'}
                             onClick={() => {
-                                console.log(number)
-                                setCredentialsCookie()
+                                updateContactNumber()
                             }}>
                             Save
                         </Button>
