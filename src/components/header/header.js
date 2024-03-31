@@ -50,6 +50,7 @@ export default function Header(props) {
     ];
 
     const collapseItemsLoggedOut = [
+        { key: 'outlets', value: "Outlets" },
         { key: 'about', value: "About" },
     ];
 
@@ -555,20 +556,7 @@ export default function Header(props) {
                                 }}
                             >
                                 {item.key === 'logout' ?
-                                    <Col >
-                                        <Row css={{
-                                            alignItems: 'center',
-                                            gap: 12,
-                                            paddingBottom: '12px'
-                                        }}>
-                                            <Text css={{
-                                                fontSize: '18px',
-                                                fontWeight: '$regular'
-                                            }}>
-                                                Dark Mode
-                                            </Text>
-                                            <Switch size={'sm'} onChange={(event) => { }} />
-                                        </Row>
+                                    <Col>
                                         <Link href="" onClick={handleLogout} css={{
                                             color: '$error'
                                         }}>
@@ -810,7 +798,7 @@ export default function Header(props) {
                     left: 0,
                     right: 0
                 }}>
-                    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={100}>
+                    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
                         <BottomNavigation style={{
                             backgroundColor: '#000',
                             width: '100vw',
