@@ -93,15 +93,16 @@ export default function EditSalePage() {
     }, []);
 
     const sendItem = async () => {
-        setBackdropLoaderOpen(true)
-        if (!checkForm()) {
-            alert('Please fill in all required fields correctly.');
-            return;
-        }
+        setBackdropLoaderOpen(true);
+    if (!checkForm()) {
+        alert('Please fill in all required fields correctly.');
+        setBackdropLoaderOpen(false);
+        return;
+    }
 
         let imageUrl = originalItemPicture; // Default to the original picture URL
 
-        if (imageFile) {
+        if (imageFile && typeof imageFile === 'object' && imageFile.size) { // Check if imageFile is a file object
             try {
                 // Obtain the pre-signed URL from your backend
                 const uploadResponse = await fetch(`${backend}/api/upload`, { credentials: 'include' });
