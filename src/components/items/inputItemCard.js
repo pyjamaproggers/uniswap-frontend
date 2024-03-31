@@ -230,16 +230,25 @@ export default function InputItemCard(props) {
                         <span className="currency-icon">₹</span>
                         <input
                             required
-                            value={item.itemPrice}
+                            value={number} // Here lies a potential issue
                             className="sale-price-input"
                             placeholder="0"
                             maxLength={5}
                             onChange={(e) => {
-                                setItem({
-                                    ...item,
-                                    itemPrice: parseInt(e.target.value, 10)
-                                });
+                                const inputVal = e.target.value;
+                                const cleanedInput = inputVal.replace(/\D/g, '');
+                                
+                                // Update the local state to control the input display
+                                setNumber(cleanedInput);
+                                
+                                // Update the parent component's state with the new price
+                                setItem(prev => ({
+                                    ...prev,
+                                    itemPrice: cleanedInput ? parseInt(cleanedInput, 10) : 0 // Convert cleaned input to number; default to 0 if empty
+                                }));
                             }}
+                            
+                            
                         />
                     </div>
 
