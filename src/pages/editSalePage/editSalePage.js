@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
+import { useNavigate } from 'react-router-dom'; 
 import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar } from "@nextui-org/react";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
@@ -62,6 +63,34 @@ export default function EditSalePage() {
         // If all checks pass
         return true;
     };
+
+    const navigate = useNavigate(); 
+    const verifyUserSession = () => {
+        fetch(`${backend}/api/auth/verify`, {
+            method: 'GET',
+            credentials: 'include', // Necessary to include the cookie in the request
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Session expired or user not logged in');
+            }
+        })
+        .then(data => {
+            console.log('User session verified:', data);
+            // Optionally update the UI or state based on the response
+        })
+        .catch(error => {
+            console.error('Error verifying user session:', error);
+            // Redirect to login page or show an error page
+            navigate('/login'); // Adjust the path as necessary
+        });
+    };
+
+    useEffect(() => {
+        verifyUserSession();
+    }, []);
 
     const sendItem = async () => {
         setBackdropLoaderOpen(true)

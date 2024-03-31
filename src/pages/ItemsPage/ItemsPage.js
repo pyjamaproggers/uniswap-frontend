@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom'; 
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
 import { Button, Col, Grid, Input, Text, Row, Badge } from "@nextui-org/react";
 import { IoFilter } from "react-icons/io5";
 import ItemCard from "../../components/items/itemCard";
-import Pic1 from '../../assets/Amul.jpeg'
-import Pic2 from '../../assets/ChaiShai.jpeg'
-import Pic3 from '../../assets/ChicagoPizzaOrder.jpeg'
-import Pic4 from '../../assets/Dhaba.jpeg'
-import Pic5 from '../../assets/FuelZone.jpeg'
-import Pic6 from '../../assets/HomeImage.jpg'
 import Skeleton from '@mui/material/Skeleton';
 import { IoSearchSharp } from "react-icons/io5";
 import Drawer from '@mui/material/Drawer';
@@ -24,6 +19,7 @@ export default function ItemsPage(props) {
 
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
+    const navigate = useNavigate(); 
 
     const type = props.type
 
@@ -54,6 +50,33 @@ export default function ItemsPage(props) {
         }
     })
 
+    const verifyUserSession = () => {
+        fetch(`${backend}/api/auth/verify`, {
+            method: 'GET',
+            credentials: 'include', // Necessary to include the cookie in the request
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Session expired or user not logged in');
+            }
+        })
+        .then(data => {
+            console.log('User session verified:', data);
+            // Optionally update the UI or state based on the response
+        })
+        .catch(error => {
+            console.error('Error verifying user session:', error);
+            // Redirect to login page or show an error page
+            navigate('/login'); // Adjust the path as necessary
+        });
+    };
+
+    useEffect(() => {
+        verifyUserSession();
+    }, []);
+
     const toggleLiveStatus = async (itemId) => {
         try {
             const response = await fetch(`${backend}/api/items/live/${itemId}`, {
@@ -80,6 +103,8 @@ export default function ItemsPage(props) {
             // Handle error by showing a message to the user
         }
     };
+
+
 
     const [priceFilters, setPriceFilters] = useState([
         { key: '1', value: '₹0-₹100', chosen: false },
