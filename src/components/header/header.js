@@ -313,7 +313,7 @@ export default function Header(props) {
     }
 
     useEffect(() => {
-        fetch('/api/auth/profile', {
+        fetch(`${backend}/api/auth/profile`, {
             credentials: 'include',
         })
             .then(res => res.json())
