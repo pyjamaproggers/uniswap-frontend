@@ -25,6 +25,10 @@ import { IoLogoWhatsapp } from "react-icons/io";
 import Paper from '@mui/material/Paper';
 import { GoHomeFill } from "react-icons/go";
 import BottomNavigation from '@mui/material/BottomNavigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function Header(props) {
     const [render, setRender] = useState(false)
@@ -77,19 +81,34 @@ export default function Header(props) {
     const [googleUserObject, setGoogleUserObject] = useState()
 
     const setCredentialsCookie = () => {
-        const numberToSend = number.trim()
-    
+        setBackdropLoaderOpen(true)
+        // const numberToSend = number.trim()
+        const numberToSend = number
+
         if (!numberToSend) {
+            setBackdropLoaderOpen(false)
             console.error('No phone number provided');
+            toast.error('No phone number... try again', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: 'Flip',
+            });
             return;
         }
-        alert(numberToSend)
+        // alert(numberToSend)
         fetch(`${backend}/api/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                token: googleUserObject,
-                contactNumber: numberToSend
+                contactNumber: numberToSend,
+                test: 'TEST VARIABLE BBABAAYBYABYABYABYAYYYYY',
+                // token: googleUserObject,
             }),
             credentials: 'include',
         })
@@ -101,6 +120,7 @@ export default function Header(props) {
                     localStorage.setItem('userName', data.user.userName);
                     localStorage.setItem('userPicture', data.user.userPicture);
                     localStorage.setItem('contactNumber', data.user.contactNumber)
+                    setBackdropLoaderOpen(false)
 
                     // Call to request notification permission should be here
                     requestNotificationPermission();
@@ -109,11 +129,12 @@ export default function Header(props) {
                 }
             }).catch(error => console.error('Error:', error));
     }
+
     function handleCallbackresponse(response) {
         var googleUserObject_ = jwt_decode(response.credential);
         console.log(googleUserObject_);
         setGoogleUserObject(response.credential); // This should be the actual token, not decoded object
-    
+
         // Call backend to verify token and check user's contact number status
         fetch(`${backend}/api/auth/google`, {
             method: 'POST',
@@ -121,40 +142,54 @@ export default function Header(props) {
             body: JSON.stringify({ token: response.credential }),
             credentials: 'include',
         })
-        .then(res => res.json())
-        .then(data => {
-            // Assuming backend response includes user object with contactNumber
-            if (data.user && data.user.contactNumber) {
-                   // Set user details in localStorage
-                   localStorage.setItem('userEmail', data.user.userEmail);
-                   localStorage.setItem('userName', data.user.userName);
-                   localStorage.setItem('userPicture', data.user.userPicture);
-                   localStorage.setItem('contactNumber', data.user.contactNumber)
+            .then(res => res.json())
+            .then(data => {
+                // Assuming backend response includes user object with contactNumber
+                if (data.user && data.user.contactNumber) {
+                    // Set user details in localStorage
+                    localStorage.setItem('userEmail', data.user.userEmail);
+                    localStorage.setItem('userName', data.user.userName);
+                    localStorage.setItem('userPicture', data.user.userPicture);
+                    localStorage.setItem('contactNumber', data.user.contactNumber)
 
-                   // Call to request notification permission should be here
-                   requestNotificationPermission();
-            } else {
-                // User does not have a contact number, show modal to add one
-                console.log("User does not have a contact number, showing modal.",);
-                setShowNumberModal(true);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Handle error, e.g., show a message to the user
-        });
+                    // Call to request notification permission should be here
+                    requestNotificationPermission();
+                } else {
+                    // User does not have a contact number, show modal to add one
+                    console.log("User does not have a contact number, showing modal.",);
+                    setShowNumberModal(true);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toast.error('Some error', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
+                
+                // Handle error, e.g., show a message to the user
+            });
     }
-    
+
 
     const updateContactNumber = () => {
         // Assuming `number` contains the new phone number
-        const updatedPhoneNumber = number.trim();
-    
+        // const updatedPhoneNumber = number.trim();
+        const updatedPhoneNumber = number
+        setBackdropLoaderOpen(true)
+
         if (!updatedPhoneNumber) {
             console.error('No phone number provided');
             return;
         }
-    
+
         fetch(`${backend}/api/user/updatePhoneNumber`, {
             method: 'PATCH', // or 'POST', depending on your backend setup
             headers: {
@@ -163,22 +198,57 @@ export default function Header(props) {
             credentials: 'include', // to ensure cookies are sent with the request
             body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to update phone number');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Phone number updated successfully:', data);
-            alert('Phone number updated successfully!');
-    
-            setShowNumberUpdateModal(false);
-        })
-        .catch(error => {
-            console.error('Error updating phone number:', error);
-            alert('Failed to update phone number. Please try again.');
-        });
+            .then(response => {
+                if (!response.ok) {
+                    setBackdropLoaderOpen(false)
+                    toast.error('Failed to update number', {
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        transition: 'Flip',
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Phone number updated successfully:', data);
+                setBackdropLoaderOpen(false)
+                // alert('Phone number updated successfully!');
+                toast.success('Number updated successfully.', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
+
+                setShowNumberUpdateModal(false);
+            })
+            .catch(error => {
+                setBackdropLoaderOpen(false)
+                console.error('Error updating phone number:', error);
+                // alert('Failed to update phone number. Please try again.');
+                toast.error('Error updating phone number', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
+            });
     };
 
 
@@ -197,6 +267,7 @@ export default function Header(props) {
     // }
 
     // Function to request notification permission and get the token
+
     const requestNotificationPermission = () => {
         Notification.requestPermission().then((permission) => {
             if (permission === "granted") {
@@ -679,12 +750,12 @@ export default function Header(props) {
                             onChange={(e) => {
                                 const inputVal = e.target.value;
                                 const numVal = parseInt(inputVal, 10);
-                                setNumber(numVal)
-                                console.log(number)
+                                // setNumber(numVal)
+                                // console.log(number)
                                 // Check if the input value is a number and its length
                                 if (!isNaN(numVal) && inputVal.length >= 10) {
                                     setPhoneStatus('success');
-                                    setNumber(e.target.value)
+                                    setNumber(parseInt(e.target.value, 10))
                                 } else {
                                     setPhoneStatus('error');
                                 }
@@ -784,7 +855,7 @@ export default function Header(props) {
                 </Grid.Container>
             </Modal>
 
-            {!(window.location.pathname === '/createsale' || window.location.pathname === '/editsale') ?
+            {!(window.location.pathname === '/createsale' || window.location.pathname === '/editsale' || Object.keys(localStorage).length <= 4) ?
                 <Grid.Container css={{
                     '@xsMin': {
                         display: 'none'
@@ -807,7 +878,7 @@ export default function Header(props) {
                             <Row css={{
                                 maxW: '330px',
                                 justifyContent: 'space-around',
-                                padding: '10px 0px 36px 0px',
+                                padding: '12px 0px 36px 0px',
                                 alignItems: 'center'
                             }}>
                                 {navigationItems.map(navItem => {
@@ -881,6 +952,13 @@ export default function Header(props) {
                 <>
                 </>
             }
+
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={backdropLoaderOpen}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
 
         </>
     );
