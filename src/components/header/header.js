@@ -312,19 +312,19 @@ export default function Header(props) {
             });
     }
 
-    useEffect(() => {
-        fetch(`${backend}/api/auth/profile`, {
-            credentials: 'include',
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.isAuthenticated) {
-                    // Update UI to reflect authenticated state
-                } else {
-                    // User is not authenticated
-                }
-            });
-    }, []);
+    // useEffect(() => {
+    //     fetch(`${backend}/api/auth/profile`, {
+    //         credentials: 'include',
+    //     })
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             if (data.isAuthenticated) {
+    //                 // Update UI to reflect authenticated state
+    //             } else {
+    //                 // User is not authenticated
+    //             }
+    //         });
+    // }, []);
 
     useEffect(() => {
         setLoginLoader(true)
