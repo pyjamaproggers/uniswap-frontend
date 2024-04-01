@@ -187,32 +187,32 @@ export default function OutletsPage() {
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
     const navigate = useNavigate(); 
-    const verifyUserSession = () => {
-        fetch(`${backend}/api/auth/verify`, {
-            method: 'GET',
-            credentials: 'include', // Necessary to include the cookie in the request
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Session expired or user not logged in');
-            }
-        })
-        .then(data => {
-            console.log('User session verified:', data);
-            // Optionally update the UI or state based on the response
-        })
-        .catch(error => {
-            console.error('Error verifying user session:', error);
-            // Redirect to login page or show an error page
-            navigate('/'); // Adjust the path as necessary
-        });
-    };
+    // const verifyUserSession = () => {
+    //     fetch(`${backend}/api/auth/verify`, {
+    //         method: 'GET',
+    //         credentials: 'include', // Necessary to include the cookie in the request
+    //     })
+    //     .then(response => {
+    //         if (response.ok) {
+    //             return response.json();
+    //         } else {
+    //             throw new Error('Session expired or user not logged in');
+    //         }
+    //     })
+    //     .then(data => {
+    //         console.log('User session verified:', data);
+    //         // Optionally update the UI or state based on the response
+    //     })
+    //     .catch(error => {
+    //         console.error('Error verifying user session:', error);
+    //         // Redirect to login page or show an error page
+    //         navigate('/'); // Adjust the path as necessary
+    //     });
+    // };
 
-    useEffect(() => {
-        verifyUserSession();
-    }, []);
+    // useEffect(() => {
+    //     verifyUserSession();
+    // }, []);
     
     const [isGalleryOpen, setIsGalleryOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
