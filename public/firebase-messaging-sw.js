@@ -2,6 +2,7 @@
 // Note that you can only use Firebase Messaging here. Other Firebase libraries are not available in the service worker.
 importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js');
+importScripts("https://cdn.pushalert.co/sw-68968.js");
 
 firebase.initializeApp({
   apiKey: "AIzaSyAawNBBBRIkCbRzbs4Sxu5-O_M_shnW0Ok",

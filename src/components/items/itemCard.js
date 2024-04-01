@@ -205,7 +205,7 @@ export default function ItemCard(props) {
     // Default to some color if item.category is not found in the mapping
     const badgeColor = categoryColors[item.itemCategory] || 'default';
 
-    if(item.live==='n'){
+    if(item.live==='n' && type==='sale'){
         return null
     }
     else{
