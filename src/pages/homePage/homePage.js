@@ -17,7 +17,7 @@ export default function HomePage() {
 
     useEffect(() => {
         localStorage.getItem('userEmail') !== null ? setIsSignedIn(true) : setIsSignedIn(false)
-    }, [])
+    }, [isSignedIn])
 
     return (
         <Grid.Container className="homebg" css={{

@@ -19,8 +19,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import InputItemCard from "../../components/items/inputItemCard";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export default function EditSalePage() {
+
+    const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
+    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
 
     const location = useLocation()
     const backend = process.env.REACT_APP_BACKEND
@@ -55,10 +60,10 @@ export default function EditSalePage() {
     
         // contactNumber: Required and must be a non-empty string
         // Additional validation can be added here, e.g., regex for phone numbers
-        if (!item.contactNumber || typeof item.contactNumber !== 'string' || item.contactNumber.trim().length === 0) {
-            alert('Contact number is required.');
-            return false;
-        }
+        // if (!item.contactNumber || typeof item.contactNumber !== 'string' || item.contactNumber.trim().length === 0) {
+        //     alert('Contact number is required.');
+        //     return false;
+        // }
     
         // If all checks pass
         return true;
@@ -84,7 +89,7 @@ export default function EditSalePage() {
         .catch(error => {
             console.error('Error verifying user session:', error);
             // Redirect to login page or show an error page
-            navigate('/'); // Adjust the path as necessary
+            navigate('/unauthorized'); // Adjust the path as necessary
         });
     };
 
@@ -141,35 +146,15 @@ export default function EditSalePage() {
             if (!itemUpdateResponse.ok) throw new Error('Failed to update item.');
             setBackdropLoaderOpen(false)
             console.log('Item updated successfully');
-            toast.success('Item updated!', {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                transition: "Flip",
-            });
+            setShowSuccessSnackbar(true)
             window.setTimeout(() => {
                 window.location.pathname = '/useritems'
-            }, 2000)
+            }, 1700)
             // Further actions on successful update, like redirecting or refreshing the item details
         } catch (error) {
             setBackdropLoaderOpen(false)
             console.error('Error updating item:', error);
-            toast.error('Some error occured. Please try again.', {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                transition: 'Flip',
-            });
+            setShowErrorSnackbar(true)
         }
     };
 
@@ -266,6 +251,46 @@ export default function EditSalePage() {
                     </Row>
                 </Button>
                 
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center'
+                    }}
+                    open={showSuccessSnackbar}
+                    autoHideDuration={1500}
+                    onClose={() => { setShowSuccessSnackbar(false) }}
+                >
+                    <Alert
+                        onClose={() => { setShowSuccessSnackbar(false) }}
+                        severity="success"
+                        variant="filled"
+                        color="success"
+                        sx={{ width: '100%' }}
+                    >
+                        Success
+                    </Alert>
+                </Snackbar>
+
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center'
+                    }}
+                    open={showErrorSnackbar}
+                    autoHideDuration={1500}
+                    onClose={() => { setShowErrorSnackbar(false) }}
+                >
+                    <Alert
+                        onClose={() => { setShowErrorSnackbar(false) }}
+                        severity="error"
+                        variant="filled"
+                        color="error"
+                        sx={{ width: '100%' }}
+                    >
+                        Error
+                    </Alert>
+                </Snackbar>
+
             </Grid.Container>
         )
     }

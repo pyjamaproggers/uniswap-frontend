@@ -29,6 +29,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export default function Header(props) {
     const [render, setRender] = useState(false)
@@ -38,6 +40,9 @@ export default function Header(props) {
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
     const [number, setNumber] = useState(0)
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
+
+    const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
+    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
 
     const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
@@ -97,8 +102,7 @@ export default function Header(props) {
             .then(data => {
 
                 if (data.user && data.user.contactNumber) {
-                    if(data.user.userEmail.split('@')[1] === 'ashoka.edu.in')
-                    {
+                    if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
                         localStorage.setItem('userEmail', data.user.userEmail);
                         localStorage.setItem('userName', data.user.userName);
                         localStorage.setItem('userPicture', data.user.userPicture);
@@ -107,18 +111,19 @@ export default function Header(props) {
                         setBackdropLoaderOpen(false);
                         requestNotificationPermission();
                     }
-                    else{
+                    else {
                         setShowAshokaOnlyModal(true)
                         setBackdropLoaderOpen(false);
 
                     }
-                    
+
                 } else {
-                    if(data.user.userEmail.split('@')[1] === 'ashoka.edu.in')
-                    {setBackdropLoaderOpen(false);
-                    console.log("User does not have a contact number, showing modal.",);
-                    setShowNumberModal(true);}
-                    else{
+                    if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
+                        setBackdropLoaderOpen(false);
+                        console.log("User does not have a contact number, showing modal.",);
+                        setShowNumberModal(true);
+                    }
+                    else {
                         setShowAshokaOnlyModal(true)
                         setBackdropLoaderOpen(false);
                     }
@@ -126,23 +131,24 @@ export default function Header(props) {
             })
             .catch(error => {
                 console.error('Error:', error);
-                toast.error(`${error}`, {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
+                setShowErrorSnackbar(true)
+                // toast.error(`${error}`, {
+                //     position: "top-center",
+                //     autoClose: 2000,
+                //     hideProgressBar: false,
+                //     closeOnClick: true,
+                //     pauseOnHover: true,
+                //     draggable: true,
+                //     progress: undefined,
+                //     theme: "colored",
+                //     transition: 'Flip',
+                // });
 
             });
     }
 
     const updateContactNumber = () => {
-        const updatedPhoneNumber = number; 
+        const updatedPhoneNumber = number;
         setBackdropLoaderOpen(true);
 
         if (!updatedPhoneNumber) {
@@ -160,17 +166,18 @@ export default function Header(props) {
             .then(response => {
                 if (!response.ok) {
                     setBackdropLoaderOpen(false);
-                    toast.error('Failed to update phone, try again.', {
-                        position: "top-center",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "colored",
-                        transition: 'Flip',
-                    });
+                    setShowErrorSnackbar(true)
+                    // toast.error('Failed to update phone, try again.', {
+                    //     position: "top-center",
+                    //     autoClose: 2000,
+                    //     hideProgressBar: false,
+                    //     closeOnClick: true,
+                    //     pauseOnHover: true,
+                    //     draggable: true,
+                    //     progress: undefined,
+                    //     theme: "colored",
+                    //     transition: 'Flip',
+                    // });
                 }
                 return response.json();
             })
@@ -178,22 +185,23 @@ export default function Header(props) {
                 console.log('Phone number updated successfully:', data);
                 return fetch(`${backend}/api/auth/verify`, {
                     method: 'GET',
-                    credentials: 'include', 
+                    credentials: 'include',
                 });
             })
             .then(verifyResponse => {
                 if (!verifyResponse.ok) {
-                    toast.error('Failed to verify user.', {
-                        position: "top-center",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "colored",
-                        transition: 'Flip',
-                    });
+                    // toast.error('Failed to verify user.', {
+                    //     position: "top-center",
+                    //     autoClose: 2000,
+                    //     hideProgressBar: false,
+                    //     closeOnClick: true,
+                    //     pauseOnHover: true,
+                    //     draggable: true,
+                    //     progress: undefined,
+                    //     theme: "colored",
+                    //     transition: 'Flip',
+                    // });
+                    setShowErrorSnackbar(true)
                     setBackdropLoaderOpen(false);
                     setShowNumberUpdateModal(false);
                     setShowNumberModal(false);
@@ -202,18 +210,20 @@ export default function Header(props) {
             })
             .then(verifyData => {
                 console.log('User verified, and cookie updated:', verifyData);
-                
-                toast.success('Number updated and user verified successfully.', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
+
+                // toast.success('Number updated and user verified successfully.', {
+                //     position: "top-center",
+                //     autoClose: 2000,
+                //     hideProgressBar: false,
+                //     closeOnClick: true,
+                //     pauseOnHover: true,
+                //     draggable: true,
+                //     progress: undefined,
+                //     theme: "colored",
+                //     transition: 'Flip',
+                // });
+
+                setShowSuccessSnackbar(true)
 
                 localStorage.setItem('userEmail', verifyData.user.userEmail);
                 localStorage.setItem('userName', verifyData.user.userName);
@@ -226,22 +236,23 @@ export default function Header(props) {
                 setShowNumberUpdateModal(false);
                 setShowNumberModal(false);
 
-                window.location.pathname='/'
+                // window.location.pathname = '/'
             })
             .catch(error => {
                 setBackdropLoaderOpen(false);
                 console.error('Error:', error);
-                toast.error('Some error... please try again', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
+                setShowErrorSnackbar(true)
+                // toast.error('Some error... please try again', {
+                //     position: "top-center",
+                //     autoClose: 2000,
+                //     hideProgressBar: false,
+                //     closeOnClick: true,
+                //     pauseOnHover: true,
+                //     draggable: true,
+                //     progress: undefined,
+                //     theme: "colored",
+                //     transition: 'Flip',
+                // });
                 setShowNumberUpdateModal(false);
                 setShowNumberModal(false);
             });
@@ -387,7 +398,7 @@ export default function Header(props) {
         <>
             <Navbar isBordered variant="static">
 
-                <Navbar.Toggle showIn={'xs'} css={{width: '44px'}}/>
+                <Navbar.Toggle showIn={'xs'} css={{ width: '44px' }} />
 
                 <Navbar.Brand
                     onClick={() => {
@@ -577,10 +588,10 @@ export default function Header(props) {
                                 </Dropdown.Item>
                                 <Dropdown.Item key="enablenotif" color=""
                                     icon={<FaPhone size={16} />}
-                                    >
-                                        <Button onClick={()=>requestNotificationPermission()}>
+                                >
+                                    <Button onClick={() => requestNotificationPermission()}>
                                         Enable Notifications
-                                        </Button>
+                                    </Button>
                                 </Dropdown.Item>
                                 <Dropdown.Item key="logout" withDivider color="error"
                                     icon={<IoLogOut size={16} />}>
@@ -953,19 +964,59 @@ export default function Header(props) {
                 <CircularProgress color="inherit" />
             </Backdrop>
 
-            <ToastContainer
-                    position="top-right"
-                    autoClose={2000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="colored"
-                    transition="Flip"
-                />
+            {/* <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+                transition="Flip"
+            /> */}
+
+            <Snackbar
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center'
+                }}
+                open={showSuccessSnackbar}
+                autoHideDuration={1500}
+                onClose={() => { setShowSuccessSnackbar(false) }}
+            >
+                <Alert
+                    onClose={() => { setShowSuccessSnackbar(false) }}
+                    severity="success"
+                    variant="filled"
+                    color="success"
+                    sx={{ width: '100%' }}
+                >
+                    Success
+                </Alert>
+            </Snackbar>
+
+            <Snackbar
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center'
+                }}
+                open={showErrorSnackbar}
+                autoHideDuration={1500}
+                onClose={() => { setShowErrorSnackbar(false) }}
+            >
+                <Alert
+                    onClose={() => { setShowErrorSnackbar(false) }}
+                    severity="error"
+                    variant="filled"
+                    color="error"
+                    sx={{ width: '100%' }}
+                >
+                    Error
+                </Alert>
+            </Snackbar>
 
         </>
     );

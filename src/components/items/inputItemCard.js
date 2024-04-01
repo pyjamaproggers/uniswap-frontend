@@ -17,9 +17,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FaCloud } from "react-icons/fa6";
 import { IoCloudOffline } from "react-icons/io5";
 import imageCompression from 'browser-image-compression';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 
 export default function InputItemCard(props) {
+
+    const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
+    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
 
     const item = props.item
     const setItem = props.setItem
@@ -82,6 +87,7 @@ export default function InputItemCard(props) {
         })
             .then(response => {
                 if (!response.ok) {
+                    setShowErrorSnackbar(true)
                     throw new Error('Error updating phone number');
                 }
                 return response.json();
@@ -95,67 +101,14 @@ export default function InputItemCard(props) {
                 }));
                 setShowNumberUpdateModal(false);
                 setBackdropLoaderOpen(false);
-                toast.success('Number updated!', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: "Flip",
-                });
+                setShowSuccessSnackbar(true)
             })
             .catch(error => {
                 console.error('Error updating phone number:', error);
                 setBackdropLoaderOpen(false);
-                toast.error('Failed to update phone number. Please try again.', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
+                setShowErrorSnackbar(true)
             });
     };
-
-    // const compressImage = async (originalImage) => {
-    //     createPreviewURL(originalImage)
-    //     console.log(originalImage.size / 1000 / 1000, 'MB (before compression)');
-    //     console.log(originalImage)
-
-    //     // Options for the compression
-    //     const options = {
-    //         maxSizeMB: 3, // The maximum size of the output file in MB
-    //         maxWidthOrHeight: 1920, // The maximum width or height of the output image
-    //         useWebWorker: true // Enable multi-threading for better performance on supported browsers
-    //     };
-
-
-    //     try {
-    //         // Attempt to compress the image with the options
-    //         const compressedBlob = await imageCompression(originalImage, options);
-    //         console.log(compressedBlob.size / 1000 / 1000, 'MB (after compression)');
-
-    //         // Convert the Blob to a File
-    //         const compressedFile = new File([compressedBlob], originalImage.name, {
-    //             type: compressedBlob.type,
-    //             lastModified: Date.now(), // or use originalImage.lastModified if you want to preserve the original timestamp
-    //         });
-    //         console.log(compressedFile)
-    //         return (compressedFile)
-    //     } catch (error) {
-    //         console.error('Error compressing the image:', error);
-    //         throw error; // Rethrow the error for further handling
-    //     }
-    // };
-
-
 
     return (
         <Grid css={{
@@ -478,7 +431,7 @@ export default function InputItemCard(props) {
                 <CircularProgress color="inherit" />
             </Backdrop>
 
-            <ToastContainer
+            {/* <ToastContainer
                 position="top-right"
                 autoClose={2000}
                 hideProgressBar={false}
@@ -490,7 +443,49 @@ export default function InputItemCard(props) {
                 pauseOnHover
                 theme="colored"
                 transition="Flip"
-            />
+            /> */}
+
+            <Snackbar
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center'
+                }}
+                open={showSuccessSnackbar}
+                autoHideDuration={1500}
+                onClose={() => { setShowSuccessSnackbar(false) }}
+            >
+                <Alert
+                    onClose={() => { setShowSuccessSnackbar(false) }}
+                    severity="success"
+                    variant="filled"
+                    color="success"
+                    sx={{ width: '100%' }}
+                >
+                    Success
+                </Alert>
+            </Snackbar>
+
+            <Snackbar
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center'
+                }}
+                open={showErrorSnackbar}
+                autoHideDuration={1500}
+                onClose={() => { setShowErrorSnackbar(false) }}
+            >
+                <Alert
+                    onClose={() => { setShowErrorSnackbar(false) }}
+                    severity="error"
+                    variant="filled"
+                    color="error"
+                    sx={{ width: '100%' }}
+                >
+                    Error
+                </Alert>
+            </Snackbar>
+
+
         </Grid>
     )
 }

@@ -18,8 +18,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PullToRefresh from 'pulltorefreshjs';
 import { ImSpinner9 } from "react-icons/im";
-import { faSpinner} from '@fortawesome/free-solid-svg-icons';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 
 export default function ItemsPage(props) {
@@ -27,6 +29,9 @@ export default function ItemsPage(props) {
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
     const navigate = useNavigate();
+
+    const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
+    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
 
     const type = props.type
 
@@ -64,10 +69,10 @@ export default function ItemsPage(props) {
                 fetchAllItems()
             },
             iconArrow: ReactDOMServer.renderToString(
-                <FontAwesomeIcon icon={faSpinner} style={{color: '#ffffff'}}/>
+                <FontAwesomeIcon icon={faSpinner} style={{ color: '#ffffff' }} />
             ),
             iconRefreshing: ReactDOMServer.renderToString(
-                <FontAwesomeIcon icon={faSpinner} spin style={{color: '#ffffff'}}/>
+                <FontAwesomeIcon icon={faSpinner} spin style={{ color: '#ffffff' }} />
             ),
         });
 
@@ -94,19 +99,9 @@ export default function ItemsPage(props) {
             })
             .catch(error => {
                 console.error('Error verifying user session:', error);
-                toast.error(`${error}`, {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
+                setShowErrorSnackbar(true)
                 // Redirect to login page or show an error page
-                // navigate('/'); // Adjust the path as necessary
+                navigate('/unauthorized'); // Adjust the path as necessary
             });
     };
 
@@ -137,17 +132,7 @@ export default function ItemsPage(props) {
             // Update state or show a notification to the user based on the response
         } catch (error) {
             console.error('Failed to toggle live status:', error);
-            toast.error(`${error}`, {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                transition: 'Flip',
-            });
+            setShowErrorSnackbar(true)
             // Handle error by showing a message to the user
         }
     };
@@ -248,16 +233,27 @@ export default function ItemsPage(props) {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            const items = await response.json();
-            console.log(items)
-            setAllItems(items.reverse()); // Update your state with the fetched items
+            let items = await response.json();
+            console.log(items);
+
+            // Sort items by dateAdded from latest to oldest
+            items.sort((a, b) => {
+                // Convert dateAdded to Date objects for comparison
+                const dateA = new Date(a.dateAdded);
+                const dateB = new Date(b.dateAdded);
+
+                // For descending order, if dateB is earlier than dateA, we should return -1 (to sort a before b)
+                return dateB - dateA;
+            });
+
+            setAllItems(items); // Update your state with the sorted items
             setFilteredItems(items); // Assuming you want to initially display all items
-            setFetchingAllItems(false)
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);
         } finally {
             setFetchingAllItems(false); // Hide loading state
         }
+
     };
 
     useEffect(() => {
@@ -369,19 +365,6 @@ export default function ItemsPage(props) {
         return (
             <Grid.Container css={{
             }}>
-                <ToastContainer
-                    position="top-right"
-                    autoClose={2000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="colored"
-                    transition="Flip"
-                />
                 <Grid.Container css={{
                     padding: '4px 4px',
                     jc: 'center'
@@ -893,6 +876,46 @@ export default function ItemsPage(props) {
                         </>
                     }
                 </Grid.Container>
+
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center'
+                    }}
+                    open={showSuccessSnackbar}
+                    autoHideDuration={1500}
+                    onClose={() => { setShowSuccessSnackbar(false) }}
+                >
+                    <Alert
+                        onClose={() => { setShowSuccessSnackbar(false) }}
+                        severity="success"
+                        variant="filled"
+                        color="success"
+                        sx={{ width: '100%' }}
+                    >
+                        Success
+                    </Alert>
+                </Snackbar>
+
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center'
+                    }}
+                    open={showErrorSnackbar}
+                    autoHideDuration={1500}
+                    onClose={() => { setShowErrorSnackbar(false) }}
+                >
+                    <Alert
+                        onClose={() => { setShowErrorSnackbar(false) }}
+                        severity="error"
+                        variant="filled"
+                        color="error"
+                        sx={{ width: '100%' }}
+                    >
+                        Error
+                    </Alert>
+                </Snackbar>
 
             </Grid.Container>
         )

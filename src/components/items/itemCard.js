@@ -10,8 +10,13 @@ import { MdDelete } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import { FaCloud } from "react-icons/fa6";
 import { IoCloudOffline } from "react-icons/io5";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export default function ItemCard(props) {
+
+    const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
+    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
 
     const navigate = useNavigate()
     const backend = process.env.REACT_APP_BACKEND
@@ -91,7 +96,6 @@ export default function ItemCard(props) {
                 // Handle failure (e.g., item not found, user not authenticated)
                 console.error(data.message);
             }
-
 
             // Removed toast success and error messages since `toast` is not defined
 
@@ -173,7 +177,8 @@ export default function ItemCard(props) {
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to delete the item.');
+                    setShowErrorSnackbar(true)
+                    // throw new Error('Failed to delete the item.');
                 }
 
                 // Here you might want to update the state to remove the item from the list
@@ -183,7 +188,7 @@ export default function ItemCard(props) {
 
             } catch (error) {
                 console.error('Error deleting the item:', error);
-                alert('There was an error trying to delete the item.');
+                setShowErrorSnackbar(true)
             }
         }
     };
@@ -205,10 +210,10 @@ export default function ItemCard(props) {
     // Default to some color if item.category is not found in the mapping
     const badgeColor = categoryColors[item.itemCategory] || 'default';
 
-    if(item.live==='n' && type==='sale'){
+    if (item.live === 'n' && type === 'sale') {
         return null
     }
-    else{
+    else {
         return (
             <Grid css={{
                 margin: '24px 24px'
@@ -280,7 +285,7 @@ export default function ItemCard(props) {
                                 jc: 'start',
                             }}>
                                 <Col>
-    
+
                                     <Text css={{
                                         fontWeight: '$medium',
                                         '@xsMin': {
@@ -294,9 +299,9 @@ export default function ItemCard(props) {
                                     }}>
                                         {item.itemName}
                                     </Text>
-    
+
                                 </Col>
-    
+
                                 {/* {type === 'user' &&
                                     <>
                                         {item.live === 'y' ?
@@ -338,7 +343,7 @@ export default function ItemCard(props) {
                         jc: 'space-between',
                         marginTop: '4px',
                         alignItems: 'normal',
-                        marginBottom: type==='sale' ? '24px' : '0px'
+                        marginBottom: type === 'sale' ? '24px' : '0px'
                     }}>
                         <Text css={{
                             fontWeight: '$medium',
@@ -400,7 +405,7 @@ export default function ItemCard(props) {
                         }}>
                             {item.live === 'y' ?
                                 <Button auto flat color={"success"}
-                                    icon={<FaCloud size={16} style={{}}/>}
+                                    icon={<FaCloud size={16} style={{}} />}
                                     onClick={() => { toggleLiveStatus(item._id) }}
                                     css={{
                                         lineHeight: '2.2'
@@ -418,7 +423,7 @@ export default function ItemCard(props) {
                                 </Button>
                             }
                             <Button auto flat color="primary"
-                            icon={<IoPencil size={16}/>}
+                                icon={<IoPencil size={16} />}
                                 onClick={() => navigate('/editsale', { state: item })}
                                 css={{
                                     lineHeight: '2.2'
@@ -436,6 +441,46 @@ export default function ItemCard(props) {
                         </Row>
                     }
                 </Col>
+
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center'
+                    }}
+                    open={showSuccessSnackbar}
+                    autoHideDuration={1500}
+                    onClose={() => { setShowSuccessSnackbar(false) }}
+                >
+                    <Alert
+                        onClose={() => { setShowSuccessSnackbar(false) }}
+                        severity="success"
+                        variant="filled"
+                        color="success"
+                        sx={{ width: '100%' }}
+                    >
+                        Success
+                    </Alert>
+                </Snackbar>
+
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center'
+                    }}
+                    open={showErrorSnackbar}
+                    autoHideDuration={1500}
+                    onClose={() => { setShowErrorSnackbar(false) }}
+                >
+                    <Alert
+                        onClose={() => { setShowErrorSnackbar(false) }}
+                        severity="error"
+                        variant="filled"
+                        color="error"
+                        sx={{ width: '100%' }}
+                    >
+                        Error
+                    </Alert>
+                </Snackbar>
             </Grid>
         );
     }

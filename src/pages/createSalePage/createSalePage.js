@@ -18,36 +18,41 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import InputItemCard from "../../components/items/inputItemCard";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export default function CreateSalePage() {
+
+    const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
+    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
 
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
 
     const [render, setRender] = useState(false)
 
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
             method: 'GET',
             credentials: 'include', // Necessary to include the cookie in the request
         })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Session expired or user not logged in');
-            }
-        })
-        .then(data => {
-            console.log('User session verified:', data);
-            // Optionally update the UI or state based on the response
-        })
-        .catch(error => {
-            console.error('Error verifying user session:', error);
-            // Redirect to login page or show an error page
-            navigate('/'); // Adjust the path as necessary
-        });
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Session expired or user not logged in');
+                }
+            })
+            .then(data => {
+                console.log('User session verified:', data);
+                // Optionally update the UI or state based on the response
+            })
+            .catch(error => {
+                console.error('Error verifying user session:', error);
+                // Redirect to login page or show an error page
+                navigate('/unauthorized'); // Adjust the path as necessary
+            });
     };
 
     useEffect(() => {
@@ -99,7 +104,7 @@ export default function CreateSalePage() {
             return false;
         }
 
-        if (!imageFile){
+        if (!imageFile) {
             alert('Image is required');
             return false;
         }
@@ -125,17 +130,7 @@ export default function CreateSalePage() {
                 const responseData = await response.json();
                 console.log('Item posted successfully:', responseData);
                 setBackdropLoaderOpen(false)
-                toast.success('Item posted!', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: "Flip",
-                });
+                setShowSuccessSnackbar(true)
                 window.setTimeout(() => {
                     window.location.pathname = '/useritems'
                 }, 2000)
@@ -144,38 +139,17 @@ export default function CreateSalePage() {
                 // Handle the error if the server response was not OK.
                 const errorData = await response.json();
                 console.error('Failed to post item:', errorData);
-                toast.error('Image upload failed', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
+                setShowErrorSnackbar(true)
                 setBackdropLoaderOpen(false)
                 // Show an error message to the user
             }
         } catch (error) {
             console.error('Error posting item to backend:', error);
-            toast.error('Some error occured. Please try again.', {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                transition: 'Flip',
-            });
+            setShowErrorSnackbar(true)
             setBackdropLoaderOpen(false)
             // Handle network errors or other errors outside the HTTP response
         }
     };
-
 
     const sendItem = async () => {
         setBackdropLoaderOpen(true)
@@ -216,32 +190,26 @@ export default function CreateSalePage() {
                 await postItemToBackend(itemData);
             } else {
                 setBackdropLoaderOpen(false)
+                setShowErrorSnackbar(true)
                 console.error('Failed to upload image:', await putResponse.text());
             }
         } catch (error) {
             setBackdropLoaderOpen(false)
+            setShowErrorSnackbar(true)
             console.error('Error:', error);
         }
     };
-
-    // const createPreviewURL = (image) => {
-    //     const url = URL.createObjectURL(image);
-    //     setPreviewUrl(url);
-    //     setRender(prev => !prev)
-    //     // Cleanup function to revoke the object URL
-    //     return () => URL.revokeObjectURL(url);
-    // }
 
     useEffect(() => {
         if (imageFile) { // Check if imageFile is a Blob (File is also a Blob)
             const url = URL.createObjectURL(imageFile);
             setPreviewUrl(url);
-    
+
             // Cleanup function to revoke the object URL
             return () => URL.revokeObjectURL(url);
         }
     }, [imageFile]);
-    
+
 
     if (localStorage.getItem('userEmail') === null) {
         return (
@@ -257,19 +225,6 @@ export default function CreateSalePage() {
                 jc: 'center',
                 alignItems: 'center'
             }}>
-                <ToastContainer
-                    position="top-right"
-                    autoClose={2000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="colored"
-                    transition="Flip"
-                />
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                     open={backdropLoaderOpen}
@@ -306,7 +261,7 @@ export default function CreateSalePage() {
                     Complete your item, upload your sale and people will directly contact you - it's that simple!
                 </Text>
 
-                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createSale'}/>
+                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createSale'} />
 
                 <Button auto flat css={{
                     margin: '0px 0px 36px 0px',
@@ -341,7 +296,45 @@ export default function CreateSalePage() {
                     </Row>
                 </Button>
 
-                
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center'
+                    }}
+                    open={showSuccessSnackbar}
+                    autoHideDuration={1500}
+                    onClose={() => { setShowSuccessSnackbar(false) }}
+                >
+                    <Alert
+                        onClose={() => { setShowSuccessSnackbar(false) }}
+                        severity="success"
+                        variant="filled"
+                        color="success"
+                        sx={{ width: '100%' }}
+                    >
+                        Success
+                    </Alert>
+                </Snackbar>
+
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center'
+                    }}
+                    open={showErrorSnackbar}
+                    autoHideDuration={1500}
+                    onClose={() => { setShowErrorSnackbar(false) }}
+                >
+                    <Alert
+                        onClose={() => { setShowErrorSnackbar(false) }}
+                        severity="error"
+                        variant="filled"
+                        color="error"
+                        sx={{ width: '100%' }}
+                    >
+                        Error
+                    </Alert>
+                </Snackbar>
 
             </Grid.Container>
         )

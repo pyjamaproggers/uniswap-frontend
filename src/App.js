@@ -12,6 +12,7 @@ import OutletsPage from './pages/outletsPage/outletsPage';
 import { useEffect, useState } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import ErrorAuthPage from './pages/ErrorAuthPage/ErrorAuthPage';
 
 function App() {
 
@@ -97,6 +98,7 @@ function App() {
                                 <Route exact path='/createsale' element={<CreateSalePage />} />
                                 <Route exact path='/editsale' element={<EditSalePage />} />
                                 <Route exact path='/outlets' element={<OutletsPage />} />
+                                <Route exact path='/unauthorized' element={<ErrorAuthPage />} />
                             </Routes>
                         </Router>
                         <Footer />
