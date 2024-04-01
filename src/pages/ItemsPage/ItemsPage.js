@@ -66,12 +66,34 @@ export default function ItemsPage(props) {
             })
             .then(data => {
                 console.log('User session verified:', data);
+                toast.error(`${error}`, {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
                 // Optionally update the UI or state based on the response
             })
             .catch(error => {
                 console.error('Error verifying user session:', error);
+                toast.error(`${error}`, {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
                 // Redirect to login page or show an error page
-                navigate('/'); // Adjust the path as necessary
+                // navigate('/'); // Adjust the path as necessary
             });
     };
 
@@ -92,7 +114,6 @@ export default function ItemsPage(props) {
             });
 
             if (!response.ok) {
-                throw new Error('Network response was not ok');
                 toast.error(`${error}`, {
                     position: "top-center",
                     autoClose: 2000,
@@ -104,6 +125,7 @@ export default function ItemsPage(props) {
                     theme: "colored",
                     transition: 'Flip',
                 });
+                throw new Error('Network response was not ok');
             }
 
             // Parse JSON response here if needed
