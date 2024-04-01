@@ -10,20 +10,22 @@ import { FaPhone } from "react-icons/fa6";
 import Paper from '@mui/material/Paper';
 import { GoHomeFill } from "react-icons/go";
 
-export default function HomePage() {
+export default function HomePage(props) {
     const [isSignedIn, setIsSignedIn] = useState(false)
+
+    const appRender = props.appRender
 
     console.log('home: ', localStorage.getItem('userEmail'))
 
     useEffect(() => {
         localStorage.getItem('userEmail') !== null ? setIsSignedIn(true) : setIsSignedIn(false)
-    }, [isSignedIn])
+    }, [isSignedIn, appRender])
 
     return (
         <Grid.Container className="homebg" css={{
             jc: 'center',
             alignItems: 'center',
-            height: window.screen.height - 76
+            height: window.screen.height - 130
         }}>
             <div className="content">
                 <Col css={{
@@ -38,7 +40,7 @@ export default function HomePage() {
                         },
                         '@xsMax': {
                             fontSize: '$3xl',
-                            fontWeight: '$semibold',
+                            fontWeight: '$medium',
                             padding: '0px 8px',
                             lineHeight: '1.3'
                         },

@@ -44,6 +44,8 @@ export default function Header(props) {
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
 
+    const setAppRender = props.setAppRender
+
     const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
     const navigate = useNavigate();
@@ -110,6 +112,7 @@ export default function Header(props) {
 
                         setBackdropLoaderOpen(false);
                         requestNotificationPermission();
+                        setAppRender(true)
                     }
                     else {
                         setShowAshokaOnlyModal(true)
@@ -235,6 +238,8 @@ export default function Header(props) {
 
                 setShowNumberUpdateModal(false);
                 setShowNumberModal(false);
+
+                setAppRender((prev)=>!prev)
 
                 // window.location.pathname = '/'
             })
