@@ -20,8 +20,8 @@ input[type="file"] {
 }
 
 .nextui-c-iWjDFM-ihglIOL-css{
-    height: max-content;
-    padding: 6px 12px 
+    height: max-content !important;
+    padding: 6px 12px !important 
 }
 
 .sale-itemName-input::placeholder{

@@ -172,7 +172,8 @@ export default function InputItemCard(props) {
                         <Dropdown.Button flat color={badgeColor}
                             css={{
                                 lineHeight: '1',
-                                padding: '6px 0px'
+                                padding: '6px 12px',
+                                height: 'max-content'
                             }}>
                             {item.itemCategory === '' ? 'Category' : item.itemCategory.charAt(0).toUpperCase() + item.itemCategory.slice(1)}
                         </Dropdown.Button>
@@ -344,6 +345,7 @@ export default function InputItemCard(props) {
                                 icon={<IoLogoWhatsapp size={'20px'} color={"#25D366"} className="item-icon" />}
                                 css={{
                                     lineHeight: '1.2',
+                                    height: 'max-content'
                                 }}>
                                 {item.contactNumber}
                             </Button>
