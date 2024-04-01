@@ -16,6 +16,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaCloud } from "react-icons/fa6";
 import { IoCloudOffline } from "react-icons/io5";
+import imageCompression from 'browser-image-compression';
 
 
 export default function InputItemCard(props) {
@@ -122,6 +123,37 @@ export default function InputItemCard(props) {
                 });
             });
     };
+
+    // const compressImage = async (originalImage) => {
+    //     createPreviewURL(originalImage)
+    //     console.log(originalImage.size / 1000 / 1000, 'MB (before compression)');
+    //     console.log(originalImage)
+
+    //     // Options for the compression
+    //     const options = {
+    //         maxSizeMB: 3, // The maximum size of the output file in MB
+    //         maxWidthOrHeight: 1920, // The maximum width or height of the output image
+    //         useWebWorker: true // Enable multi-threading for better performance on supported browsers
+    //     };
+
+
+    //     try {
+    //         // Attempt to compress the image with the options
+    //         const compressedBlob = await imageCompression(originalImage, options);
+    //         console.log(compressedBlob.size / 1000 / 1000, 'MB (after compression)');
+
+    //         // Convert the Blob to a File
+    //         const compressedFile = new File([compressedBlob], originalImage.name, {
+    //             type: compressedBlob.type,
+    //             lastModified: Date.now(), // or use originalImage.lastModified if you want to preserve the original timestamp
+    //         });
+    //         console.log(compressedFile)
+    //         return (compressedFile)
+    //     } catch (error) {
+    //         console.error('Error compressing the image:', error);
+    //         throw error; // Rethrow the error for further handling
+    //     }
+    // };
 
 
 
@@ -276,8 +308,10 @@ export default function InputItemCard(props) {
                     }}>
                         <input onChange={(event) => {
                             if (event.target.files && event.target.files[0]) {
-                                if (event.target.files[0].size > 2200000) {
-                                    window.alert('Maximum file size: 2mb!');
+                                console.log(event.target.files[0].size/1000/1000)
+                                console.log(event.target.files[0])
+                                if (event.target.files[0].size > (7 * 1000 * 1000)) {
+                                    window.alert('Maximum file size: 7mb!');
                                 } else {
                                     setImageFile(event.target.files[0]);
                                     // Assuming you have logic here to create a preview URL

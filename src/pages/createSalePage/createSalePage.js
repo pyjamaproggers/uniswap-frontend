@@ -23,6 +23,9 @@ export default function CreateSalePage() {
 
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
+
+    const [render, setRender] = useState(false)
+
     const navigate = useNavigate(); 
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
@@ -93,6 +96,11 @@ export default function CreateSalePage() {
         // Additional validation can be added here, e.g., regex for phone numbers
         if (!item.contactNumber || typeof item.contactNumber !== 'string' || item.contactNumber.trim().length === 0) {
             alert('Contact number is required.');
+            return false;
+        }
+
+        if (!imageFile){
+            alert('Image is required');
             return false;
         }
 
@@ -216,17 +224,24 @@ export default function CreateSalePage() {
         }
     };
 
+    // const createPreviewURL = (image) => {
+    //     const url = URL.createObjectURL(image);
+    //     setPreviewUrl(url);
+    //     setRender(prev => !prev)
+    //     // Cleanup function to revoke the object URL
+    //     return () => URL.revokeObjectURL(url);
+    // }
 
     useEffect(() => {
-        if (imageFile) {
+        if (imageFile) { // Check if imageFile is a Blob (File is also a Blob)
             const url = URL.createObjectURL(imageFile);
-            // console.log(url)
             setPreviewUrl(url);
-
+    
             // Cleanup function to revoke the object URL
             return () => URL.revokeObjectURL(url);
         }
     }, [imageFile]);
+    
 
     if (localStorage.getItem('userEmail') === null) {
         return (
@@ -291,7 +306,7 @@ export default function CreateSalePage() {
                     Complete your item, upload your sale and people will directly contact you - it's that simple!
                 </Text>
 
-                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createSale'} />
+                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createSale'}/>
 
                 <Button auto flat css={{
                     margin: '0px 0px 36px 0px',
