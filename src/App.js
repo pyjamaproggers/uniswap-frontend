@@ -95,6 +95,7 @@ function App() {
                                 <Route exact path='/' element={<HomePage />} />
                                 <Route exact path='/saleitems' element={<Itemspage type={'sale'} />} />
                                 <Route exact path='/useritems' element={<Itemspage type={'user'} />} />
+                                <Route exact path='/favourites' element={<Itemspage type={'favourites'} />} />
                                 <Route exact path='/createsale' element={<CreateSalePage />} />
                                 <Route exact path='/editsale' element={<EditSalePage />} />
                                 <Route exact path='/outlets' element={<OutletsPage />} />

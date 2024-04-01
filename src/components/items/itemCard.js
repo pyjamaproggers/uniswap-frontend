@@ -213,6 +213,9 @@ export default function ItemCard(props) {
     if (item.live === 'n' && type === 'sale') {
         return null
     }
+    if(type==='favourites' && !(favouriteItems.includes(item._id))){
+        return null
+    }
     else {
         return (
             <Grid css={{
@@ -302,25 +305,6 @@ export default function ItemCard(props) {
 
                                 </Col>
 
-                                {/* {type === 'user' &&
-                                    <>
-                                        {item.live === 'y' ?
-                                            <>
-                                                <Badge variant="flat" size={'md'} color={'success'}
-                                                    onClick={() => { toggleLiveStatus(item._id) }}>
-                                                    • Live
-                                                </Badge>
-                                            </>
-                                            :
-                                            <>
-                                                <Badge variant="flat" size={'md'} color={'error'}
-                                                    onClick={() => { toggleLiveStatus(item._id) }}>
-                                                    • Not Live
-                                                </Badge>
-                                            </>
-                                        }
-                                    </>
-                                } */}
                             </Row>
                         }
                     >
@@ -358,7 +342,7 @@ export default function ItemCard(props) {
                         }}>
                             {getTimeDifference(item.dateAdded)}
                         </Text>
-                        {type === 'sale' &&
+                        {(type === 'sale' || type === 'favourites') &&
                             <Row css={{
                                 padding: '4px 8px 0px 8px',
                                 gap: 6,

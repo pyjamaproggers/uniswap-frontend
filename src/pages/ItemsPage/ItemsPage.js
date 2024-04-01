@@ -369,7 +369,7 @@ export default function ItemsPage(props) {
                     padding: '4px 4px',
                     jc: 'center'
                 }}>
-                    {type === 'sale' ?
+                    {type === 'sale' &&
                         <Text css={{
                             fontWeight: '$semibold',
                             '@xsMin': {
@@ -384,7 +384,8 @@ export default function ItemsPage(props) {
                         }}>
                             All Items On Sale
                         </Text>
-                        :
+                    }
+                    {type === 'user' &&
                         <Text css={{
                             fontWeight: '$semibold',
                             '@xsMin': {
@@ -397,7 +398,23 @@ export default function ItemsPage(props) {
                             },
                             width: 'max-content'
                         }}>
-                            {localStorage.getItem('userName')}'s Items
+                            {localStorage.getItem('userName').split(" ")[0]}'s Items
+                        </Text>
+                    }
+                    {type === 'favourites' &&
+                        <Text css={{
+                            fontWeight: '$semibold',
+                            '@xsMin': {
+                                fontSize: '$3xl',
+                                padding: '1% 2%'
+                            },
+                            '@xsMax': {
+                                fontSize: '$2xl',
+                                padding: '4%'
+                            },
+                            width: 'max-content'
+                        }}>
+                            {localStorage.getItem('userName').split(" ")[0]}'s Favourites
                         </Text>
                     }
                     <Row css={{
@@ -826,7 +843,7 @@ export default function ItemsPage(props) {
                             {(filtersApplied.searched.length == 0 && filtersApplied.category.length == 0 && filtersApplied.price.length == 0) ? //filters applied or not
                                 <>
                                     {/* If filters not applied then show allItems */}
-                                    {type === 'sale' ?
+                                    {type === 'sale' || type === 'favourites' ?
                                         <>
                                             {allItems.map((item, index) => (
                                                 <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} />
