@@ -96,6 +96,7 @@ export default function Header(props) {
         })
             .then(res => res.json())
             .then(data => {
+                console.log(data.user)
                 // Assuming backend response includes user object with contactNumber
                 if (data.user && data.user.contactNumber) {
                     // Set user details in localStorage
