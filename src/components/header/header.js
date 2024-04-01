@@ -82,6 +82,7 @@ export default function Header(props) {
 
 
     function handleCallbackresponse(response) {
+        setBackdropLoaderOpen(true);
         var googleUserObject_ = jwt_decode(response.credential);
         console.log(googleUserObject_);
         setGoogleUserObject(response.credential); // This should be the actual token, not decoded object
@@ -104,9 +105,11 @@ export default function Header(props) {
                     localStorage.setItem('contactNumber', data.user.contactNumber)
 
                     // Call to request notification permission should be here
+                    setBackdropLoaderOpen(false);
                     requestNotificationPermission();
                 } else {
                     // User does not have a contact number, show modal to add one
+                    setBackdropLoaderOpen(false);
                     console.log("User does not have a contact number, showing modal.",);
                     setShowNumberModal(true);
                 }
@@ -124,7 +127,7 @@ export default function Header(props) {
                     theme: "colored",
                     transition: 'Flip',
                 });
-                
+
                 // Handle error, e.g., show a message to the user
             });
     }
@@ -132,12 +135,12 @@ export default function Header(props) {
     const updateContactNumber = () => {
         const updatedPhoneNumber = number; // Assuming `number` contains the new phone number
         setBackdropLoaderOpen(true);
-    
+
         if (!updatedPhoneNumber) {
             console.error('No phone number provided');
             return;
         }
-    
+
         // First, update the user's phone number
         fetch(`${backend}/api/user/updatePhoneNumber`, {
             method: 'PATCH',
@@ -147,72 +150,108 @@ export default function Header(props) {
             credentials: 'include', // to ensure cookies are sent with the request
             body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to update number');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Phone number updated successfully:', data);
-    
-            // Now, verify the user to get a new token with updated info
-            return fetch(`${backend}/api/auth/verify`, {
-                method: 'GET',
-                credentials: 'include', // Important to include cookies
+            .then(response => {
+                if (!response.ok) {
+                    setBackdropLoaderOpen(false);
+                    toast.error('Failed to update phone, try again.', {
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        transition: 'Flip',
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Phone number updated successfully:', data);
+                setBackdropLoaderOpen(false);
+                toast.success('Successfully updated.', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
+
+                // Now, verify the user to get a new token with updated info
+                return fetch(`${backend}/api/auth/verify`, {
+                    method: 'GET',
+                    credentials: 'include', // Important to include cookies
+                });
+            })
+            .then(verifyResponse => {
+                if (!verifyResponse.ok) {
+                    toast.error('Failed to verify user.', {
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        transition: 'Flip',
+                    });
+                    setBackdropLoaderOpen(false);
+                    setShowNumberUpdateModal(false);
+                    setShowNumberModal(false);
+                }
+                return verifyResponse.json();
+            })
+            .then(verifyData => {
+                console.log('User verified, and cookie updated:', verifyData);
+                setBackdropLoaderOpen(false);
+                toast.success('Number updated and user verified successfully.', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
+
+                // Optionally update local storage or UI based on verified user data
+                // Assuming verifyData.user contains the updated user info
+                localStorage.setItem('userEmail', verifyData.user.userEmail);
+                localStorage.setItem('userName', verifyData.user.userName);
+                localStorage.setItem('userPicture', verifyData.user.userPicture);
+                localStorage.setItem('contactNumber', verifyData.user.contactNumber);
+
+                setShowNumberUpdateModal(false);
+                setShowNumberModal(false);
+
+                // Continue with any further actions, like requesting notification permissions
+                // requestNotificationPermission();
+            })
+            .catch(error => {
+                setBackdropLoaderOpen(false);
+                console.error('Error:', error);
+                toast.error('Some error... please try again', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
             });
-        })
-        .then(verifyResponse => {
-            if (!verifyResponse.ok) {
-                throw new Error('Failed to verify user');
-            }
-            return verifyResponse.json();
-        })
-        .then(verifyData => {
-            console.log('User verified, and cookie updated:', verifyData);
-            toast.success('Number updated and user verified successfully.', {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                transition: 'Flip',
-            });
-    
-            // Optionally update local storage or UI based on verified user data
-            // Assuming verifyData.user contains the updated user info
-            localStorage.setItem('userEmail', verifyData.user.userEmail);
-            localStorage.setItem('userName', verifyData.user.userName);
-            localStorage.setItem('userPicture', verifyData.user.userPicture);
-            localStorage.setItem('contactNumber', verifyData.user.contactNumber);
-    
-            setBackdropLoaderOpen(false);
-            setShowNumberUpdateModal(false);
-            setShowNumberModal(false);
-    
-            // Continue with any further actions, like requesting notification permissions
-            requestNotificationPermission();
-        })
-        .catch(error => {
-            setBackdropLoaderOpen(false);
-            console.error('Error:', error);
-            toast.error(error.message, {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                transition: 'Flip',
-            });
-        });
     };
-    
+
     // function handleCallbackresponse(response) {
     //     var googleUserObject_ = jwt_decode(response.credential);
     //     console.log(googleUserObject_)

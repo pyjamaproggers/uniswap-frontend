@@ -205,233 +205,239 @@ export default function ItemCard(props) {
     // Default to some color if item.category is not found in the mapping
     const badgeColor = categoryColors[item.itemCategory] || 'default';
 
-    return (
-        <Grid css={{
-            margin: '24px 24px'
-        }}>
-            <Col css={{
-                display: 'flex',
-                flexDirection: 'column'
+    if(item.live==='n'){
+        return null
+    }
+    else{
+        return (
+            <Grid css={{
+                margin: '24px 24px'
             }}>
-                <Row css={{
-                    alignItems: 'center',
-                    padding: '0px 8px 4px 8px',
-                    jc: 'space-between'
+                <Col css={{
+                    display: 'flex',
+                    flexDirection: 'column'
                 }}>
                     <Row css={{
                         alignItems: 'center',
-                        gap: 6,
+                        padding: '0px 8px 4px 8px',
+                        jc: 'space-between'
                     }}>
-                        <Avatar
-                            color=""
-                            size="md"
-                            src={item.userPicture}
-                            className="avatar"
-                        />
+                        <Row css={{
+                            alignItems: 'center',
+                            gap: 6,
+                        }}>
+                            <Avatar
+                                color=""
+                                size="md"
+                                src={item.userPicture}
+                                className="avatar"
+                            />
+                            <Text css={{
+                                display: 'inline-block', // Allows the use of maxW
+                                maxW: '100px',
+                                fontWeight: '$medium',
+                                '@xsMin': {
+                                    fontSize: '$lg',
+                                },
+                                '@xsMax': {
+                                    fontSize: '$md'
+                                },
+                            }}>
+                                <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.20' }}>
+                                    {firstName}
+                                </span>
+                                <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.20' }}>
+                                    {lastName}
+                                </span>
+                            </Text>
+                        </Row>
+                        <Badge variant="flat" size={'md'} color={badgeColor}>
+                            {item.itemCategory.charAt(0).toUpperCase() + item.itemCategory.slice(1)}
+                        </Badge>
+                        <Badge variant="flat" size={'md'} color={"primary"}>
+                            ₹ {item.itemPrice}
+                        </Badge>
+                    </Row>
+                    <Image src={item.itemPicture}
+                        css={{
+                            height: '300px',
+                            // minWidth: '300px',
+                            // maxW: '330px',
+                            width: '320px',
+                            objectFit: 'cover',
+                            borderRadius: '4px'
+                        }} />
+                    <Collapse css={{
+                        width: '330px',
+                        borderStyle: 'solid',
+                        borderColor: '$gray100',
+                        borderWidth: '0px 0px 1px 0px'
+                    }}
+                        divider={false}
+                        title={
+                            <Row css={{
+                                alignItems: 'baseline',
+                                jc: 'start',
+                            }}>
+                                <Col>
+    
+                                    <Text css={{
+                                        fontWeight: '$medium',
+                                        '@xsMin': {
+                                            fontSize: '$lg'
+                                        },
+                                        '@xsMax': {
+                                            fontSize: '$md'
+                                        },
+                                        paddingRight: '4px',
+                                        // lineHeight: '1.25',
+                                    }}>
+                                        {item.itemName}
+                                    </Text>
+    
+                                </Col>
+    
+                                {/* {type === 'user' &&
+                                    <>
+                                        {item.live === 'y' ?
+                                            <>
+                                                <Badge variant="flat" size={'md'} color={'success'}
+                                                    onClick={() => { toggleLiveStatus(item._id) }}>
+                                                    • Live
+                                                </Badge>
+                                            </>
+                                            :
+                                            <>
+                                                <Badge variant="flat" size={'md'} color={'error'}
+                                                    onClick={() => { toggleLiveStatus(item._id) }}>
+                                                    • Not Live
+                                                </Badge>
+                                            </>
+                                        }
+                                    </>
+                                } */}
+                            </Row>
+                        }
+                    >
                         <Text css={{
-                            display: 'inline-block', // Allows the use of maxW
-                            maxW: '100px',
-                            fontWeight: '$medium',
+                            fontWeight: '$regular',
                             '@xsMin': {
-                                fontSize: '$lg',
+                                fontSize: '$base'
                             },
                             '@xsMax': {
                                 fontSize: '$md'
                             },
+                            padding: '0px 8px 4px 8px',
+                            color: '$gray800',
+                            lineHeight: '1.25'
                         }}>
-                            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.20' }}>
-                                {firstName}
-                            </span>
-                            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.20' }}>
-                                {lastName}
-                            </span>
+                            {item.itemDescription}
                         </Text>
+                    </Collapse>
+                    <Row css={{
+                        jc: 'space-between',
+                        marginTop: '4px',
+                        alignItems: 'normal',
+                        marginBottom: type==='sale' ? '24px' : '0px'
+                    }}>
+                        <Text css={{
+                            fontWeight: '$medium',
+                            '@xsMin': {
+                                fontSize: '$md',
+                            },
+                            '@xsMax': {
+                                fontSize: '$sm'
+                            },
+                            color: '$gray600',
+                            paddingLeft: '8px'
+                        }}>
+                            {getTimeDifference(item.dateAdded)}
+                        </Text>
+                        {type === 'sale' &&
+                            <Row css={{
+                                padding: '4px 8px 0px 8px',
+                                gap: 6,
+                                alignItems: 'center',
+                                width: 'max-content',
+                            }}>
+                                <Button auto flat color={'success'} className="collapse-buttons">
+                                    <IoLogoWhatsapp size={'20px'} color={"#25D366"} onClick={() => {
+                                        window.open(url)
+                                    }} className="item-icon" />
+                                </Button>
+                                {favouriteItems.includes(item._id) ?
+                                    <Button auto flat color={'error'} className="collapse-buttons">
+                                        <IoMdHeart size={20} style={{
+                                            borderRadius: '12px',
+                                            color: '#F31260'
+                                        }} className="item-icon"
+                                            onClick={() => {
+                                                handleFavouriteButtonClick(favouriteItems, item)
+                                            }} />
+                                    </Button>
+                                    :
+                                    <Button auto flat color={'error'} className="collapse-buttons">
+                                        <IoMdHeart size={20} style={{
+                                            borderRadius: '12px',
+                                            color: '#ffffff',
+                                            opacity: '0.6'
+                                        }} className="item-icon"
+                                            onClick={() => {
+                                                handleFavouriteButtonClick(favouriteItems, item)
+                                            }} />
+                                    </Button>
+                                }
+                            </Row>
+                        }
                     </Row>
-                    <Badge variant="flat" size={'md'} color={badgeColor}>
-                        {item.itemCategory.charAt(0).toUpperCase() + item.itemCategory.slice(1)}
-                    </Badge>
-                    <Badge variant="flat" size={'md'} color={"primary"}>
-                        ₹ {item.itemPrice}
-                    </Badge>
-                </Row>
-                <Image src={item.itemPicture}
-                    css={{
-                        height: '300px',
-                        // minWidth: '300px',
-                        // maxW: '330px',
-                        width: '320px',
-                        objectFit: 'cover',
-                        borderRadius: '4px'
-                    }} />
-                <Collapse css={{
-                    width: '330px',
-                    borderStyle: 'solid',
-                    borderColor: '$gray100',
-                    borderWidth: '0px 0px 1px 0px'
-                }}
-                    divider={false}
-                    title={
+                    {type === 'user' &&
                         <Row css={{
-                            alignItems: 'baseline',
-                            jc: 'start',
-                        }}>
-                            <Col>
-
-                                <Text css={{
-                                    fontWeight: '$medium',
-                                    '@xsMin': {
-                                        fontSize: '$lg'
-                                    },
-                                    '@xsMax': {
-                                        fontSize: '$md'
-                                    },
-                                    paddingRight: '4px',
-                                    // lineHeight: '1.25',
-                                }}>
-                                    {item.itemName}
-                                </Text>
-
-                            </Col>
-
-                            {/* {type === 'user' &&
-                                <>
-                                    {item.live === 'y' ?
-                                        <>
-                                            <Badge variant="flat" size={'md'} color={'success'}
-                                                onClick={() => { toggleLiveStatus(item._id) }}>
-                                                • Live
-                                            </Badge>
-                                        </>
-                                        :
-                                        <>
-                                            <Badge variant="flat" size={'md'} color={'error'}
-                                                onClick={() => { toggleLiveStatus(item._id) }}>
-                                                • Not Live
-                                            </Badge>
-                                        </>
-                                    }
-                                </>
-                            } */}
-                        </Row>
-                    }
-                >
-                    <Text css={{
-                        fontWeight: '$regular',
-                        '@xsMin': {
-                            fontSize: '$base'
-                        },
-                        '@xsMax': {
-                            fontSize: '$md'
-                        },
-                        padding: '0px 8px 4px 8px',
-                        color: '$gray800',
-                        lineHeight: '1.25'
-                    }}>
-                        {item.itemDescription}
-                    </Text>
-                </Collapse>
-                <Row css={{
-                    jc: 'space-between',
-                    marginTop: '4px',
-                    alignItems: 'normal',
-                    marginBottom: type==='sale' ? '24px' : '0px'
-                }}>
-                    <Text css={{
-                        fontWeight: '$medium',
-                        '@xsMin': {
-                            fontSize: '$md',
-                        },
-                        '@xsMax': {
-                            fontSize: '$sm'
-                        },
-                        color: '$gray600',
-                        paddingLeft: '8px'
-                    }}>
-                        {getTimeDifference(item.dateAdded)}
-                    </Text>
-                    {type === 'sale' &&
-                        <Row css={{
-                            padding: '4px 8px 0px 8px',
-                            gap: 6,
+                            justifyContent: 'flex-end',
                             alignItems: 'center',
-                            width: 'max-content',
+                            paddingTop: '8px',
+                            gap: 4,
+                            marginBottom: '24px'
                         }}>
-                            <Button auto flat color={'success'} className="collapse-buttons">
-                                <IoLogoWhatsapp size={'20px'} color={"#25D366"} onClick={() => {
-                                    window.open(url)
-                                }} className="item-icon" />
-                            </Button>
-                            {favouriteItems.includes(item._id) ?
-                                <Button auto flat color={'error'} className="collapse-buttons">
-                                    <IoMdHeart size={20} style={{
-                                        borderRadius: '12px',
-                                        color: '#F31260'
-                                    }} className="item-icon"
-                                        onClick={() => {
-                                            handleFavouriteButtonClick(favouriteItems, item)
-                                        }} />
+                            {item.live === 'y' ?
+                                <Button auto flat color={"success"}
+                                    icon={<FaCloud size={16} style={{}}/>}
+                                    onClick={() => { toggleLiveStatus(item._id) }}
+                                    css={{
+                                        lineHeight: '2.2'
+                                    }}>
+                                    Live
                                 </Button>
                                 :
-                                <Button auto flat color={'error'} className="collapse-buttons">
-                                    <IoMdHeart size={20} style={{
-                                        borderRadius: '12px',
-                                        color: '#ffffff',
-                                        opacity: '0.6'
-                                    }} className="item-icon"
-                                        onClick={() => {
-                                            handleFavouriteButtonClick(favouriteItems, item)
-                                        }} />
+                                <Button auto flat color={"error"}
+                                    icon={<IoCloudOffline size={16} />}
+                                    onClick={() => { toggleLiveStatus(item._id) }}
+                                    css={{
+                                        lineHeight: '2.2'
+                                    }}>
+                                    Not Live
                                 </Button>
                             }
+                            <Button auto flat color="primary"
+                            icon={<IoPencil size={16}/>}
+                                onClick={() => navigate('/editsale', { state: item })}
+                                css={{
+                                    lineHeight: '2.2'
+                                }}>
+                                Edit
+                            </Button>
+                            <Button auto flat color="error"
+                                onClick={() => handleDeleteItem(item._id)}
+                                css={{
+                                    lineHeight: '2.2'
+                                }}>
+                                <MdDelete size={16} />
+                                Delete
+                            </Button>
                         </Row>
                     }
-                </Row>
-                {type === 'user' &&
-                    <Row css={{
-                        justifyContent: 'flex-end',
-                        alignItems: 'center',
-                        paddingTop: '8px',
-                        gap: 4,
-                        marginBottom: '24px'
-                    }}>
-                        {item.live === 'y' ?
-                            <Button auto flat color={"success"}
-                                icon={<FaCloud size={16} style={{}}/>}
-                                onClick={() => { toggleLiveStatus(item._id) }}
-                                css={{
-                                    lineHeight: '2.2'
-                                }}>
-                                Live
-                            </Button>
-                            :
-                            <Button auto flat color={"error"}
-                                icon={<IoCloudOffline size={16} />}
-                                onClick={() => { toggleLiveStatus(item._id) }}
-                                css={{
-                                    lineHeight: '2.2'
-                                }}>
-                                Not Live
-                            </Button>
-                        }
-                        <Button auto flat color="primary"
-                        icon={<IoPencil size={16}/>}
-                            onClick={() => navigate('/editsale', { state: item })}
-                            css={{
-                                lineHeight: '2.2'
-                            }}>
-                            Edit
-                        </Button>
-                        <Button auto flat color="error"
-                            onClick={() => handleDeleteItem(item._id)}
-                            css={{
-                                lineHeight: '2.2'
-                            }}>
-                            <MdDelete size={16} />
-                            Delete
-                        </Button>
-                    </Row>
-                }
-            </Col>
-        </Grid>
-    );
+                </Col>
+            </Grid>
+        );
+    }
+
 }
