@@ -63,14 +63,14 @@ export default function InputItemCard(props) {
 
     const updateContactNumber = () => {
         const updatedPhoneNumber = number.trim();
-    
+
         if (!updatedPhoneNumber) {
             console.error('No phone number provided');
             return;
         }
-    
+
         setBackdropLoaderOpen(true);
-    
+
         fetch(`${backend}/api/user/updatePhoneNumber`, {
             method: 'PATCH',
             headers: {
@@ -79,50 +79,50 @@ export default function InputItemCard(props) {
             credentials: 'include',
             body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error updating phone number');
-            }
-            return response.json();
-        })
-        .then(() => {
-            console.log('Phone number updated successfully');
-            // Update the item state with the new contact number
-            setItem(prevItem => ({
-                ...prevItem,
-                contactNumber: updatedPhoneNumber
-            }));
-            setShowNumberUpdateModal(false);
-            setBackdropLoaderOpen(false);
-            toast.success('Number updated!', {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                transition: "Flip",
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error updating phone number');
+                }
+                return response.json();
+            })
+            .then(() => {
+                console.log('Phone number updated successfully');
+                // Update the item state with the new contact number
+                setItem(prevItem => ({
+                    ...prevItem,
+                    contactNumber: updatedPhoneNumber
+                }));
+                setShowNumberUpdateModal(false);
+                setBackdropLoaderOpen(false);
+                toast.success('Number updated!', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: "Flip",
+                });
+            })
+            .catch(error => {
+                console.error('Error updating phone number:', error);
+                setBackdropLoaderOpen(false);
+                toast.error('Failed to update phone number. Please try again.', {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
             });
-        })
-        .catch(error => {
-            console.error('Error updating phone number:', error);
-            setBackdropLoaderOpen(false);
-            toast.error('Failed to update phone number. Please try again.', {
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-                transition: 'Flip',
-            });
-        });
     };
-    
+
 
 
     return (
@@ -441,6 +441,20 @@ export default function InputItemCard(props) {
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
+
+            <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+                transition="Flip"
+            />
         </Grid>
     )
 }
