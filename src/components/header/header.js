@@ -106,10 +106,11 @@ export default function Header(props) {
 
                         setBackdropLoaderOpen(false);
                         requestNotificationPermission();
-
                     }
                     else{
                         setShowAshokaOnlyModal(true)
+                        setBackdropLoaderOpen(false);
+
                     }
                     
                 } else {
@@ -119,6 +120,7 @@ export default function Header(props) {
                     setShowNumberModal(true);}
                     else{
                         setShowAshokaOnlyModal(true)
+                        setBackdropLoaderOpen(false);
                     }
                 }
             })
