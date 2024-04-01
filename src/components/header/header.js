@@ -170,19 +170,6 @@ export default function Header(props) {
             })
             .then(data => {
                 console.log('Phone number updated successfully:', data);
-                setBackdropLoaderOpen(false);
-                toast.success('Successfully updated.', {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
-
                 // Now, verify the user to get a new token with updated info
                 return fetch(`${backend}/api/auth/verify`, {
                     method: 'GET',
@@ -210,7 +197,7 @@ export default function Header(props) {
             })
             .then(verifyData => {
                 console.log('User verified, and cookie updated:', verifyData);
-                setBackdropLoaderOpen(false);
+                
                 toast.success('Number updated and user verified successfully.', {
                     position: "top-center",
                     autoClose: 2000,
@@ -229,6 +216,9 @@ export default function Header(props) {
                 localStorage.setItem('userName', verifyData.user.userName);
                 localStorage.setItem('userPicture', verifyData.user.userPicture);
                 localStorage.setItem('contactNumber', verifyData.user.contactNumber);
+                setBackdropLoaderOpen(false);
+
+                setRender((prev) => !prev);
 
                 setShowNumberUpdateModal(false);
                 setShowNumberModal(false);
@@ -382,7 +372,7 @@ export default function Header(props) {
 
             window.google.accounts.id.renderButton(
                 document.getElementById("GoogleButton"),
-                { theme: 'dark', size: 'large', shape: 'circle', type: 'icon' }
+                { theme: 'dark', size: 'large', shape: 'circle', type: 'icon', }
             );
             setLoginLoader(false)
         }, 2000)
@@ -969,6 +959,20 @@ export default function Header(props) {
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
+
+            <ToastContainer
+                    position="top-right"
+                    autoClose={2000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="colored"
+                    transition="Flip"
+                />
 
         </>
     );
