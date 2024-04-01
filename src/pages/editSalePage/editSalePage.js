@@ -84,7 +84,7 @@ export default function EditSalePage() {
         .catch(error => {
             console.error('Error verifying user session:', error);
             // Redirect to login page or show an error page
-            navigate('/login'); // Adjust the path as necessary
+            navigate('/'); // Adjust the path as necessary
         });
     };
 
