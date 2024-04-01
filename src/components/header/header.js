@@ -113,9 +113,13 @@ export default function Header(props) {
                     }
                     
                 } else {
-                    setBackdropLoaderOpen(false);
+                    if(data.user.userEmail.split('@')[1] === 'ashoka.edu.in')
+                    {setBackdropLoaderOpen(false);
                     console.log("User does not have a contact number, showing modal.",);
-                    setShowNumberModal(true);
+                    setShowNumberModal(true);}
+                    else{
+                        setShowAshokaOnlyModal(true)
+                    }
                 }
             })
             .catch(error => {
