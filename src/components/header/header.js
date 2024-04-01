@@ -225,6 +225,8 @@ export default function Header(props) {
 
                 setShowNumberUpdateModal(false);
                 setShowNumberModal(false);
+
+                window.location.pathname='/'
             })
             .catch(error => {
                 setBackdropLoaderOpen(false);
@@ -383,7 +385,7 @@ export default function Header(props) {
 
     return (
         <>
-            <Navbar isBordered variant="sticky">
+            <Navbar isBordered variant="static">
 
                 <Navbar.Toggle showIn={'xs'} css={{width: '44px'}}/>
 

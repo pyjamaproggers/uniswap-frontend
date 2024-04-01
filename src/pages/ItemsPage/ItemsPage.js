@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ReactDOMServer from 'react-dom/server';
 import { useNavigate } from 'react-router-dom';
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
 import { Button, Col, Grid, Input, Text, Row, Badge } from "@nextui-org/react";
@@ -15,6 +16,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PullToRefresh from 'pulltorefreshjs';
+import { ImSpinner9 } from "react-icons/im";
+import { faSpinner} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 export default function ItemsPage(props) {
@@ -49,6 +54,25 @@ export default function ItemsPage(props) {
     useEffect(() => {
         if (!JSON.parse(localStorage.getItem('favouriteItems'))) {
             localStorage.setItem('favouriteItems', JSON.stringify([]))
+        }
+    })
+
+    useEffect(() => {
+        PullToRefresh.init({
+            mainElement: 'body',
+            onRefresh() {
+                fetchAllItems()
+            },
+            iconArrow: ReactDOMServer.renderToString(
+                <FontAwesomeIcon icon={faSpinner} style={{color: '#ffffff'}}/>
+            ),
+            iconRefreshing: ReactDOMServer.renderToString(
+                <FontAwesomeIcon icon={faSpinner} spin style={{color: '#ffffff'}}/>
+            ),
+        });
+
+        return () => {
+            PullToRefresh.destroyAll();
         }
     })
 
