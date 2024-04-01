@@ -573,6 +573,13 @@ export default function Header(props) {
                                     icon={<FaPhone size={16} />}>
                                     Update Phone
                                 </Dropdown.Item>
+                                <Dropdown.Item key="enablenotif" color=""
+                                    icon={<FaPhone size={16} />}
+                                    >
+                                        <Button onClick={requestNotificationPermission()}>
+                                        Enable Notifications
+                                        </Button>
+                                </Dropdown.Item>
                                 <Dropdown.Item key="logout" withDivider color="error"
                                     icon={<IoLogOut size={16} />}>
                                     Log Out
