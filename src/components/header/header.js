@@ -132,26 +132,23 @@ export default function Header(props) {
                     transition: 'Flip',
                 });
 
-                // Handle error, e.g., show a message to the user
             });
     }
 
     const updateContactNumber = () => {
-        const updatedPhoneNumber = number; // Assuming `number` contains the new phone number
+        const updatedPhoneNumber = number; 
         setBackdropLoaderOpen(true);
 
         if (!updatedPhoneNumber) {
             console.error('No phone number provided');
             return;
         }
-
-        // First, update the user's phone number
         fetch(`${backend}/api/user/updatePhoneNumber`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include', // to ensure cookies are sent with the request
+            credentials: 'include',
             body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
         })
             .then(response => {
@@ -173,10 +170,9 @@ export default function Header(props) {
             })
             .then(data => {
                 console.log('Phone number updated successfully:', data);
-                // Now, verify the user to get a new token with updated info
                 return fetch(`${backend}/api/auth/verify`, {
                     method: 'GET',
-                    credentials: 'include', // Important to include cookies
+                    credentials: 'include', 
                 });
             })
             .then(verifyResponse => {
@@ -213,8 +209,6 @@ export default function Header(props) {
                     transition: 'Flip',
                 });
 
-                // Optionally update local storage or UI based on verified user data
-                // Assuming verifyData.user contains the updated user info
                 localStorage.setItem('userEmail', verifyData.user.userEmail);
                 localStorage.setItem('userName', verifyData.user.userName);
                 localStorage.setItem('userPicture', verifyData.user.userPicture);
@@ -225,9 +219,6 @@ export default function Header(props) {
 
                 setShowNumberUpdateModal(false);
                 setShowNumberModal(false);
-
-                // Continue with any further actions, like requesting notification permissions
-                // requestNotificationPermission();
             })
             .catch(error => {
                 setBackdropLoaderOpen(false);
@@ -251,22 +242,6 @@ export default function Header(props) {
         setShowNumberModal(false);
 
     };
-
-    // function handleCallbackresponse(response) {
-    //     var googleUserObject_ = jwt_decode(response.credential);
-    //     console.log(googleUserObject_)
-    //     setGoogleUserObject(response.credential)
-
-    //     if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
-
-    //         setShowNumberModal(true)
-
-    //     } else {
-    //         setShowAshokaOnlyModal(true);
-    //     }
-    // }
-
-    // Function to request notification permission and get the token
 
     const requestNotificationPermission = () => {
         Notification.requestPermission().then((permission) => {
