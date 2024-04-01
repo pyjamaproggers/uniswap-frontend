@@ -66,17 +66,6 @@ export default function ItemsPage(props) {
             })
             .then(data => {
                 console.log('User session verified:', data);
-                toast.error(`${error}`, {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
                 // Optionally update the UI or state based on the response
             })
             .catch(error => {
@@ -114,17 +103,6 @@ export default function ItemsPage(props) {
             });
 
             if (!response.ok) {
-                toast.error(`${error}`, {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "colored",
-                    transition: 'Flip',
-                });
                 throw new Error('Network response was not ok');
             }
 
