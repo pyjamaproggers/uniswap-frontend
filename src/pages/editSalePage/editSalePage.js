@@ -235,7 +235,8 @@ export default function EditSalePage() {
 
                 <Button auto flat css={{
                     margin: '0px 0px 36px 0px',
-                    padding: '6px 0px'
+                    padding: '6px 12px',
+                    height: 'max-content'
                 }}
                     onClick={() => {
                         if (checkForm()) {
