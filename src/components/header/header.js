@@ -401,7 +401,7 @@ export default function Header(props) {
         <>
             <Navbar isBordered variant="sticky">
 
-                <Navbar.Toggle showIn={'xs'} />
+                <Navbar.Toggle showIn={'xs'} css={{width: '44px'}}/>
 
                 <Navbar.Brand
                     onClick={() => {
