@@ -276,7 +276,7 @@ export default function InputItemCard(props) {
                     }}>
                         <input onChange={(event) => {
                             if (event.target.files && event.target.files[0]) {
-                                if (event.target.files[0].size > 2200000) {
+                                if (event.target.files[0].size > 5200000) {
                                     window.alert('Maximum file size: 2mb!');
                                 } else {
                                     setImageFile(event.target.files[0]);
