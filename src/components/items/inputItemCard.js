@@ -308,8 +308,8 @@ export default function InputItemCard(props) {
                     }}>
                         <input onChange={(event) => {
                             if (event.target.files && event.target.files[0]) {
-                                console.log(event.target.files[0].size/1000/1000)
-                                console.log(event.target.files[0])
+                                // console.log(event.target.files[0].size/1000/1000)
+                                // console.log(event.target.files[0])
                                 if (event.target.files[0].size > (7 * 1000 * 1000)) {
                                     window.alert('Maximum file size: 7mb!');
                                 } else {

@@ -84,7 +84,6 @@ export default function Header(props) {
     function handleCallbackresponse(response) {
         setBackdropLoaderOpen(true);
         var googleUserObject_ = jwt_decode(response.credential);
-        console.log(googleUserObject_);
         setGoogleUserObject(response.credential); // This should be the actual token, not decoded object
 
         // Call backend to verify token and check user's contact number status
@@ -96,23 +95,33 @@ export default function Header(props) {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data.user)
-                // Assuming backend response includes user object with contactNumber
-                if (data.user && data.user.contactNumber) {
-                    // Set user details in localStorage
-                    localStorage.setItem('userEmail', data.user.userEmail);
-                    localStorage.setItem('userName', data.user.userName);
-                    localStorage.setItem('userPicture', data.user.userPicture);
-                    localStorage.setItem('contactNumber', data.user.contactNumber)
 
-                    // Call to request notification permission should be here
-                    setBackdropLoaderOpen(false);
-                    requestNotificationPermission();
+                if (data.user && data.user.contactNumber) {
+                    if(data.user.userEmail.split('@')[1] === 'ashoka.edu.in')
+                    {
+                        localStorage.setItem('userEmail', data.user.userEmail);
+                        localStorage.setItem('userName', data.user.userName);
+                        localStorage.setItem('userPicture', data.user.userPicture);
+                        localStorage.setItem('contactNumber', data.user.contactNumber)
+
+                        setBackdropLoaderOpen(false);
+                        requestNotificationPermission();
+                    }
+                    else{
+                        setShowAshokaOnlyModal(true)
+                        setBackdropLoaderOpen(false);
+
+                    }
+                    
                 } else {
-                    // User does not have a contact number, show modal to add one
-                    setBackdropLoaderOpen(false);
+                    if(data.user.userEmail.split('@')[1] === 'ashoka.edu.in')
+                    {setBackdropLoaderOpen(false);
                     console.log("User does not have a contact number, showing modal.",);
-                    setShowNumberModal(true);
+                    setShowNumberModal(true);}
+                    else{
+                        setShowAshokaOnlyModal(true)
+                        setBackdropLoaderOpen(false);
+                    }
                 }
             })
             .catch(error => {
@@ -129,26 +138,23 @@ export default function Header(props) {
                     transition: 'Flip',
                 });
 
-                // Handle error, e.g., show a message to the user
             });
     }
 
     const updateContactNumber = () => {
-        const updatedPhoneNumber = number; // Assuming `number` contains the new phone number
+        const updatedPhoneNumber = number; 
         setBackdropLoaderOpen(true);
 
         if (!updatedPhoneNumber) {
             console.error('No phone number provided');
             return;
         }
-
-        // First, update the user's phone number
         fetch(`${backend}/api/user/updatePhoneNumber`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include', // to ensure cookies are sent with the request
+            credentials: 'include',
             body: JSON.stringify({ newPhoneNumber: updatedPhoneNumber }),
         })
             .then(response => {
@@ -170,10 +176,9 @@ export default function Header(props) {
             })
             .then(data => {
                 console.log('Phone number updated successfully:', data);
-                // Now, verify the user to get a new token with updated info
                 return fetch(`${backend}/api/auth/verify`, {
                     method: 'GET',
-                    credentials: 'include', // Important to include cookies
+                    credentials: 'include', 
                 });
             })
             .then(verifyResponse => {
@@ -210,8 +215,6 @@ export default function Header(props) {
                     transition: 'Flip',
                 });
 
-                // Optionally update local storage or UI based on verified user data
-                // Assuming verifyData.user contains the updated user info
                 localStorage.setItem('userEmail', verifyData.user.userEmail);
                 localStorage.setItem('userName', verifyData.user.userName);
                 localStorage.setItem('userPicture', verifyData.user.userPicture);
@@ -222,9 +225,6 @@ export default function Header(props) {
 
                 setShowNumberUpdateModal(false);
                 setShowNumberModal(false);
-
-                // Continue with any further actions, like requesting notification permissions
-                // requestNotificationPermission();
             })
             .catch(error => {
                 setBackdropLoaderOpen(false);
@@ -248,22 +248,6 @@ export default function Header(props) {
         setShowNumberModal(false);
 
     };
-
-    // function handleCallbackresponse(response) {
-    //     var googleUserObject_ = jwt_decode(response.credential);
-    //     console.log(googleUserObject_)
-    //     setGoogleUserObject(response.credential)
-
-    //     if (jwt_decode(response.credential).email.split('@')[1] === 'ashoka.edu.in') {
-
-    //         setShowNumberModal(true)
-
-    //     } else {
-    //         setShowAshokaOnlyModal(true);
-    //     }
-    // }
-
-    // Function to request notification permission and get the token
 
     const requestNotificationPermission = () => {
         Notification.requestPermission().then((permission) => {
@@ -588,6 +572,13 @@ export default function Header(props) {
                                 <Dropdown.Item key="phoneAuth" color=""
                                     icon={<FaPhone size={16} />}>
                                     Update Phone
+                                </Dropdown.Item>
+                                <Dropdown.Item key="enablenotif" color=""
+                                    icon={<FaPhone size={16} />}
+                                    >
+                                        <Button onClick={requestNotificationPermission()}>
+                                        Enable Notifications
+                                        </Button>
                                 </Dropdown.Item>
                                 <Dropdown.Item key="logout" withDivider color="error"
                                     icon={<IoLogOut size={16} />}>
