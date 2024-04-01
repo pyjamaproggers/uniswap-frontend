@@ -117,7 +117,7 @@ export default function Header(props) {
             })
             .catch(error => {
                 console.error('Error:', error);
-                toast.error('Some error', {
+                toast.error(`${error}`, {
                     position: "top-center",
                     autoClose: 2000,
                     hideProgressBar: false,
