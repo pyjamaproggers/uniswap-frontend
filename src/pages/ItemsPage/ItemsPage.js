@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
 import { Button, Col, Grid, Input, Text, Row, Badge } from "@nextui-org/react";
 import { IoFilter } from "react-icons/io5";
@@ -13,13 +13,15 @@ import './ItemsPage.css'
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useLocation } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 export default function ItemsPage(props) {
 
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const type = props.type
 
@@ -55,22 +57,22 @@ export default function ItemsPage(props) {
             method: 'GET',
             credentials: 'include', // Necessary to include the cookie in the request
         })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Session expired or user not logged in');
-            }
-        })
-        .then(data => {
-            console.log('User session verified:', data);
-            // Optionally update the UI or state based on the response
-        })
-        .catch(error => {
-            console.error('Error verifying user session:', error);
-            // Redirect to login page or show an error page
-            navigate('/'); // Adjust the path as necessary
-        });
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Session expired or user not logged in');
+                }
+            })
+            .then(data => {
+                console.log('User session verified:', data);
+                // Optionally update the UI or state based on the response
+            })
+            .catch(error => {
+                console.error('Error verifying user session:', error);
+                // Redirect to login page or show an error page
+                navigate('/'); // Adjust the path as necessary
+            });
     };
 
     useEffect(() => {
@@ -91,6 +93,17 @@ export default function ItemsPage(props) {
 
             if (!response.ok) {
                 throw new Error('Network response was not ok');
+                toast.error(`${error}`, {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: 'Flip',
+                });
             }
 
             // Parse JSON response here if needed
@@ -100,6 +113,17 @@ export default function ItemsPage(props) {
             // Update state or show a notification to the user based on the response
         } catch (error) {
             console.error('Failed to toggle live status:', error);
+            toast.error(`${error}`, {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: 'Flip',
+            });
             // Handle error by showing a message to the user
         }
     };
@@ -321,6 +345,19 @@ export default function ItemsPage(props) {
         return (
             <Grid.Container css={{
             }}>
+                <ToastContainer
+                    position="top-right"
+                    autoClose={2000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="colored"
+                    transition="Flip"
+                />
                 <Grid.Container css={{
                     padding: '4px 4px',
                     jc: 'center'
@@ -791,7 +828,7 @@ export default function ItemsPage(props) {
                                         :
                                         <>
                                             {userItems.map((item, index) => (
-                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} onItemDeleted={onItemDeleted}/>
+                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} onItemDeleted={onItemDeleted} />
                                             ))}
                                         </>
                                     }
