@@ -31,6 +31,8 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { GoBellFill } from "react-icons/go";
+
 
 export default function Header(props) {
     const [render, setRender] = useState(false)
@@ -239,7 +241,7 @@ export default function Header(props) {
                 setShowNumberUpdateModal(false);
                 setShowNumberModal(false);
 
-                setAppRender((prev)=>!prev)
+                setAppRender((prev) => !prev)
 
                 // window.location.pathname = '/'
             })
@@ -337,6 +339,7 @@ export default function Header(props) {
                     localStorage.removeItem('userPicture');
                     localStorage.removeItem('itemsPosted');
                     localStorage.removeItem('favouriteItems');
+                    localStorage.removeItem('contactNumber');
                     localStorage.clear()
                     // Redirect user to the homepage or login page
                     window.location.pathname = '/' // Adjust the path as necessary for your application
@@ -551,6 +554,9 @@ export default function Header(props) {
                                     else if (actionKey === 'phoneAuth') {
                                         setShowNumberUpdateModal(true)
                                     }
+                                    else if (actionKey === 'enablenotif') {
+                                        requestNotificationPermission()
+                                    }
                                     else {
                                         console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
                                     }
@@ -562,6 +568,9 @@ export default function Header(props) {
                                     </Text>
                                     <Text b color="inherit" css={{ d: "flex", fontSize: '$base' }}>
                                         {localStorage.getItem('userName')}
+                                    </Text>
+                                    <Text b color="inherit" css={{ d: "flex", fontSize: '$sm' }}>
+                                        {localStorage.getItem('contactNumber')}
                                     </Text>
                                     {/* <Text b color="inherit" 
                                     css={{ 
@@ -588,15 +597,13 @@ export default function Header(props) {
                                     Favourites
                                 </Dropdown.Item>
                                 <Dropdown.Item key="phoneAuth" color=""
-                                    icon={<FaPhone size={16} />}>
+                                    icon={<FaPhone size={12} style={{margin: '2px'}}/>}>
                                     Update Phone
                                 </Dropdown.Item>
                                 <Dropdown.Item key="enablenotif" color=""
-                                    icon={<FaPhone size={16} />}
+                                    icon={<GoBellFill size={16} />}
                                 >
-                                    <Button onClick={() => requestNotificationPermission()}>
-                                        Enable Notifications
-                                    </Button>
+                                    Enable Notifications
                                 </Dropdown.Item>
                                 <Dropdown.Item key="logout" withDivider color="error"
                                     icon={<IoLogOut size={16} />}>
@@ -926,6 +933,9 @@ export default function Header(props) {
                                             else if (actionKey === 'phoneAuth') {
                                                 setShowNumberUpdateModal(true)
                                             }
+                                            else if (actionKey === 'enablenotif') {
+                                                requestNotificationPermission()
+                                            }
                                             else {
                                                 console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
                                             }
@@ -942,10 +952,14 @@ export default function Header(props) {
                                                 {localStorage.getItem('contactNumber')}
                                             </Text>
                                         </Dropdown.Item>
-
                                         <Dropdown.Item key="phoneAuth" withDivider color=""
-                                            icon={<FaPhone size={16} />}>
+                                            icon={<FaPhone size={12} style={{margin: '2px'}}/>}>
                                             Update Phone
+                                        </Dropdown.Item>
+                                        <Dropdown.Item key="enablenotif" color=""
+                                            icon={<GoBellFill size={16} />}
+                                        >
+                                            Enable Notifications
                                         </Dropdown.Item>
                                         <Dropdown.Item key="logout" withDivider color="error"
                                             icon={<IoLogOut size={16} />}>

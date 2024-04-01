@@ -213,13 +213,18 @@ export default function ItemCard(props) {
     if (item.live === 'n' && type === 'sale') {
         return null
     }
-    if(type==='favourites' && !(favouriteItems.includes(item._id))){
+    if (type === 'favourites' && !(favouriteItems.includes(item._id))) {
         return null
     }
     else {
         return (
             <Grid css={{
-                margin: '24px 24px'
+                '@xsMax': {
+                    margin: '24px 6px'
+                },
+                '@xsMin': {
+                    margin: '24px 24px'
+                }
             }}>
                 <Col css={{
                     display: 'flex',
@@ -227,7 +232,7 @@ export default function ItemCard(props) {
                 }}>
                     <Row css={{
                         alignItems: 'center',
-                        padding: '0px 8px 4px 8px',
+                        padding: '0px 8px 8px 8px',
                         jc: 'space-between'
                     }}>
                         <Row css={{
@@ -268,15 +273,25 @@ export default function ItemCard(props) {
                     </Row>
                     <Image src={item.itemPicture}
                         css={{
-                            height: '300px',
+                            height: '360px',
                             // minWidth: '300px',
                             // maxW: '330px',
-                            width: '320px',
+                            '@xsMax': {
+                                width: '90vw'
+                            },
+                            '@xsMin': {
+                                width: '360px',
+                            },
                             objectFit: 'cover',
                             borderRadius: '4px'
                         }} />
                     <Collapse css={{
-                        width: '330px',
+                        '@xsMax': {
+                            width: '90vw'
+                        },
+                        '@xsMin': {
+                            width: '360px',
+                        },
                         borderStyle: 'solid',
                         borderColor: '$gray100',
                         borderWidth: '0px 0px 1px 0px'
