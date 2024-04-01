@@ -576,7 +576,7 @@ export default function Header(props) {
                                 <Dropdown.Item key="enablenotif" color=""
                                     icon={<FaPhone size={16} />}
                                     >
-                                        <Button onClick={requestNotificationPermission()}>
+                                        <Button onClick={()=>requestNotificationPermission()}>
                                         Enable Notifications
                                         </Button>
                                 </Dropdown.Item>
