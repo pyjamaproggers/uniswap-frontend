@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import AshokaLogo from '../../assets/AshokaLogo.png'
+import Icon from '../../assets/UniSwap2.PNG'
 import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col, Row, Switch, Input, Grid, Button } from "@nextui-org/react";
 import { icons } from "../icons/icons.js";
 import { GiClothes } from "react-icons/gi";
@@ -249,7 +249,13 @@ export default function Header(props) {
                     theme: "colored",
                     transition: 'Flip',
                 });
+                setShowNumberUpdateModal(false);
+                setShowNumberModal(false);
             });
+
+        setShowNumberUpdateModal(false);
+        setShowNumberModal(false);
+
     };
 
     // function handleCallbackresponse(response) {
@@ -406,29 +412,33 @@ export default function Header(props) {
 
                 <Navbar.Toggle showIn={'xs'} />
 
-                <Navbar.Brand onClick={() => {
-                    window.location.pathname = '/'
-                }}
+                <Navbar.Brand
+                    onClick={() => {
+                        window.location.pathname = '/'
+                    }}
                     css={{
                         '&:hover': {
                             cursor: 'pointer'
-                        }
+                        },
+                        justifyContent: 'center'
                     }}>
                     <Image
                         css={{
-                            height: '24px',
-                            width: '100%',
+                            height: '60px',
+                            width: '60px',
                         }}
-                        src={AshokaLogo} />
-                    <Text b color="inherit" css={{
-                        padding: '0px 8px',
-                        '&:hover': {
-                            cursor: 'pointer',
-                            textDecoration: 'underline'
-                        }
-                    }}>
+                        src={Icon} />
+                    {/* <Text b color="inherit"
+                        hideIn={'xs'}
+                        css={{
+                            padding: '0px 8px',
+                            '&:hover': {
+                                cursor: 'pointer',
+                                textDecoration: 'underline'
+                            }
+                        }}>
                         UniSwap™
-                    </Text>
+                    </Text> */}
                 </Navbar.Brand>
 
                 {Object.keys(localStorage).length >= 2 &&

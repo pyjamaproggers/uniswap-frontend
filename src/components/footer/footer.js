@@ -69,7 +69,7 @@ function Footer(){
                     },
                     marginBottom: '72px'
                 }}>
-                    © 2024 UniSwap™ @Ashoka University. All Rights Reserved.
+                    © 2024 UniSwap™. All Rights Reserved.
                 </Text>
             </Col>
         </Container>
