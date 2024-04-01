@@ -292,7 +292,7 @@ export default function Header(props) {
             .then(response => response.json())
             .then(data => {
                 setRender((prev) => !prev);
-                window.location.pathname = '/';
+                // window.location.pathname = '/';
             })
             .catch((error) => console.error("Error sending FCM token to server:", error));
     };
