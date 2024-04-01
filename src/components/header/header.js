@@ -84,7 +84,6 @@ export default function Header(props) {
     function handleCallbackresponse(response) {
         setBackdropLoaderOpen(true);
         var googleUserObject_ = jwt_decode(response.credential);
-        console.log(googleUserObject_);
         setGoogleUserObject(response.credential); // This should be the actual token, not decoded object
 
         // Call backend to verify token and check user's contact number status
@@ -96,20 +95,24 @@ export default function Header(props) {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data.user)
-                // Assuming backend response includes user object with contactNumber
-                if (data.user && data.user.contactNumber) {
-                    // Set user details in localStorage
-                    localStorage.setItem('userEmail', data.user.userEmail);
-                    localStorage.setItem('userName', data.user.userName);
-                    localStorage.setItem('userPicture', data.user.userPicture);
-                    localStorage.setItem('contactNumber', data.user.contactNumber)
 
-                    // Call to request notification permission should be here
-                    setBackdropLoaderOpen(false);
-                    requestNotificationPermission();
+                if (data.user && data.user.contactNumber) {
+                    if(data.user.userEmail.split('@')[1] === 'ashoka.edu.in')
+                    {
+                        localStorage.setItem('userEmail', data.user.userEmail);
+                        localStorage.setItem('userName', data.user.userName);
+                        localStorage.setItem('userPicture', data.user.userPicture);
+                        localStorage.setItem('contactNumber', data.user.contactNumber)
+
+                        setBackdropLoaderOpen(false);
+                        requestNotificationPermission();
+
+                    }
+                    else{
+                        setShowAshokaOnlyModal(true)
+                    }
+                    
                 } else {
-                    // User does not have a contact number, show modal to add one
                     setBackdropLoaderOpen(false);
                     console.log("User does not have a contact number, showing modal.",);
                     setShowNumberModal(true);
