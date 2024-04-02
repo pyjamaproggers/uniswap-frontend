@@ -21,6 +21,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import InputItemCard from "../../components/items/inputItemCard";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { FaChevronLeft } from "react-icons/fa";
 
 export default function EditSalePage() {
 
@@ -183,19 +184,14 @@ export default function EditSalePage() {
                 jc: 'center',
                 alignItems: 'center'
             }}>
-                <ToastContainer
-                    position="top-right"
-                    autoClose={2000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="colored"
-                    transition="Flip"
-                />
+                <div style={{
+                    position: 'absolute',
+                    top: '98px',
+                    left: '15px'
+                }}
+                onClick={() => navigate(-1)}>
+                    <FaChevronLeft size={16} color="#f0f0f0"/>
+                </div>
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                     open={backdropLoaderOpen}
@@ -245,7 +241,7 @@ export default function EditSalePage() {
                             fontWeight: '$regular',
                             color: '$blue600'
                         }}>
-                            Upload
+                            Update
                         </Text>
                         <IoSendSharp size={16} />
                     </Row>

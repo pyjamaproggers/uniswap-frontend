@@ -65,9 +65,9 @@ function Footer(){
                     borderColor: '$gray400',
                     borderWidth: '1px 0px 0px 0px',
                     '@xsMax':{
-                        fontSize: '$xs'
+                        fontSize: '$xs',
+                        marginBottom: '80px'
                     },
-                    marginBottom: '72px'
                 }}>
                     © 2024 UniSwap™. All Rights Reserved.
                 </Text>

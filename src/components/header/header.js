@@ -597,7 +597,7 @@ export default function Header(props) {
                                     Favourites
                                 </Dropdown.Item>
                                 <Dropdown.Item key="phoneAuth" color=""
-                                    icon={<FaPhone size={12} style={{margin: '2px'}}/>}>
+                                    icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
                                     Update Phone
                                 </Dropdown.Item>
                                 <Dropdown.Item key="enablenotif" color=""
@@ -871,7 +871,7 @@ export default function Header(props) {
                 </Grid.Container>
             </Modal>
 
-            {!(window.location.pathname === '/createsale' || window.location.pathname === '/editsale' || Object.keys(localStorage).length <= 4) ?
+            {!(window.location.pathname === '/unauthorised' || Object.keys(localStorage).length <= 4) ?
                 <Grid.Container css={{
                     '@xsMin': {
                         display: 'none'
@@ -893,8 +893,8 @@ export default function Header(props) {
                         }}>
                             <Row css={{
                                 maxW: '330px',
-                                justifyContent: 'space-around',
-                                padding: '12px 0px 36px 0px',
+                                justifyContent: 'space-between',
+                                padding: '8px 8px 44px 8px',
                                 alignItems: 'center'
                             }}>
                                 {navigationItems.map(navItem => {
@@ -951,9 +951,32 @@ export default function Header(props) {
                                             <Text b color="inherit" css={{ d: "flex", fontSize: '$sm' }}>
                                                 {localStorage.getItem('contactNumber')}
                                             </Text>
+                                            {/* <Text b color="inherit" 
+                                    css={{ 
+                                        d: "flex", 
+                                        fontSize: '$sm',
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis'
+                                    }}
+                                    >
+                                        {localStorage.getItem('userEmail')}
+                                    </Text> */}
                                         </Dropdown.Item>
-                                        <Dropdown.Item key="phoneAuth" withDivider color=""
-                                            icon={<FaPhone size={12} style={{margin: '2px'}}/>}>
+                                        <Dropdown.Item key="createsale" withDivider color=""
+                                            icon={<FaPlus size={16} />}>
+                                            Create Sale
+                                        </Dropdown.Item>
+                                        <Dropdown.Item key="useritems" color=""
+                                            icon={<FaBagShopping size={16} />}>
+                                            My Sale Items
+                                        </Dropdown.Item>
+                                        <Dropdown.Item key="favourites" color=""
+                                            icon={<IoMdHeart size={16} />}>
+                                            Favourites
+                                        </Dropdown.Item>
+                                        <Dropdown.Item key="phoneAuth" color=""
+                                            icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
                                             Update Phone
                                         </Dropdown.Item>
                                         <Dropdown.Item key="enablenotif" color=""

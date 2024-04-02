@@ -107,6 +107,7 @@ export default function InputItemCard(props) {
                 console.error('Error updating phone number:', error);
                 setBackdropLoaderOpen(false);
                 setShowErrorSnackbar(true)
+                window.location.pathname='/useritems'
             });
     };
 

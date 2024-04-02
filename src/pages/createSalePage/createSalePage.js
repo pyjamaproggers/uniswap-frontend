@@ -20,6 +20,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import InputItemCard from "../../components/items/inputItemCard";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { FaChevronLeft } from "react-icons/fa";
 
 export default function CreateSalePage() {
 
@@ -32,6 +33,7 @@ export default function CreateSalePage() {
     const [render, setRender] = useState(false)
 
     const navigate = useNavigate();
+
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
             method: 'GET',
@@ -225,6 +227,14 @@ export default function CreateSalePage() {
                 jc: 'center',
                 alignItems: 'center'
             }}>
+                <div style={{
+                    position: 'absolute',
+                    top: '98px',
+                    left: '15px'
+                }}
+                onClick={() => navigate(-1)}>
+                    <FaChevronLeft size={16} color="#f0f0f0"/>
+                </div>
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                     open={backdropLoaderOpen}
