@@ -4,7 +4,9 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import ReactGA from "react-ga4";
 
+ReactGA.initialize(process.env.REACT_APP_measurementId);
 // if ('serviceWorker' in navigator) {
 //     window.addEventListener('load', function () {
 //         navigator.serviceWorker.register('./firebase-messaging-sw.js').then(function (registration) {
@@ -21,8 +23,6 @@ root.render(
         <App />
     </GoogleOAuthProvider>
 );
-
-// Pyjama Programmers CLientID: 84838878723-s4pc8fhltthe59h5epk6v49lldooeukq.apps.googleusercontent.com
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

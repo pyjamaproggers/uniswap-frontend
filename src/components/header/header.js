@@ -32,6 +32,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { GoBellFill } from "react-icons/go";
+import ReactGA from 'react-ga4'
 
 
 export default function Header(props) {
@@ -89,6 +90,9 @@ export default function Header(props) {
 
     const [googleUserObject, setGoogleUserObject] = useState()
 
+    useEffect(() => {
+        ReactGA.pageview(location.pathname);
+    }, [location]);
 
     function handleCallbackresponse(response) {
         setBackdropLoaderOpen(true);

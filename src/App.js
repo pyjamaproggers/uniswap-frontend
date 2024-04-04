@@ -13,6 +13,8 @@ import { useEffect, useState } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import ErrorAuthPage from './pages/ErrorAuthPage/ErrorAuthPage';
+import { useLocation } from 'react-router-dom';
+import ReactGA from 'react-ga4'
 
 function App() {
 
