@@ -38,6 +38,8 @@ export default function ItemsPage(props) {
     const [fetchingAllItems, setFetchingAllItems] = useState(true)
     const [render, setRender] = useState(false)
 
+    const [scrollRender, setScrollRender] = useState(false)
+
     const [filtersApplied, setFiltersApplied] = useState({
         price: [],
         category: [],
@@ -76,9 +78,9 @@ export default function ItemsPage(props) {
             ),
         });
 
-        return () => {
-            PullToRefresh.destroyAll();
-        }
+        // return () => {
+        //     PullToRefresh.destroyAll();
+        // }
     })
 
     const verifyUserSession = () => {
@@ -252,6 +254,8 @@ export default function ItemsPage(props) {
 
             setAllItems(items); // Update your state with the sorted items
             setFilteredItems(items); // Assuming you want to initially display all items
+            setScrollRender(prev => !prev)
+            // scrollToSharedItem()
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);
         } finally {
@@ -259,11 +263,6 @@ export default function ItemsPage(props) {
         }
 
     };
-
-    useEffect(() => {
-        fetchAllItems();
-    }, []);
-
 
     const sendNewFavouriteItemsToDB = (newFavouriteItems) => {
         console.log('New Favourite Items to save: ', newFavouriteItems)
@@ -302,6 +301,43 @@ export default function ItemsPage(props) {
         window.location.pathname = '/useritems'
     }
 
+    const shareItemViaWhatsApp = (itemId) => {
+        // Your website's base URL
+        const baseUrl = "https://localhost:3000";
+
+        // Construct the URL to the specific item
+        // Using a query parameter
+        const itemUrl = `${baseUrl}/saleitems?itemId=${itemId}`;
+        // Or using a hash fragment
+        // const itemUrl = `${baseUrl}/saleitems#${itemId}`;
+
+        // Encode the URL
+        const encodedUrl = encodeURIComponent(itemUrl);
+
+        // Message to share
+        const message = `Check out this item on UniSwap: ${encodedUrl}`;
+
+        // Open WhatsApp with the constructed URL
+        window.open(`https://wa.me/?text=${message}`, "_blank");
+    };
+
+    function scrollToSharedItem() {
+        const searchParams = new URLSearchParams(window.location.search);
+        const itemId = searchParams.get('itemId');
+
+        if (itemId) {
+            const attemptScroll = (retryCount = 0) => {
+                const elementToScrollTo = document.getElementById(itemId);
+                if (elementToScrollTo) {
+                    elementToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else if (retryCount < 5) { // Retry up to 5 times
+                    setTimeout(() => attemptScroll(retryCount + 1), 500); // Wait 500ms before retrying
+                }
+            };
+
+            attemptScroll();
+        }
+    }
 
     function filterItemsByEmail(email) {
         return allItems.filter(item => item.userEmail === email);
@@ -324,12 +360,14 @@ export default function ItemsPage(props) {
     }, [favouriteItems])
 
     useEffect(() => {
-        window.setTimeout(() => {
-            // Fetch all items for sale
-            fetchAllItems()
-            setFetchingAllItems(false)
-        }, 2000)
+        fetchAllItems()
+        setFetchingAllItems(false)
     }, [])
+
+    useEffect(() => {
+        console.log('RUNNIGN THIS')
+        scrollToSharedItem()
+    }, [scrollRender])
 
     const location = useLocation();
     useEffect(() => {
@@ -850,7 +888,9 @@ export default function ItemsPage(props) {
                                     {type === 'sale' || type === 'favourites' ?
                                         <>
                                             {allItems.map((item, index) => (
-                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} />
+                                                <div id={item._id}>
+                                                    <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} shareItemViaWhatsApp={shareItemViaWhatsApp} />
+                                                </div>
                                             ))}
                                         </>
                                         :
@@ -869,7 +909,9 @@ export default function ItemsPage(props) {
                                             {
                                                 filteredItems.map((item, index) => {
                                                     return (
-                                                        <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} onItemDeleted={onItemDeleted} />
+                                                        <div id={item._id}>
+                                                            <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} onItemDeleted={onItemDeleted} shareItemViaWhatsApp={shareItemViaWhatsApp} />
+                                                        </div>
                                                     )
                                                 })}
                                         </>

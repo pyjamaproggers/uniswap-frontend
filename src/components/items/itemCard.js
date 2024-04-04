@@ -12,6 +12,8 @@ import { FaCloud } from "react-icons/fa6";
 import { IoCloudOffline } from "react-icons/io5";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import ReactGA from 'react-ga4'
+import { IoPaperPlane } from "react-icons/io5";
 
 export default function ItemCard(props) {
 
@@ -40,6 +42,7 @@ export default function ItemCard(props) {
     let handleFavouriteItemToggle = props.handleFavouriteItemToggle
     let handleLiveToggle = props.handleLiveToggle
     let onItemDeleted = props.onItemDeleted
+    let shareItemViaWhatsApp = props.shareItemViaWhatsApp
     // console.log(item.id, favouriteItems, favouriteItems.includes(item.id))
     // console.log(props)
 
@@ -366,6 +369,10 @@ export default function ItemCard(props) {
                             }}>
                                 <Button auto flat color={'success'} className="collapse-buttons">
                                     <IoLogoWhatsapp size={'20px'} color={"#25D366"} onClick={() => {
+                                        ReactGA.event({
+                                            category: item.itemCategory,
+                                            action: 'WhatsApp Button Click'
+                                        })
                                         window.open(url)
                                     }} className="item-icon" />
                                 </Button>
@@ -391,6 +398,13 @@ export default function ItemCard(props) {
                                             }} />
                                     </Button>
                                 }
+                                <Button auto flat color={'primary'} className="collapse-buttons">
+                                    <IoPaperPlane size={'20px'} color={"#0072F5"} onClick={() => {
+                                        // share link to WA function
+                                        shareItemViaWhatsApp(item._id)
+                                    }} className="item-icon"
+                                    />
+                                </Button>
                             </Row>
                         }
                     </Row>
