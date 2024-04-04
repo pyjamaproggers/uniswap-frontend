@@ -303,7 +303,7 @@ export default function ItemsPage(props) {
 
     const shareItemViaWhatsApp = (itemId) => {
         // Your website's base URL
-        const baseUrl = "https://localhost:3000";
+        const baseUrl = "https://uniswap.co.in";
 
         // Construct the URL to the specific item
         // Using a query parameter
