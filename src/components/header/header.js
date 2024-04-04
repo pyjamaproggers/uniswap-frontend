@@ -91,7 +91,7 @@ export default function Header(props) {
     const [googleUserObject, setGoogleUserObject] = useState()
 
     useEffect(() => {
-        ReactGA.pageview(location.pathname);
+        ReactGA.send({ hitType: "pageview", page: location.pathname, title: location.pathname });
     }, [location]);
 
     function handleCallbackresponse(response) {
