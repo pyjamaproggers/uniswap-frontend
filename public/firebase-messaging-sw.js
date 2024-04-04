@@ -1,9 +1,9 @@
-import { initializeApp } from "firebase/app";
-import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
+// Use importScripts to load Firebase JS SDK
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
-// Initialize the Firebase app in the service worker by passing in
-// your app's Firebase config object.
-const firebaseApp = initializeApp({
+// Firebase configuration
+const firebaseConfig = {
   apiKey: "AIzaSyAawNBBBRIkCbRzbs4Sxu5-O_M_shnW0Ok",
   authDomain: "uniswap-418221.firebaseapp.com",
   projectId: "uniswap-418221",
@@ -11,23 +11,25 @@ const firebaseApp = initializeApp({
   messagingSenderId: "84838878723",
   appId: "1:84838878723:web:ea20d2112707c489384836",
   measurementId: "G-FYFKW26X8K"
-});
+};
 
-// Retrieve an instance of Firebase Messaging so that it can handle background
-// messages.
-const messaging = getMessaging(firebaseApp);
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
-// Handle incoming background messages. 
-onBackgroundMessage(messaging, (payload) => {
+// Retrieve an instance of Firebase Messaging so it can handle background messages
+const messaging = firebase.messaging();
+
+// Handle incoming background messages
+messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  
   // Customize notification here
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: '/logo.PNG' 
+    icon: '/logo.PNG'
   };
 
   // Show the notification
-  self.registration.showNotification(notificationTitle,
-    notificationOptions);
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
