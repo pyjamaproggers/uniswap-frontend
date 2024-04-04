@@ -17,7 +17,7 @@ import { IoMdHeart } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlinePhoneIphone } from "react-icons/md";
-import { messaging } from "../../services/firebase.js";
+import messaging from "../../firebase.js";
 import { getToken } from "firebase/messaging";
 import './header.css'
 import { FaPhone } from "react-icons/fa6";
