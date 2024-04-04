@@ -274,14 +274,14 @@ export default function ItemCard(props) {
                     <Image src={item.itemPicture}
                         css={{
                             height: '360px',
-                            // minWidth: '300px',
-                            // maxW: '330px',
-                            '@xsMax': {
-                                width: '90vw'
-                            },
-                            '@xsMin': {
-                                width: '360px',
-                            },
+                            width: '90vw',
+                            maxWidth: '360px',
+                            // '@xsMax': {
+                            //     width: '90vw'
+                            // },
+                            // '@xsMin': {
+                            //     width: '360px',
+                            // },
                             objectFit: 'cover',
                             borderRadius: '4px'
                         }} />

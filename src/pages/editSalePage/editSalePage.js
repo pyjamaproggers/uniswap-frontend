@@ -40,6 +40,10 @@ export default function EditSalePage() {
     const [imageFile, setImageFile] = useState(item.itemPicture)
     const [previewUrl, setPreviewUrl] = useState(null)
 
+    document.querySelectorAll('input, select, textarea').forEach((element) => {
+        element.addEventListener('focus', (event) => event.preventDefault());
+    });
+
     const checkForm = () => {
         // itemName: Required and must be a non-empty string
         if (!item.itemName || typeof item.itemName !== 'string' || item.itemName.trim().length === 0) {
@@ -150,7 +154,7 @@ export default function EditSalePage() {
             setShowSuccessSnackbar(true)
             window.setTimeout(() => {
                 window.location.pathname = '/useritems'
-            }, 1700)
+            }, 1000)
             // Further actions on successful update, like redirecting or refreshing the item details
         } catch (error) {
             setBackdropLoaderOpen(false)

@@ -34,6 +34,10 @@ export default function CreateSalePage() {
 
     const navigate = useNavigate();
 
+    document.querySelectorAll('input, select, textarea').forEach((element) => {
+        element.addEventListener('focus', (event) => event.preventDefault());
+    });
+
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
             method: 'GET',
@@ -135,7 +139,7 @@ export default function CreateSalePage() {
                 setShowSuccessSnackbar(true)
                 window.setTimeout(() => {
                     window.location.pathname = '/useritems'
-                }, 2000)
+                }, 1000)
                 // Here, you can redirect the user or show a success message
             } else {
                 // Handle the error if the server response was not OK.

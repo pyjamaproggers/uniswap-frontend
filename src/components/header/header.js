@@ -63,8 +63,8 @@ export default function Header(props) {
     ];
 
     const collapseItemsLoggedOut = [
-        { key: 'outlets', value: "Outlets" },
-        { key: 'about', value: "About" },
+        { key: '/outlets', value: "Outlets" },
+        { key: '/about', value: "About" },
     ];
 
     const collapseItemsLoggedIn = [
@@ -517,7 +517,7 @@ export default function Header(props) {
                 <Navbar.Content
                     css={{
                         "@xs": {
-                            w: "12%",
+                            // w: "12%",
                             jc: "flex-end",
                         },
                     }}
@@ -626,7 +626,7 @@ export default function Header(props) {
                                     css={{
                                         minWidth: "100%",
                                     }}
-                                    href=''
+                                    href={item.key}
                                 >
                                     {item.value}
                                 </Link>

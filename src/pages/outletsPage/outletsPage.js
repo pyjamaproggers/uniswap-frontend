@@ -112,6 +112,15 @@ export default function OutletsPage() {
             website: ''
         },
         {
+            name: 'Food Village',
+            timing: '12pm To 2am',
+            picture: FoodVillage,
+            phone: '+918104213125',
+            menu: [Grey, Grey, Grey, Grey],
+            location: 'Food Street (Next To Tennis Court)',
+            website: ''
+        },
+        {
             name: 'Subway',
             timing: '24/7',
             picture: Subway,
@@ -127,6 +136,15 @@ export default function OutletsPage() {
             phone: '+918104213125',
             menu: [CP1, CP2],
             location: 'Mess (RH1 Entry)',
+            website: ''
+        },
+        {
+            name: 'Nescafe',
+            timing: '12pm To 2am',
+            picture: Nescafe,
+            phone: '+918104213125',
+            menu: [N1, N2, N3, N4, N5, N6],
+            location: 'Between AC02 & AC03',
             website: ''
         },
         {
@@ -148,30 +166,12 @@ export default function OutletsPage() {
             website: ''
         },
         {
-            name: 'Nescafe',
-            timing: '12pm To 2am',
-            picture: Nescafe,
-            phone: '+918104213125',
-            menu: [N1, N2, N3, N4, N5, N6],
-            location: 'Between AC02 & AC03',
-            website: ''
-        },
-        {
             name: 'Amul',
             timing: '12pm To 11pm',
             picture: Amul,
             phone: '+918104213125',
             menu: [Grey, Grey, Grey, Grey],
             location: 'Mess (AC01 Entry)',
-            website: ''
-        },
-        {
-            name: 'Food Village',
-            timing: '12pm To 2am',
-            picture: FoodVillage,
-            phone: '+918104213125',
-            menu: [Grey, Grey, Grey, Grey],
-            location: 'Food Street (Next To Tennis Court)',
             website: ''
         },
         {
@@ -184,9 +184,11 @@ export default function OutletsPage() {
             website: ''
         },
     ]
+
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
     const navigate = useNavigate(); 
+
     // const verifyUserSession = () => {
     //     fetch(`${backend}/api/auth/verify`, {
     //         method: 'GET',
@@ -314,7 +316,8 @@ export default function OutletsPage() {
                 const isOpen = isCurrentlyOpen(outlet.timing);
                 return (
                     <Grid key={index} css={{
-                        width: '320px',
+                        maxWidth: '350px',
+                        width: '100%',
                         margin: '12px 0px'
                     }}>
                         <Col css={{

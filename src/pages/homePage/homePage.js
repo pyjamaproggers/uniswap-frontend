@@ -24,8 +24,10 @@ export default function HomePage(props) {
     return (
         <Grid.Container className="homebg" css={{
             jc: 'center',
-            alignItems: 'center',
-            height: window.screen.height - 130
+            alignItems: '',
+            height: window.screen.height - 200,
+            paddingTop: '25%'
+            // padding: '10% 0px 40% 0'
         }}>
             <div className="content">
                 <Col css={{
@@ -47,7 +49,7 @@ export default function HomePage(props) {
                         textAlign: 'center',
                         color: '$white'
                     }}>
-                        Official Ashoka University UniSwap™ Website
+                        Official UniSwap™ Website
                     </Text>
                     {isSignedIn ?
                         <>
@@ -94,7 +96,7 @@ export default function HomePage(props) {
                                 textAlign: 'center',
                                 color: '$white'
                             }}>
-                                Please sign in using your ashoka email ID using the google button located at the top-right ↑
+                                Please sign in using your university email ID using the google button located at the top-right ↑
                             </Text>
                             
                         </>

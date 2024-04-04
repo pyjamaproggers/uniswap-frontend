@@ -137,6 +137,10 @@ export default function ItemsPage(props) {
         }
     };
 
+    document.querySelectorAll('input, select, textarea').forEach((element) => {
+        element.addEventListener('focus', (event) => event.preventDefault());
+    });
+
 
 
     const [priceFilters, setPriceFilters] = useState([
@@ -210,7 +214,7 @@ export default function ItemsPage(props) {
 
 
             setFilteredItems(final);
-            console.log({ favouriteItems })
+            // console.log({ favouriteItems })
             setBackdropLoaderOpen(false)
         }, 1000)
     }
@@ -234,7 +238,7 @@ export default function ItemsPage(props) {
                 throw new Error('Network response was not ok');
             }
             let items = await response.json();
-            console.log(items);
+            // console.log(items);
 
             // Sort items by dateAdded from latest to oldest
             items.sort((a, b) => {
