@@ -14,11 +14,15 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import ReactGA from 'react-ga4'
 import { IoPaperPlane } from "react-icons/io5";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function ItemCard(props) {
 
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
+
+    const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
 
     const navigate = useNavigate()
     const backend = process.env.REACT_APP_BACKEND
@@ -76,7 +80,7 @@ export default function ItemCard(props) {
 
 
     const toggleLiveStatus = async (itemId, currentStatus) => {
-        // Removed setBackdropLoaderOpen(true);
+        setBackdropLoaderOpen(true);
         console.log('hi')
         try {
             const response = await fetch(`${backend}/api/items/${itemId}/live`, {
@@ -93,6 +97,7 @@ export default function ItemCard(props) {
 
             if (response.ok) {
                 console.log('updating live status itemcard')
+                setBackdropLoaderOpen(false);
                 handleLiveToggle(itemId, data.live)
 
             } else {
@@ -104,9 +109,10 @@ export default function ItemCard(props) {
 
         } catch (error) {
             console.error('Failed to toggle live status:', error);
+            setBackdropLoaderOpen(false);
             // Removed toast error message since `toast` is not defined
         } finally {
-            // Removed setBackdropLoaderOpen(false);
+            setBackdropLoaderOpen(false);
         }
     };
 
@@ -169,6 +175,7 @@ export default function ItemCard(props) {
 
     const handleDeleteItem = async (itemId) => {
         if (window.confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
+            setBackdropLoaderOpen(true);
             try {
                 const response = await fetch(`${backend}/api/items/${itemId}`, {
                     method: 'DELETE', // Using the DELETE method for the API request
@@ -186,12 +193,14 @@ export default function ItemCard(props) {
 
                 // Here you might want to update the state to remove the item from the list
                 console.log(`Item with ID ${itemId} deleted successfully.`);
+                setBackdropLoaderOpen(false);
                 // For example, you could call a prop function to refresh the items
                 onItemDeleted();
 
             } catch (error) {
                 console.error('Error deleting the item:', error);
                 setShowErrorSnackbar(true)
+                setBackdropLoaderOpen(false);
             }
         }
     };
@@ -228,6 +237,14 @@ export default function ItemCard(props) {
                     margin: '24px 24px'
                 }
             }}>
+
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={backdropLoaderOpen}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
+
                 <Col css={{
                     display: 'flex',
                     flexDirection: 'column'
