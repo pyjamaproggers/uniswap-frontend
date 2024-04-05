@@ -148,7 +148,7 @@ export default function ItemsPage(props) {
     const [priceFilters, setPriceFilters] = useState([
         { key: '1', value: '₹0-₹100', chosen: false },
         { key: '2', value: '₹100-₹500', chosen: false },
-        { key: '3', value: '₹500-1000', chosen: false },
+        { key: '3', value: '₹500-₹1000', chosen: false },
         { key: '4', value: '₹1000-₹2000', chosen: false },
         { key: '5', value: '₹2000+', chosen: false }
     ]);
