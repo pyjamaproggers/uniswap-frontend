@@ -159,7 +159,7 @@ export default function ItemsPage(props) {
         { key: 'tickets', value: 'Tickets', color: "primary", chosen: false }, // Indigo
         { key: 'stationery', value: 'Stationery', color: "success", chosen: false }, // Green
         { key: 'jewellry', value: 'Jewellry', color: "warning", chosen: false }, // Yellow
-        { key: 'lostandfound', value: 'Lost & Found', color: "default", chosen: false }, // Grey
+        { key: 'lost&found', value: 'Lost & Found', color: "default", chosen: false }, // Grey
         { key: 'miscellaneous', value: 'Miscellaneous', color: "default", chosen: false }, // Cyan
     ]);
 

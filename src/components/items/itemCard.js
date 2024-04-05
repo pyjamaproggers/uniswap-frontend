@@ -205,7 +205,6 @@ export default function ItemCard(props) {
         tickets: 'primary',
         stationery: 'success',
         jewellry: 'warning',
-        lostandfound: 'neutral',
     };
 
     const type = props.type
