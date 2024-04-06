@@ -229,14 +229,17 @@ export default function ItemCard(props) {
     }
     else {
         return (
-            <Grid css={{
+            <Grid 
+            css={{
                 '@xsMax': {
                     margin: '24px 6px'
                 },
                 '@xsMin': {
                     margin: '24px 24px'
-                }
-            }}>
+                },
+                jc: 'center'
+            }}
+            >
 
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -247,12 +250,15 @@ export default function ItemCard(props) {
 
                 <Col css={{
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    alignItems: 'center'
                 }}>
                     <Row css={{
                         alignItems: 'center',
                         padding: '0px 8px 8px 8px',
-                        jc: 'space-between'
+                        jc: 'space-between',
+                        width: '95%',
+                        maxWidth: '360px'
                     }}>
                         <Row css={{
                             alignItems: 'center',
@@ -305,12 +311,8 @@ export default function ItemCard(props) {
                             borderRadius: '4px'
                         }} />
                     <Collapse css={{
-                        '@xsMax': {
-                            width: '90vw'
-                        },
-                        '@xsMin': {
-                            width: '360px',
-                        },
+                        width: '95%',
+                        maxWidth: '360px',
                         borderStyle: 'solid',
                         borderColor: '$gray100',
                         borderWidth: '0px 0px 1px 0px'
@@ -371,6 +373,8 @@ export default function ItemCard(props) {
                         </Text>
                     </Collapse>
                     <Row css={{
+                        width: '95%',
+                        maxWidth: '360px',
                         jc: 'space-between',
                         marginTop: '4px',
                         alignItems: 'normal',

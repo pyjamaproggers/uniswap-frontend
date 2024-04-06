@@ -62,30 +62,16 @@ export default function ItemsPage(props) {
     let tempFavouriteItems = JSON.parse(localStorage.getItem('favouriteItems'))
     const [favouriteItems, setFavouriteItems] = useState(tempFavouriteItems ? tempFavouriteItems : [])
 
+    const [visibleItems, setVisibleItems] = useState([]);
+    const [lastItemIndex, setLastItemIndex] = useState(0);
+
+    const ITEMS_PER_PAGE = 5; // Number of items you want to load per chunk
+
     useEffect(() => {
         if (!JSON.parse(localStorage.getItem('favouriteItems'))) {
             localStorage.setItem('favouriteItems', JSON.stringify([]))
         }
-    })
-
-    // useEffect(() => {
-    //     PullToRefresh.init({
-    //         mainElement: 'body',
-    //         onRefresh() {
-    //             fetchAllItems()
-    //         },
-    //         iconArrow: ReactDOMServer.renderToString(
-    //             <FontAwesomeIcon icon={faSpinner} style={{ color: '#ffffff' }} />
-    //         ),
-    //         iconRefreshing: ReactDOMServer.renderToString(
-    //             <FontAwesomeIcon icon={faSpinner} spin style={{ color: '#ffffff' }} />
-    //         ),
-    //     });
-
-    //     // return () => {
-    //     //     PullToRefresh.destroyAll();
-    //     // }
-    // })
+    }, [])
 
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
@@ -152,7 +138,6 @@ export default function ItemsPage(props) {
         searchInputElement.addEventListener('focus', (event) => event.preventDefault())
 
     }, [])
-
 
     const [priceFilters, setPriceFilters] = useState([
         { key: '1', value: '₹0-₹100', chosen: false },
@@ -239,38 +224,50 @@ export default function ItemsPage(props) {
         }
     }, [filtersApplied]);
 
+    const loadMoreItems = () => {
+        // Determine the items to show based on the filters applied and type
+        // console.log(filteredItems)
+        const currentItems = type === 'sale' || type === 'favourites' ? filteredItems : userItems;
+        // console.log('currentItems: ', currentItems)
+    
+        // Calculate the next set of items based on the last item index
+        const nextItems = currentItems.slice(lastItemIndex, lastItemIndex + ITEMS_PER_PAGE);
+        // console.log(lastItemIndex)
+        // console.log(lastItemIndex + ITEMS_PER_PAGE)
+        // console.log(currentItems.slice(lastItemIndex, 5))
+        // console.log('nextItems: ', nextItems)
+        if(currentItems.length===0){
+            console.log('its 0')
+            setLastItemIndex(lastItemIndex);
+        }
+        else{
+            console.log('its not 0')
+            setLastItemIndex(lastItemIndex + ITEMS_PER_PAGE);
+        }
+        // Update the visible items and the last item index
+        setVisibleItems(prevItems => [...prevItems, ...nextItems]);
+    };
+
     const fetchAllItems = async () => {
-        setFetchingAllItems(true); // Show loading state
+        setFetchingAllItems(true);
         try {
             const response = await fetch(`${backend}/items`, {
-                credentials: 'include', // to include cookies in the request (if your backend is set to send cookies)
+                credentials: 'include',
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             let items = await response.json();
-            // console.log(items);
-
-            // Sort items by dateAdded from latest to oldest
-            items.sort((a, b) => {
-                // Convert dateAdded to Date objects for comparison
-                const dateA = new Date(a.dateAdded);
-                const dateB = new Date(b.dateAdded);
-
-                // For descending order, if dateB is earlier than dateA, we should return -1 (to sort a before b)
-                return dateB - dateA;
-            });
-
-            setAllItems(items); // Update your state with the sorted items
-            setFilteredItems(items); // Assuming you want to initially display all items
-            setScrollRender(prev => !prev)
-            // scrollToSharedItem()
+    
+            items.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+    
+            setAllItems(items);
+            setFilteredItems(items); // Assuming you want to initially display all items regardless of type
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);
         } finally {
-            setFetchingAllItems(false); // Hide loading state
+            setFetchingAllItems(false);
         }
-
     };
 
     const sendNewFavouriteItemsToDB = (newFavouriteItems) => {
@@ -369,12 +366,17 @@ export default function ItemsPage(props) {
     }, [favouriteItems])
 
     useEffect(() => {
-        fetchAllItems()
-        setFetchingAllItems(false)
-    }, [])
+        const initializeItems = async () => {
+            await fetchAllItems(); // Make sure this correctly sets allItems and filteredItems
+        };
+        initializeItems();
+    }, []); // This effect runs once on component mount
+    
+    useEffect(()=> {
+        loadMoreItems()
+    }, [filteredItems, userItems, allItems])
 
     useEffect(() => {
-        console.log('RUNNIGN THIS')
         scrollToSharedItem()
     }, [scrollRender])
 
@@ -408,31 +410,64 @@ export default function ItemsPage(props) {
         }
     }, [])
 
-    function ListRow({ index, style, data }) {
-        if (!data) {
-            console.error('Data is undefined in Row component');
-            return null; // Or render a fallback UI
-        }
-        // console.log('Row data:', data);
-        const { items, type, favouriteItems, handleFavouriteItemToggle, handleLiveToggle, onItemDeleted, shareItemViaWhatsApp } = data;
-        const item = items[index];
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return;
+            loadMoreItems(); // Load more items when the user scrolls to the bottom
+        };
+    
+        // Add the event listener
+        window.addEventListener('scroll', handleScroll);
+    
+        // Cleanup
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastItemIndex]); // Dependency on lastItemIndex ensures the effect runs again when items are added
+    
 
-        // Determine whether to include share or live toggle functions based on the item type
-        const extraProps = type === 'sale' || type === 'favourites' ? { shareItemViaWhatsApp } : { handleLiveToggle, onItemDeleted };
+    useEffect(() => {
+        // Temporary check to see if manually setting visibleItems works
+        setVisibleItems(allItems.slice(0, ITEMS_PER_PAGE));
+    }, [allItems]);
 
-        return (
-            <div style={style} id={item._id}>
-                <ItemCard
-                    key={item._id}
-                    item={item}
-                    favouriteItems={favouriteItems}
-                    handleFavouriteItemToggle={handleFavouriteItemToggle}
-                    type={type}
-                    {...extraProps}
-                />
-            </div>
-        );
-    }
+    // const calculateListHeight = () => {
+    //     if (type === 'sale') {
+    //         return allItems.filter(x => x.live === 'y').length * 509
+    //     }
+    //     else if (type === 'favourites') {
+    //         return allItems.filter(x => x.live === 'y').length * 509
+    //     }
+    // }
+
+    // function ListRow({ index, style, data }) {
+    //     if (!data) {
+    //         console.error('Data is undefined in Row component');
+    //         return null; // Or render a fallback UI
+    //     }
+    //     // console.log('Row data:', data);
+    //     const { items, type, favouriteItems, handleFavouriteItemToggle, handleLiveToggle, onItemDeleted, shareItemViaWhatsApp } = data;
+    //     const item = items[index];
+
+    //     // Determine whether to include share or live toggle functions based on the item type
+    //     const extraProps = type === 'sale' || type === 'favourites' ? { shareItemViaWhatsApp } : { handleLiveToggle, onItemDeleted };
+
+    //     return (
+    //         <div style={{
+    //             ...style,
+    //             display: 'flex',
+    //             flexDirection: 'column',
+    //         }}
+    //             id={item._id}>
+    //             <ItemCard
+    //                 key={item._id}
+    //                 item={item}
+    //                 favouriteItems={favouriteItems}
+    //                 handleFavouriteItemToggle={handleFavouriteItemToggle}
+    //                 type={type}
+    //                 {...extraProps}
+    //             />
+    //         </div>
+    //     );
+    // }
 
 
     if (localStorage.getItem('userEmail') === null) {
@@ -450,6 +485,7 @@ export default function ItemsPage(props) {
 
                 <Grid.Container>
 
+                    {console.log(visibleItems)}
                     <Grid.Container css={{
                         padding: '4px 4px',
                         jc: 'center'
@@ -483,7 +519,7 @@ export default function ItemsPage(props) {
                                 },
                                 width: 'max-content'
                             }}>
-                                {localStorage.getItem('userName').split(" ")[0]}'s Items
+                                {localStorage.getItem('userName').split(" ")[0]}'s Sale Items
                             </Text>
                         }
                         {type === 'favourites' &&
@@ -534,7 +570,7 @@ export default function ItemsPage(props) {
                                 padding: '0% 2% 1% 2%'
                             },
                             '@xsMax': {
-                                padding: '0% 0% 2.5% 0%'
+                                padding: '0% 0% 1% 0%'
                             },
                             alignItems: 'center',
                             jc: 'center'
@@ -552,7 +588,7 @@ export default function ItemsPage(props) {
                                             '&:hover': {
                                                 cursor: 'pointer'
                                             }
-                                        }}> {/* Ensure key is here */}
+                                        }}>
                                             <Badge
                                                 variant="flat"
                                                 size={'md'}
@@ -942,59 +978,21 @@ export default function ItemsPage(props) {
 
                         {!fetchingAllItems && !backdropLoaderOpen &&
                             <>
-                                {(filtersApplied.searched.length === 0 && filtersApplied.category.length === 0 && filtersApplied.price.length === 0) ?
-                                    // If no filters applied, render allItems or userItems based on the type
-                                    <List
-                                        height={window.screen.height} // Adjust based on your layout
-                                        itemCount={type === 'sale' || type === 'favourites' ? allItems.length : userItems.length}
-                                        itemSize={350} // Adjust based on your ItemCard size
-                                        width={'100%'}
-                                        itemData={{
-                                            items: type === 'sale' || type === 'favourites' ? allItems : userItems,
-                                            type,
-                                            favouriteItems,
-                                            handleFavouriteItemToggle,
-                                            handleLiveToggle,
-                                            onItemDeleted,
-                                            shareItemViaWhatsApp
-                                        }}
-                                    >
-                                        {ListRow}
-                                    </List>
-                                    :
-                                    // If filters are applied
-                                    filteredItems && filteredItems.length > 0 ?
-                                        <List
-                                            height={600} // Adjust based on your layout
-                                            itemCount={filteredItems.length}
-                                            itemSize={350} // Adjust based on your ItemCard size
-                                            width={'100%'}
-                                            itemData={{
-                                                items: filteredItems,
-                                                type,
-                                                favouriteItems,
-                                                handleFavouriteItemToggle,
-                                                handleLiveToggle,
-                                                onItemDeleted,
-                                                shareItemViaWhatsApp
-                                            }}
-                                        >
-                                            {ListRow}
-                                        </List>
-                                        :
-                                        // If filters applied but no items to show
-                                        <Text css={{
-                                            fontWeight: '$semibold',
-                                            '@xsMax': {
-                                                fontSize: '$xl'
-                                            },
-                                            '@xsMin': {
-                                                fontSize: '$2xl'
-                                            },
-                                            padding: '48px 0px 50vh 0px'
-                                        }}>
-                                            No results to show...
-                                        </Text>
+                                {
+                                    visibleItems.map((item, index) => (
+                                        <div key={item._id} id={item._id}>
+                                            {/* Integrate the ItemCard component with the necessary props */}
+                                            <ItemCard
+                                                item={item}
+                                                favouriteItems={favouriteItems}
+                                                handleFavouriteItemToggle={handleFavouriteItemToggle}
+                                                type={type}
+                                                handleLiveToggle={type !== 'sale' && type !== 'favourites' ? handleLiveToggle : undefined}
+                                                onItemDeleted={type !== 'sale' && type !== 'favourites' ? onItemDeleted : undefined}
+                                                shareItemViaWhatsApp={type === 'sale' || type === 'favourites' ? shareItemViaWhatsApp : undefined}
+                                            />
+                                        </div>
+                                    ))
                                 }
                             </>
                         }
