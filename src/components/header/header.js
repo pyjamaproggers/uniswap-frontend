@@ -13,6 +13,7 @@ import jwt_decode from "jwt-decode";
 import Skeleton from '@mui/material/Skeleton';
 import { FaPlus } from "react-icons/fa";
 import { FaBagShopping } from "react-icons/fa6";
+import { MdStorefront } from 'react-icons/md';
 import { IoMdHeart } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -58,7 +59,7 @@ export default function Header(props) {
 
     const navigationItems = [
         { path: '/', icon: GoHomeFill },
-        { path: '/saleitems', icon: FaBagShopping },
+        { path: '/saleitems', icon: MdStorefront },
         { path: '/createsale', icon: FaPlus },
         { path: '/favourites', icon: IoMdHeart }
     ];
@@ -891,14 +892,14 @@ export default function Header(props) {
                 }}>
                     <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
                         <BottomNavigation style={{
-                            backgroundColor: '#000',
+                            backgroundColor: '#0c0c0c',
                             width: '100vw',
                             height: 'max-content'
                         }}>
                             <Row css={{
                                 maxW: '330px',
                                 justifyContent: 'space-between',
-                                padding: '8px 8px 44px 8px',
+                                padding: '10px 8px 52px 8px',
                                 alignItems: 'center'
                             }}>
                                 {navigationItems.map(navItem => {
@@ -908,8 +909,8 @@ export default function Header(props) {
                                     return (
                                         <IconComponent
                                             key={navItem.path}
-                                            size={24}
-                                            color={isSelected ? '#F31260' : 'gray'}
+                                            size={28}
+                                            color={isSelected ? '#F31260' : '#3A3F42'}
                                             onClick={() => navigate(navItem.path)}
                                         />
                                     );

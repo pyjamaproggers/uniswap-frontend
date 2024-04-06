@@ -16,12 +16,16 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import PullToRefresh from 'pulltorefreshjs';
 import { ImSpinner9 } from "react-icons/im";
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";
+// import PullToRefresh from 'pulltorefreshjs';
+import PullToRefresh from 'react-simple-pull-to-refresh';
+import { FixedSizeList as List } from 'react-window';
 
 
 export default function ItemsPage(props) {
@@ -64,24 +68,24 @@ export default function ItemsPage(props) {
         }
     })
 
-    useEffect(() => {
-        PullToRefresh.init({
-            mainElement: 'body',
-            onRefresh() {
-                fetchAllItems()
-            },
-            iconArrow: ReactDOMServer.renderToString(
-                <FontAwesomeIcon icon={faSpinner} style={{ color: '#ffffff' }} />
-            ),
-            iconRefreshing: ReactDOMServer.renderToString(
-                <FontAwesomeIcon icon={faSpinner} spin style={{ color: '#ffffff' }} />
-            ),
-        });
+    // useEffect(() => {
+    //     PullToRefresh.init({
+    //         mainElement: 'body',
+    //         onRefresh() {
+    //             fetchAllItems()
+    //         },
+    //         iconArrow: ReactDOMServer.renderToString(
+    //             <FontAwesomeIcon icon={faSpinner} style={{ color: '#ffffff' }} />
+    //         ),
+    //         iconRefreshing: ReactDOMServer.renderToString(
+    //             <FontAwesomeIcon icon={faSpinner} spin style={{ color: '#ffffff' }} />
+    //         ),
+    //     });
 
-        // return () => {
-        //     PullToRefresh.destroyAll();
-        // }
-    })
+    //     // return () => {
+    //     //     PullToRefresh.destroyAll();
+    //     // }
+    // })
 
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
@@ -139,10 +143,15 @@ export default function ItemsPage(props) {
         }
     };
 
-    document.querySelectorAll('input, select, textarea').forEach((element) => {
-        element.addEventListener('focus', (event) => event.preventDefault());
-    });
+    useEffect(() => {
+        document.querySelectorAll('input, select, textarea').forEach((element) => {
+            element.addEventListener('focus', (event) => event.preventDefault());
+        });
 
+        let searchInputElement = document.getElementsByClassName('items-search-input')[0]
+        searchInputElement.addEventListener('focus', (event) => event.preventDefault())
+
+    }, [])
 
 
     const [priceFilters, setPriceFilters] = useState([
@@ -370,6 +379,7 @@ export default function ItemsPage(props) {
     }, [scrollRender])
 
     const location = useLocation();
+
     useEffect(() => {
         const categoryKeyFromNavbar = location.state?.category;
         if (categoryKeyFromNavbar) {
@@ -398,6 +408,33 @@ export default function ItemsPage(props) {
         }
     }, [])
 
+    function ListRow({ index, style, data }) {
+        if (!data) {
+            console.error('Data is undefined in Row component');
+            return null; // Or render a fallback UI
+        }
+        // console.log('Row data:', data);
+        const { items, type, favouriteItems, handleFavouriteItemToggle, handleLiveToggle, onItemDeleted, shareItemViaWhatsApp } = data;
+        const item = items[index];
+
+        // Determine whether to include share or live toggle functions based on the item type
+        const extraProps = type === 'sale' || type === 'favourites' ? { shareItemViaWhatsApp } : { handleLiveToggle, onItemDeleted };
+
+        return (
+            <div style={style} id={item._id}>
+                <ItemCard
+                    key={item._id}
+                    item={item}
+                    favouriteItems={favouriteItems}
+                    handleFavouriteItemToggle={handleFavouriteItemToggle}
+                    type={type}
+                    {...extraProps}
+                />
+            </div>
+        );
+    }
+
+
     if (localStorage.getItem('userEmail') === null) {
         return (
             <ErrorAuthPage />
@@ -405,582 +442,609 @@ export default function ItemsPage(props) {
     }
     else {
         return (
-            <Grid.Container css={{
-            }}>
-                <Grid.Container css={{
-                    padding: '4px 4px',
-                    jc: 'center'
-                }}>
-                    {type === 'sale' &&
-                        <Text css={{
-                            fontWeight: '$semibold',
-                            '@xsMin': {
-                                fontSize: '$3xl',
-                                padding: '1% 2%'
-                            },
-                            '@xsMax': {
-                                fontSize: '$2xl',
-                                padding: '4%'
-                            },
-                            width: 'max-content'
-                        }}>
-                            All Items On Sale
-                        </Text>
-                    }
-                    {type === 'user' &&
-                        <Text css={{
-                            fontWeight: '$semibold',
-                            '@xsMin': {
-                                fontSize: '$3xl',
-                                padding: '1% 2%'
-                            },
-                            '@xsMax': {
-                                fontSize: '$2xl',
-                                padding: '4%'
-                            },
-                            width: 'max-content'
-                        }}>
-                            {localStorage.getItem('userName').split(" ")[0]}'s Items
-                        </Text>
-                    }
-                    {type === 'favourites' &&
-                        <Text css={{
-                            fontWeight: '$semibold',
-                            '@xsMin': {
-                                fontSize: '$3xl',
-                                padding: '1% 2%'
-                            },
-                            '@xsMax': {
-                                fontSize: '$2xl',
-                                padding: '4%'
-                            },
-                            width: 'max-content'
-                        }}>
-                            {localStorage.getItem('userName').split(" ")[0]}'s Favourites
-                        </Text>
-                    }
-                    <Row css={{
-                        '@xsMin': {
-                            padding: '0% 2% 1% 2%'
-                        },
-                        '@xsMax': {
-                            padding: '0% 4% 1% 4%'
-                        },
-                        alignItems: 'center',
-                        gap: 10,
-                        jc: 'center'
-                    }}>
-                        <Input clearable placeholder="Corset / Cargos / Necklace" width="280px" css={{ margin: '0px 0px 8px 0px' }}
-                            initialValue=""
-                            labelLeft={<IoSearchSharp size={'20px'} color={""} />}
-                            animated={false}
-                            onChange={(e) => {
-                                window.setTimeout(() => {
-                                    setFiltersApplied(prev => ({
-                                        ...prev,
-                                        searched: e.target.value
-                                    }))
-                                }, 1500)
-                            }}
-                        />
-                    </Row>
+            <PullToRefresh onRefresh={fetchAllItems}
+                pullingContent={''}
+                maxPullDownDistance={80}
+                pullDownThreshold={60}
+            >
+
+                <Grid.Container>
 
                     <Grid.Container css={{
-                        '@xsMin': {
-                            padding: '0% 2% 1% 2%'
-                        },
-                        '@xsMax': {
-                            padding: '0% 2% 1% 2%'
-                        },
-                        alignItems: 'center',
+                        padding: '4px 4px',
                         jc: 'center'
                     }}>
-                        <div className="horizontal-scroller">
-                            {priceFilters.map((priceFilter) => (
-                                <Grid key={priceFilter.key} css={{
-                                    margin: '4px 2px',
-                                    '&:hover': {
-                                        cursor: 'pointer'
-                                    }
-                                }}> {/* Ensure key is here */}
-                                    <Badge
-                                        variant="flat"
-                                        size={'md'}
-                                        color={priceFilter.chosen ? "primary" : "default"}
-                                        onClick={() => {
-                                            // Toggle the "chosen" property for the clicked filter
-                                            const updatedPriceFilters = priceFilters.map(filter => {
-                                                if (filter.key === priceFilter.key) {
-                                                    return { ...filter, chosen: !filter.chosen };
-                                                }
-                                                return filter;
-                                            });
-                                            setPriceFilters(updatedPriceFilters);
-
-                                            // Update the filtersApplied state
-                                            setFiltersApplied(prevState => {
-                                                const isFilterApplied = prevState.price.includes(priceFilter.key);
-                                                const newPriceFilters = isFilterApplied
-                                                    ? prevState.price.filter(k => k !== priceFilter.key) // Remove filter
-                                                    : [...prevState.price, priceFilter.key]; // Add filter
-
-                                                return {
-                                                    ...prevState,
-                                                    price: newPriceFilters,
-                                                };
-                                            });
-                                        }}
-                                    >
-                                        {priceFilter.value}
-                                    </Badge>
-                                </Grid>
-                            ))}
-                        </div>
-                    </Grid.Container>
-
-                    <Grid.Container css={{
-                        '@xsMin': {
-                            padding: '0% 2% 2% 2%'
-                        },
-                        '@xsMax': {
-                            padding: '0% 2% 5% 2%'
-                        },
-                        alignItems: 'center',
-                        jc: 'center'
-                    }}>
-                        <div className="horizontal-scroller">
-                            {categoryFilters.map((categoryFilter) => (
-                                <Grid key={categoryFilter.key} css={{
-                                    margin: '4px 2px',
-                                    '&:hover': {
-                                        cursor: 'pointer'
-                                    }
-                                }}>
-                                    <Badge
-                                        variant="flat"
-                                        size="md"
-                                        color={categoryFilter.chosen ? categoryFilter.color : ""} // Use the filter's color if chosen
-                                        onClick={() => {
-                                            // Toggle the "chosen" property for the clicked filter
-                                            const updatedCategoryFilters = categoryFilters.map(filter => {
-                                                if (filter.key === categoryFilter.key) {
-                                                    return { ...filter, chosen: !filter.chosen };
-                                                }
-                                                return filter;
-                                            });
-                                            setCategoryFilters(updatedCategoryFilters);
-
-                                            // Assuming you have a similar state management for category as you have for price
-                                            // Update a hypothetical filtersApplied state for categories
-                                            setFiltersApplied(prevState => {
-                                                const isFilterApplied = prevState.category.includes(categoryFilter.key);
-                                                const newCategoryFilters = isFilterApplied
-                                                    ? prevState.category.filter(k => k !== categoryFilter.key) // Remove filter
-                                                    : [...prevState.category, categoryFilter.key]; // Add filter
-
-                                                return {
-                                                    ...prevState,
-                                                    category: newCategoryFilters,
-                                                };
-                                            });
-                                        }}
-                                    >
-                                        {categoryFilter.value}
-                                    </Badge>
-                                </Grid>
-                            ))}
-                        </div>
-
-                    </Grid.Container>
-
-                    <Backdrop
-                        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                        open={backdropLoaderOpen}
-                    >
-                        <CircularProgress color="inherit" />
-                    </Backdrop>
-
-                    {(fetchingAllItems || backdropLoaderOpen) &&
-                        <>
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
+                        {type === 'sale' &&
+                            <Text css={{
+                                fontWeight: '$semibold',
+                                '@xsMin': {
+                                    fontSize: '$3xl',
+                                    padding: '1% 2%'
+                                },
+                                '@xsMax': {
+                                    fontSize: '$2xl',
+                                    padding: '4%'
+                                },
+                                width: 'max-content'
                             }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
-
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
+                                All Items On Sale
+                            </Text>
+                        }
+                        {type === 'user' &&
+                            <Text css={{
+                                fontWeight: '$semibold',
+                                '@xsMin': {
+                                    fontSize: '$3xl',
+                                    padding: '1% 2%'
+                                },
+                                '@xsMax': {
+                                    fontSize: '$2xl',
+                                    padding: '4%'
+                                },
+                                width: 'max-content'
                             }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
-
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
+                                {localStorage.getItem('userName').split(" ")[0]}'s Items
+                            </Text>
+                        }
+                        {type === 'favourites' &&
+                            <Text css={{
+                                fontWeight: '$semibold',
+                                '@xsMin': {
+                                    fontSize: '$3xl',
+                                    padding: '1% 2%'
+                                },
+                                '@xsMax': {
+                                    fontSize: '$2xl',
+                                    padding: '4%'
+                                },
+                                width: 'max-content'
                             }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
+                                {localStorage.getItem('userName').split(" ")[0]}'s Favourites
+                            </Text>
+                        }
+                        <Row css={{
+                            '@xsMin': {
+                                padding: '0% 2% 1% 2%'
+                            },
+                            '@xsMax': {
+                                padding: '0% 4% 1% 4%'
+                            },
+                            alignItems: 'center',
+                            gap: 10,
+                            jc: 'center'
+                        }}>
+                            <Input clearable placeholder="Corset / Cargos / Necklace" width="280px" css={{ margin: '0px 0px 8px 0px' }}
+                                initialValue=""
+                                labelLeft={<IoSearchSharp size={'20px'} color={""} />}
+                                animated={false}
+                                onChange={(e) => {
+                                    window.setTimeout(() => {
+                                        setFiltersApplied(prev => ({
+                                            ...prev,
+                                            searched: e.target.value
+                                        }))
+                                    }, 1500)
+                                }}
+                                className="items-search-input"
+                            />
+                        </Row>
 
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
+                        <Grid.Container css={{
+                            '@xsMin': {
+                                padding: '0% 2% 1% 2%'
+                            },
+                            '@xsMax': {
+                                padding: '0% 0% 2.5% 0%'
+                            },
+                            alignItems: 'center',
+                            jc: 'center'
+                        }}>
+                            <Row css={{
+                                alignItems: 'center',
+                                gap: 4,
+                                jc: 'center',
                             }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
+                                <IoIosArrowBack color="#7f7f7f" size={16} />
+                                <div className="horizontal-scroller">
+                                    {priceFilters.map((priceFilter) => (
+                                        <Grid key={priceFilter.key} css={{
+                                            margin: '4px 2px',
+                                            '&:hover': {
+                                                cursor: 'pointer'
+                                            }
+                                        }}> {/* Ensure key is here */}
+                                            <Badge
+                                                variant="flat"
+                                                size={'md'}
+                                                color={priceFilter.chosen ? "primary" : "default"}
+                                                onClick={() => {
+                                                    // Toggle the "chosen" property for the clicked filter
+                                                    const updatedPriceFilters = priceFilters.map(filter => {
+                                                        if (filter.key === priceFilter.key) {
+                                                            return { ...filter, chosen: !filter.chosen };
+                                                        }
+                                                        return filter;
+                                                    });
+                                                    setPriceFilters(updatedPriceFilters);
 
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
+                                                    // Update the filtersApplied state
+                                                    setFiltersApplied(prevState => {
+                                                        const isFilterApplied = prevState.price.includes(priceFilter.key);
+                                                        const newPriceFilters = isFilterApplied
+                                                            ? prevState.price.filter(k => k !== priceFilter.key) // Remove filter
+                                                            : [...prevState.price, priceFilter.key]; // Add filter
+
+                                                        return {
+                                                            ...prevState,
+                                                            price: newPriceFilters,
+                                                        };
+                                                    });
+                                                }}
+                                            >
+                                                {priceFilter.value}
+                                            </Badge>
+                                        </Grid>
+                                    ))}
+                                </div>
+                                <IoIosArrowForward color="#7f7f7f" size={16} />
+                            </Row>
+                        </Grid.Container>
+
+                        <Grid.Container css={{
+                            '@xsMin': {
+                                padding: '0% 2% 2% 2%'
+                            },
+                            '@xsMax': {
+                                padding: '0% 2% 5% 2%'
+                            },
+                            alignItems: 'center',
+                            jc: 'center'
+                        }}>
+                            <Row css={{
+                                alignItems: 'center',
+                                gap: 4,
+                                jc: 'center',
                             }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
+                                <IoIosArrowBack color="#7f7f7f" size={16} />
+                                <div className="horizontal-scroller">
+                                    {categoryFilters.map((categoryFilter) => (
+                                        <Grid key={categoryFilter.key} css={{
+                                            margin: '4px 2px',
+                                            '&:hover': {
+                                                cursor: 'pointer'
+                                            }
                                         }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
+                                            <Badge
+                                                variant="flat"
+                                                size="md"
+                                                color={categoryFilter.chosen ? categoryFilter.color : ""} // Use the filter's color if chosen
+                                                onClick={() => {
+                                                    // Toggle the "chosen" property for the clicked filter
+                                                    const updatedCategoryFilters = categoryFilters.map(filter => {
+                                                        if (filter.key === categoryFilter.key) {
+                                                            return { ...filter, chosen: !filter.chosen };
+                                                        }
+                                                        return filter;
+                                                    });
+                                                    setCategoryFilters(updatedCategoryFilters);
 
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
-                            }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
+                                                    // Assuming you have a similar state management for category as you have for price
+                                                    // Update a hypothetical filtersApplied state for categories
+                                                    setFiltersApplied(prevState => {
+                                                        const isFilterApplied = prevState.category.includes(categoryFilter.key);
+                                                        const newCategoryFilters = isFilterApplied
+                                                            ? prevState.category.filter(k => k !== categoryFilter.key) // Remove filter
+                                                            : [...prevState.category, categoryFilter.key]; // Add filter
+
+                                                        return {
+                                                            ...prevState,
+                                                            category: newCategoryFilters,
+                                                        };
+                                                    });
+                                                }}
+                                            >
+                                                {categoryFilter.value}
+                                            </Badge>
+                                        </Grid>
+                                    ))}
+                                </div>
+                                <IoIosArrowForward color="#7f7f7f" size={16} />
+                            </Row>
+
+                        </Grid.Container>
+
+                        <Backdrop
+                            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                            open={backdropLoaderOpen}
+                        >
+                            <CircularProgress color="inherit" />
+                        </Backdrop>
+
+                        {(fetchingAllItems || backdropLoaderOpen) &&
+                            <>
+                                <Col css={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    width: '330px',
+                                    margin: '24px 24px'
                                 }}>
                                     <Row css={{
                                         alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
+                                        padding: '4px 4px 12px 4px',
+                                        jc: 'space-between'
                                     }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content',
+                                            gap: 10
                                         }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
-                        </>
-                    }
-
-                    {!fetchingAllItems && !backdropLoaderOpen &&
-                        <>
-                            {(filtersApplied.searched.length == 0 && filtersApplied.category.length == 0 && filtersApplied.price.length == 0) ? //filters applied or not
-                                <>
-                                    {/* If filters not applied then show allItems */}
-                                    {type === 'sale' || type === 'favourites' ?
-                                        <>
-                                            {allItems.map((item, index) => (
-                                                <div id={item._id}>
-                                                    <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} shareItemViaWhatsApp={shareItemViaWhatsApp} />
-                                                </div>
-                                            ))}
-                                        </>
-                                        :
-                                        <>
-                                            {userItems.map((item, index) => (
-                                                <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} onItemDeleted={onItemDeleted} />
-                                            ))}
-                                        </>
-                                    }
-                                </>
-                                :
-                                <>
-                                    {filteredItems && filteredItems.length > 0 &&
-                                        <>
-                                            {/* If filters applied and there are filtered items */}
-                                            {
-                                                filteredItems.map((item, index) => {
-                                                    return (
-                                                        <div id={item._id}>
-                                                            <ItemCard key={index} item={item} favouriteItems={favouriteItems} handleFavouriteItemToggle={handleFavouriteItemToggle} type={type} handleLiveToggle={handleLiveToggle} onItemDeleted={onItemDeleted} shareItemViaWhatsApp={shareItemViaWhatsApp} />
-                                                        </div>
-                                                    )
-                                                })}
-                                        </>
-                                    }
-                                    {filteredItems && filteredItems.length == 0 &&
-                                        <>
-                                            {/* If filters applied but no filtered items to show */}
-                                            <Text css={{
-                                                fontWeight: '$semibold',
-                                                '@xsMax': {
-                                                    fontSize: '$xl'
-                                                },
-                                                '@xsMin': {
-                                                    fontSize: '$2xl'
-                                                },
-                                                padding: '48px 0px 50vh 0px'
+                                            <Skeleton animation="wave" variant="circular" width={40} height={40} />
+                                            <Col css={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                jc: 'center',
+                                                gap: 4,
+                                                width: 'max-content'
                                             }}>
-                                                No results to show...
-                                            </Text>
-                                        </>
-                                    }
-                                </>
-                            }
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                            </Col>
+                                        </Row>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={60} height={20} />
+                                        </Row>
+                                    </Row>
+                                    <Skeleton animation="wave" variant="rounded" width={330} height={300} />
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        paddingTop: '12px',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={120} height={10} />
+                                        <Skeleton animation="wave" variant="rounded" width={80} height={20} />
+                                    </Row>
+                                </Col>
 
-                        </>
-                    }
+                                <Col css={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    width: '330px',
+                                    margin: '24px 24px'
+                                }}>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        padding: '4px 4px 12px 4px',
+                                        jc: 'space-between'
+                                    }}>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content',
+                                            gap: 10
+                                        }}>
+                                            <Skeleton animation="wave" variant="circular" width={40} height={40} />
+                                            <Col css={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                jc: 'center',
+                                                gap: 4,
+                                                width: 'max-content'
+                                            }}>
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                            </Col>
+                                        </Row>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={60} height={20} />
+                                        </Row>
+                                    </Row>
+                                    <Skeleton animation="wave" variant="rounded" width={330} height={300} />
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        paddingTop: '12px',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={120} height={10} />
+                                        <Skeleton animation="wave" variant="rounded" width={80} height={20} />
+                                    </Row>
+                                </Col>
+
+                                <Col css={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    width: '330px',
+                                    margin: '24px 24px'
+                                }}>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        padding: '4px 4px 12px 4px',
+                                        jc: 'space-between'
+                                    }}>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content',
+                                            gap: 10
+                                        }}>
+                                            <Skeleton animation="wave" variant="circular" width={40} height={40} />
+                                            <Col css={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                jc: 'center',
+                                                gap: 4,
+                                                width: 'max-content'
+                                            }}>
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                            </Col>
+                                        </Row>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={60} height={20} />
+                                        </Row>
+                                    </Row>
+                                    <Skeleton animation="wave" variant="rounded" width={330} height={300} />
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        paddingTop: '12px',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={120} height={10} />
+                                        <Skeleton animation="wave" variant="rounded" width={80} height={20} />
+                                    </Row>
+                                </Col>
+
+                                <Col css={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    width: '330px',
+                                    margin: '24px 24px'
+                                }}>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        padding: '4px 4px 12px 4px',
+                                        jc: 'space-between'
+                                    }}>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content',
+                                            gap: 10
+                                        }}>
+                                            <Skeleton animation="wave" variant="circular" width={40} height={40} />
+                                            <Col css={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                jc: 'center',
+                                                gap: 4,
+                                                width: 'max-content'
+                                            }}>
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                            </Col>
+                                        </Row>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={60} height={20} />
+                                        </Row>
+                                    </Row>
+                                    <Skeleton animation="wave" variant="rounded" width={330} height={300} />
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        paddingTop: '12px',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={120} height={10} />
+                                        <Skeleton animation="wave" variant="rounded" width={80} height={20} />
+                                    </Row>
+                                </Col>
+
+                                <Col css={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    width: '330px',
+                                    margin: '24px 24px'
+                                }}>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        padding: '4px 4px 12px 4px',
+                                        jc: 'space-between'
+                                    }}>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content',
+                                            gap: 10
+                                        }}>
+                                            <Skeleton animation="wave" variant="circular" width={40} height={40} />
+                                            <Col css={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                jc: 'center',
+                                                gap: 4,
+                                                width: 'max-content'
+                                            }}>
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                            </Col>
+                                        </Row>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={60} height={20} />
+                                        </Row>
+                                    </Row>
+                                    <Skeleton animation="wave" variant="rounded" width={330} height={300} />
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        paddingTop: '12px',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={120} height={10} />
+                                        <Skeleton animation="wave" variant="rounded" width={80} height={20} />
+                                    </Row>
+                                </Col>
+
+                                <Col css={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    width: '330px',
+                                    margin: '24px 24px'
+                                }}>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        padding: '4px 4px 12px 4px',
+                                        jc: 'space-between'
+                                    }}>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content',
+                                            gap: 10
+                                        }}>
+                                            <Skeleton animation="wave" variant="circular" width={40} height={40} />
+                                            <Col css={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                jc: 'center',
+                                                gap: 4,
+                                                width: 'max-content'
+                                            }}>
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} />
+                                            </Col>
+                                        </Row>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={60} height={20} />
+                                        </Row>
+                                    </Row>
+                                    <Skeleton animation="wave" variant="rounded" width={330} height={300} />
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        paddingTop: '12px',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={120} height={10} />
+                                        <Skeleton animation="wave" variant="rounded" width={80} height={20} />
+                                    </Row>
+                                </Col>
+                            </>
+                        }
+
+                        {!fetchingAllItems && !backdropLoaderOpen &&
+                            <>
+                                {(filtersApplied.searched.length === 0 && filtersApplied.category.length === 0 && filtersApplied.price.length === 0) ?
+                                    // If no filters applied, render allItems or userItems based on the type
+                                    <List
+                                        height={window.screen.height} // Adjust based on your layout
+                                        itemCount={type === 'sale' || type === 'favourites' ? allItems.length : userItems.length}
+                                        itemSize={350} // Adjust based on your ItemCard size
+                                        width={'100%'}
+                                        itemData={{
+                                            items: type === 'sale' || type === 'favourites' ? allItems : userItems,
+                                            type,
+                                            favouriteItems,
+                                            handleFavouriteItemToggle,
+                                            handleLiveToggle,
+                                            onItemDeleted,
+                                            shareItemViaWhatsApp
+                                        }}
+                                    >
+                                        {ListRow}
+                                    </List>
+                                    :
+                                    // If filters are applied
+                                    filteredItems && filteredItems.length > 0 ?
+                                        <List
+                                            height={600} // Adjust based on your layout
+                                            itemCount={filteredItems.length}
+                                            itemSize={350} // Adjust based on your ItemCard size
+                                            width={'100%'}
+                                            itemData={{
+                                                items: filteredItems,
+                                                type,
+                                                favouriteItems,
+                                                handleFavouriteItemToggle,
+                                                handleLiveToggle,
+                                                onItemDeleted,
+                                                shareItemViaWhatsApp
+                                            }}
+                                        >
+                                            {ListRow}
+                                        </List>
+                                        :
+                                        // If filters applied but no items to show
+                                        <Text css={{
+                                            fontWeight: '$semibold',
+                                            '@xsMax': {
+                                                fontSize: '$xl'
+                                            },
+                                            '@xsMin': {
+                                                fontSize: '$2xl'
+                                            },
+                                            padding: '48px 0px 50vh 0px'
+                                        }}>
+                                            No results to show...
+                                        </Text>
+                                }
+                            </>
+                        }
+
+
+                    </Grid.Container>
+
+                    <Snackbar
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center'
+                        }}
+                        open={showSuccessSnackbar}
+                        autoHideDuration={1500}
+                        onClose={() => { setShowSuccessSnackbar(false) }}
+                    >
+                        <Alert
+                            onClose={() => { setShowSuccessSnackbar(false) }}
+                            severity="success"
+                            variant="filled"
+                            color="success"
+                            sx={{ width: '100%' }}
+                        >
+                            Success
+                        </Alert>
+                    </Snackbar>
+
+                    <Snackbar
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center'
+                        }}
+                        open={showErrorSnackbar}
+                        autoHideDuration={1500}
+                        onClose={() => { setShowErrorSnackbar(false) }}
+                    >
+                        <Alert
+                            onClose={() => { setShowErrorSnackbar(false) }}
+                            severity="error"
+                            variant="filled"
+                            color="error"
+                            sx={{ width: '100%' }}
+                        >
+                            Error
+                        </Alert>
+                    </Snackbar>
+
                 </Grid.Container>
 
-                <Snackbar
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center'
-                    }}
-                    open={showSuccessSnackbar}
-                    autoHideDuration={1500}
-                    onClose={() => { setShowSuccessSnackbar(false) }}
-                >
-                    <Alert
-                        onClose={() => { setShowSuccessSnackbar(false) }}
-                        severity="success"
-                        variant="filled"
-                        color="success"
-                        sx={{ width: '100%' }}
-                    >
-                        Success
-                    </Alert>
-                </Snackbar>
-
-                <Snackbar
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center'
-                    }}
-                    open={showErrorSnackbar}
-                    autoHideDuration={1500}
-                    onClose={() => { setShowErrorSnackbar(false) }}
-                >
-                    <Alert
-                        onClose={() => { setShowErrorSnackbar(false) }}
-                        severity="error"
-                        variant="filled"
-                        color="error"
-                        sx={{ width: '100%' }}
-                    >
-                        Error
-                    </Alert>
-                </Snackbar>
-
-            </Grid.Container>
+            </PullToRefresh>
         )
     }
 }

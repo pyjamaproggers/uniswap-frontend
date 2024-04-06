@@ -67,6 +67,21 @@ export default function InputItemCard(props) {
         { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
     ]
 
+    useEffect(() => {
+        document.querySelectorAll('input, select, textarea').forEach((element) => {
+            element.addEventListener('focus', (event) => event.preventDefault())
+        })
+        let priceInputElement = document.getElementsByClassName('sale-price-input')[0]
+        priceInputElement.addEventListener('focus', (event)=>event.preventDefault())
+
+        let nameInputElement = document.getElementsByClassName('sale-itemName-input')[0]
+        nameInputElement.addEventListener('focus', (event)=>event.preventDefault())
+
+        let descInputElement = document.getElementsByClassName('sale-itemDesc-input')[0]
+        descInputElement.addEventListener('focus', (event)=>event.preventDefault())
+
+    }, [])
+
     const updateContactNumber = () => {
         const updatedPhoneNumber = number.trim();
 
@@ -107,7 +122,7 @@ export default function InputItemCard(props) {
                 console.error('Error updating phone number:', error);
                 setBackdropLoaderOpen(false);
                 setShowErrorSnackbar(true)
-                window.location.pathname='/useritems'
+                window.location.pathname = '/useritems'
             });
     };
 

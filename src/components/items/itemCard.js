@@ -338,6 +338,19 @@ export default function ItemCard(props) {
                                     </Text>
 
                                 </Col>
+                                {(type === 'user') &&
+                                    <>
+                                        {(item.live === 'y') ?
+                                            <Badge variant="flat" size={'md'} color={"success"}>
+                                                • Live
+                                            </Badge>
+                                            :
+                                            <Badge variant="flat" size={'md'} color={"warning"}>
+                                                • Not Live
+                                            </Badge>
+                                        }
+                                    </>
+                                }
 
                             </Row>
                         }
@@ -433,22 +446,22 @@ export default function ItemCard(props) {
                             marginBottom: '24px'
                         }}>
                             {item.live === 'y' ?
+                                <Button auto flat color={"warning"}
+                                    icon={<IoCloudOffline size={16} />}
+                                    onClick={() => { toggleLiveStatus(item._id) }}
+                                    css={{
+                                        lineHeight: '2.2'
+                                    }}>
+                                    Unpublish
+                                </Button>
+                                :
                                 <Button auto flat color={"success"}
                                     icon={<FaCloud size={16} style={{}} />}
                                     onClick={() => { toggleLiveStatus(item._id) }}
                                     css={{
                                         lineHeight: '2.2'
                                     }}>
-                                    Live
-                                </Button>
-                                :
-                                <Button auto flat color={"error"}
-                                    icon={<IoCloudOffline size={16} />}
-                                    onClick={() => { toggleLiveStatus(item._id) }}
-                                    css={{
-                                        lineHeight: '2.2'
-                                    }}>
-                                    Not Live
+                                    Publish
                                 </Button>
                             }
                             <Button auto flat color="primary"
