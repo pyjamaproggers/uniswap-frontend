@@ -4,15 +4,14 @@ export const favouriteItemsSlice = createSlice({
     name: 'favouriteItems',
     initialState: [],
     reducers: {
-        setFavouriteItems: (state, action) => {
-            return action.payload;
-        },
+        setFavouriteItems: (state, action) => action.payload,
         addFavouriteItem: (state, action) => {
-            state.push(action.payload.id);
+            // Prevent adding duplicate IDs
+            if (!state.includes(action.payload.id)) {
+                state.push(action.payload.id);
+            }
         },
-        removeFavouriteItem: (state, action) => {
-            return state.filter(item => item.id !== action.payload.id);
-        },
+        removeFavouriteItem: (state, action) => state.filter(itemID => itemID !== action.payload.id),
     },
 });
 

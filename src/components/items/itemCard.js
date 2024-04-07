@@ -161,7 +161,6 @@ export default function ItemCard(props) {
         }
     }
 
-
     const handleDeleteItem = async (itemId) => {
         if (window.confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
             setBackdropLoaderOpen(true);
@@ -184,7 +183,7 @@ export default function ItemCard(props) {
                 console.log(`Item with ID ${itemId} deleted successfully.`);
                 setBackdropLoaderOpen(false);
                 // For example, you could call a prop function to refresh the items
-                onItemDeleted();
+                onItemDeleted(itemId);
 
             } catch (error) {
                 console.error('Error deleting the item:', error);
@@ -193,9 +192,6 @@ export default function ItemCard(props) {
             }
         }
     };
-    useEffect(() => {
-        console.log('Updated favouriteItems in ItemCard component')
-    }, [favouriteItems])
 
     const categoryColors = {
         apparel: 'error',

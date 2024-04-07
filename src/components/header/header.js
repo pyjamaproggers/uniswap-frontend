@@ -916,7 +916,8 @@ export default function Header(props) {
                                             key={navItem.path}
                                             size={28}
                                             color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
-                                            onClick={() => window.location.pathname = navItem.path}
+                                            // onClick={() => window.location.pathname = navItem.path}
+                                            onClick={()=> navigate(navItem.path)}
                                         />
                                     );
                                 })}

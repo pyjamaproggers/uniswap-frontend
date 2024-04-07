@@ -91,7 +91,7 @@ export default function SaleItemsPage() {
 
     useEffect(() => {
         filterItems()
-    }, [filtersApplied]);
+    }, [filtersApplied, favouriteItems]);
 
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
@@ -195,27 +195,23 @@ export default function SaleItemsPage() {
     };
 
     const handleFavouriteItemToggle = (itemIDToUpdate) => {
-        
-        let updatedFavouriteItems = []
-        if(favouriteItems.includes(itemIDToUpdate)){
-            updatedFavouriteItems = favouriteItems.filter(itemID => itemID !== itemIDToUpdate)
+        const isCurrentlyFavourite = favouriteItems.includes(itemIDToUpdate);
+        let updatedFavouriteItems = [];
+    
+        if (isCurrentlyFavourite) {
+            updatedFavouriteItems = favouriteItems.filter(itemID => itemID !== itemIDToUpdate);
+            dispatch(removeFavouriteItem({id: itemIDToUpdate})); // Dispatching the action to remove
+        } else {
+            updatedFavouriteItems = [...favouriteItems, itemIDToUpdate];
+            dispatch(addFavouriteItem({id: itemIDToUpdate})); // Dispatching the action to add
         }
-        else{
-            updatedFavouriteItems = [...favouriteItems]
-            updatedFavouriteItems.push(itemIDToUpdate)
-        }
+    
         // Update local storage
         localStorage.setItem('favouriteItems', JSON.stringify(updatedFavouriteItems));
-
-        if (favouriteItems.some(item => item.id === itemIDToUpdate)) {
-            dispatch(removeFavouriteItem({id: itemIDToUpdate}));
-        }
-        else {
-            dispatch(addFavouriteItem({id: itemIDToUpdate}));
-        }
-
-        setRender(prev => !prev)
+    
+        setRender(prev => !prev); // Trigger re-render if necessary
     };
+    
 
     return (
         <PullToRefresh onRefresh={fetchAllItems}
@@ -225,7 +221,7 @@ export default function SaleItemsPage() {
             aria-label='pulltorefresh'
         >
             <Grid.Container>
-                {console.log('FavouriteItems: ', favouriteItems)}
+                {/* {console.log('FavouriteItems: ', favouriteItems)} */}
                 <Grid.Container css={{
                     padding: '4px 4px',
                     jc: 'center'
@@ -395,286 +391,6 @@ export default function SaleItemsPage() {
                         </Row>
 
                     </Grid.Container>
-
-                    {(fetchingAllItems || backdropLoaderOpen) &&
-                        <>
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
-                            }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
-
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
-                            }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
-
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
-                            }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
-
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
-                            }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
-
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
-                            }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
-
-                            <Col css={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                width: '330px',
-                                margin: '24px 24px'
-                            }}>
-                                <Row css={{
-                                    alignItems: 'center',
-                                    padding: '4px 4px 12px 4px',
-                                    jc: 'space-between'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content',
-                                        gap: 10
-                                    }}>
-                                        <Skeleton animation="wave" variant="circular" width={40} height={40} />
-                                        <Col css={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            jc: 'center',
-                                            gap: 4,
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                            <Skeleton animation="wave" variant="rounded" width={80} height={5} />
-                                        </Col>
-                                    </Row>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        width: 'max-content'
-                                    }}>
-                                        <Skeleton animation="wave" variant="rounded" width={60} height={20} />
-                                    </Row>
-                                </Row>
-                                <Skeleton animation="wave" variant="rounded" width={330} height={300} />
-                                <Row css={{
-                                    alignItems: 'center',
-                                    paddingTop: '12px',
-                                    gap: 10
-                                }}>
-                                    <Skeleton animation="wave" variant="rounded" width={120} height={10} />
-                                    <Skeleton animation="wave" variant="rounded" width={80} height={20} />
-                                </Row>
-                            </Col>
-                        </>
-                    }
 
                     {!fetchingAllItems && !backdropLoaderOpen && filteredItems &&
                         <>
