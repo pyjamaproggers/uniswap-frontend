@@ -140,6 +140,19 @@ export default function Header(props) {
                     }
                 }
             })
+            .then(data => {
+                if (!data.hasFcmToken) {
+                    toast.warn("Seems like you don't have notifications enabled. Press on your avatar and click on 'Enable Notifications' to turn them on.", {
+                        position: "top-center",
+                        autoClose: false, 
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        theme: "colored",
+                    });
+                }
+            })
+            
             .catch(error => {
                 console.error('Error:', error);
                 setShowErrorSnackbar(true)
