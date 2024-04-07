@@ -115,7 +115,7 @@ export default function UserItemsPage() {
     };
 
     function filterItems() {
-        setBackdropLoaderOpen(true)
+        // setBackdropLoaderOpen(true)
         let result = userItems;
 
         const getPriceRange = (rangeStr) => {
@@ -166,7 +166,7 @@ export default function UserItemsPage() {
         })
 
         setFilteredItems(final);
-        setBackdropLoaderOpen(false)
+        // setBackdropLoaderOpen(false)
     }
 
     const fetchAllItems = async (userEmail) => {
@@ -258,12 +258,10 @@ export default function UserItemsPage() {
                             labelLeft={<IoSearchSharp size={'20px'} color={""} />}
                             animated={false}
                             onChange={(e) => {
-                                window.setTimeout(() => {
-                                    setFiltersApplied(prev => ({
-                                        ...prev,
-                                        searched: e.target.value
-                                    }))
-                                }, 1500)
+                                setFiltersApplied(prev => ({
+                                    ...prev,
+                                    searched: e.target.value
+                                }))
                             }}
                             className="items-search-input"
                             aria-label="input-search"

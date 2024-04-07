@@ -118,7 +118,7 @@ export default function SaleItemsPage() {
     };
 
     function filterItems() {
-        setBackdropLoaderOpen(true)
+        // setBackdropLoaderOpen(true)
         let result = saleItems;
 
         const getPriceRange = (rangeStr) => {
@@ -169,7 +169,7 @@ export default function SaleItemsPage() {
         })
 
         setFilteredItems(final);
-        setBackdropLoaderOpen(false)
+        // setBackdropLoaderOpen(false)
     }
 
     const fetchAllItems = async () => {
@@ -256,12 +256,10 @@ export default function SaleItemsPage() {
                             labelLeft={<IoSearchSharp size={'20px'} color={""} />}
                             animated={false}
                             onChange={(e) => {
-                                window.setTimeout(() => {
-                                    setFiltersApplied(prev => ({
-                                        ...prev,
-                                        searched: e.target.value
-                                    }))
-                                }, 1500)
+                                setFiltersApplied(prev => ({
+                                    ...prev,
+                                    searched: e.target.value
+                                }))
                             }}
                             className="items-search-input"
                             aria-label="input-search"

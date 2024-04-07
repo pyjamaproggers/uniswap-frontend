@@ -18,7 +18,7 @@ import ReactGA from 'react-ga4'
 import { store } from './store';
 import SaleItemsPage from './pages/saleItemsPage/saleItemsPage';
 import UserItemsPage from './pages/userItemsPage/userItemsPage';
-
+import FavouritesItemsPage from './pages/favouriteItemsPage/favouriteItemsPage';
 
 function App() {
 
@@ -104,7 +104,7 @@ function App() {
                                 {/* <Route exact path='/saleitems' element={<Itemspage type={'sale'} />} /> */}
                                 <Route exact path='/saleitems' element={<SaleItemsPage/>} />
                                 <Route exact path='/useritems' element={<UserItemsPage/>} />
-                                <Route exact path='/favourites' element={<Itemspage type={'favourites'} />} />
+                                <Route exact path='/favourites' element={<FavouritesItemsPage/>} />
                                 <Route exact path='/createsale' element={<CreateSalePage />} />
                                 <Route exact path='/editsale' element={<EditSalePage />} />
                                 <Route exact path='/outlets' element={<OutletsPage />} />

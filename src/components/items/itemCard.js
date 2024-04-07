@@ -21,31 +21,30 @@ export default function ItemCard(props) {
 
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
-
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
-
     const navigate = useNavigate()
     const backend = process.env.REACT_APP_BACKEND
-
     const [render, setRender] = useState(false)
-
-    // const [item, setItem] = useState({ ...props.item })
-
     const item = props.item
-
+    const type = props.type
     const [firstName, lastName] = item.userName.split(' ');
-
     const URL = 'https://wa.me'
     // let number = item.contactNumber.replace(/[^\w\s]/gi, '').replace(/ /g, '')
     let number = item.contactNumber
-
     let message = `Hi ${firstName}, this is regarding the ${item.itemName} you put on the UniSwap™ website priced at ${item.itemPrice}...`
     let url = `${URL}/${number}?text=${encodeURI(message)}`;
-
     let favouriteItems = props.favouriteItems
     let handleFavouriteItemToggle = props.handleFavouriteItemToggle
     let handleLiveToggle = props.handleLiveToggle
     let onItemDeleted = props.onItemDeleted
+    const categoryColors = {
+        apparel: 'error',
+        food: 'secondary',
+        tickets: 'primary',
+        stationery: 'success',
+        jewellry: 'warning',
+    };
+    const badgeColor = categoryColors[item.itemCategory] || 'default';
     // let shareItemViaWhatsApp = props.shareItemViaWhatsApp
 
     const handleFavouriteButtonClick = async (favouriteItems, item) => {
@@ -76,7 +75,7 @@ export default function ItemCard(props) {
         }
     }
 
-    const toggleLiveStatus = async (itemId, currentStatus) => {
+    const handleLiveButtonClick = async (itemId, currentStatus) => {
         setBackdropLoaderOpen(true);
         console.log('hi')
         try {
@@ -139,7 +138,6 @@ export default function ItemCard(props) {
         }
     }
 
-
     function formatDate(date) {
         const day = date.getDate();
         const monthNames = ["January", "February", "March", "April", "May", "June",
@@ -192,19 +190,6 @@ export default function ItemCard(props) {
             }
         }
     };
-
-    const categoryColors = {
-        apparel: 'error',
-        food: 'secondary',
-        tickets: 'primary',
-        stationery: 'success',
-        jewellry: 'warning',
-    };
-
-    const type = props.type
-
-    // Default to some color if item.category is not found in the mapping
-    const badgeColor = categoryColors[item.itemCategory] || 'default';
 
     if (item.live === 'n' && type === 'sale') {
         return null
@@ -430,7 +415,7 @@ export default function ItemCard(props) {
                             {item.live === 'y' ?
                                 <Button auto flat color={"warning"}
                                     icon={<IoCloudOffline size={16} />}
-                                    onClick={() => { toggleLiveStatus(item._id) }}
+                                    onClick={() => { handleLiveButtonClick(item._id) }}
                                     css={{
                                         lineHeight: '2.2'
                                     }}>
@@ -439,7 +424,7 @@ export default function ItemCard(props) {
                                 :
                                 <Button auto flat color={"success"}
                                     icon={<FaCloud size={16} style={{}} />}
-                                    onClick={() => { toggleLiveStatus(item._id) }}
+                                    onClick={() => { handleLiveButtonClick(item._id) }}
                                     css={{
                                         lineHeight: '2.2'
                                     }}>
