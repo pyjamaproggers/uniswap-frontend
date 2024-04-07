@@ -17,7 +17,7 @@ import { useLocation } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ImSpinner9 } from "react-icons/im";
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner, faV } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
@@ -212,7 +212,7 @@ export default function ItemsPage(props) {
             setFilteredItems(final);
             // console.log({ favouriteItems })
             setBackdropLoaderOpen(false)
-        }, 1000)
+        }, 200)
     }
 
     useEffect(() => {
@@ -222,32 +222,51 @@ export default function ItemsPage(props) {
         else {
             filterItems(type)
         }
+        setLastItemIndex(0)
+        setVisibleItems([])
     }, [filtersApplied]);
+
+    // useEffect(()=>{
+    //     // run to refresh items
+    // }, [type])
 
     const loadMoreItems = () => {
         // Determine the items to show based on the filters applied and type
-        // console.log(filteredItems)
         const currentItems = type === 'sale' || type === 'favourites' ? filteredItems : userItems;
-        // console.log('currentItems: ', currentItems)
-        const currentLiveItems = currentItems.filter(x=>x.live==='y')
-        // Calculate the next set of items based on the last item index
-        console.log('CURRNET LIVE ITEMS',currentLiveItems)
-        const nextItems = currentLiveItems.slice(lastItemIndex, lastItemIndex + ITEMS_PER_PAGE);
-        // console.log(lastItemIndex)
-        // console.log(lastItemIndex + ITEMS_PER_PAGE)
-        // console.log(currentItems.slice(lastItemIndex, 5))
-        // console.log('nextItems: ', nextItems)
-        if(currentLiveItems.length===0){
-            console.log('its 0')
-            setLastItemIndex(lastItemIndex);
+        const currentLiveItems = currentItems.filter(x => x.live === 'y');
+        let nextItems = [];
+    
+        if (type === 'favourites') {
+            // Filter to get only favourite items that are live
+            let favouriteLiveItems = currentLiveItems.filter(liveItem => favouriteItems.includes(liveItem._id));
+            
+            // Filter out items that are already visible to avoid duplicates
+            nextItems = favouriteLiveItems.filter(liveItem => !visibleItems.some(item => item._id === liveItem._id));
+        } else {
+            // Slice the next set of items for non-favourite types
+            nextItems = currentLiveItems.slice(lastItemIndex, lastItemIndex + ITEMS_PER_PAGE);
         }
-        else{
-            console.log('its not 0')
-            setLastItemIndex(lastItemIndex + ITEMS_PER_PAGE);
+    
+        // Debugging logs
+        console.log('CURRENT LIVE ITEMS', currentLiveItems);
+        console.log('nextItems: ', nextItems);
+    
+        if (currentLiveItems.length === 0) {
+            console.log('its 0');
+            // Handle the case when no more items are left to add
+        } else {
+            console.log('its not 0');
+            // Only update the lastItemIndex if we are not processing favourites
+            // This prevents advancing the index when re-filtering favourites
+            if (type !== 'favourites') {
+                setLastItemIndex(lastItemIndex + ITEMS_PER_PAGE);
+            }
         }
-        // Update the visible items and the last item index
+    
+        // Update the visible items with the new set of next items
         setVisibleItems(prevItems => [...prevItems, ...nextItems]);
     };
+    
 
     const fetchAllItems = async () => {
         setFetchingAllItems(true);
@@ -413,7 +432,7 @@ export default function ItemsPage(props) {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 10) return;
+            if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 20) return;
             loadMoreItems(); // Load more items when the user scrolls to the bottom
         };
 
@@ -487,7 +506,7 @@ export default function ItemsPage(props) {
 
                 <Grid.Container>
 
-                    {console.log(visibleItems)}
+                    {/* {console.log(visibleItems)} */}
                     <Grid.Container css={{
                         padding: '4px 4px',
                         jc: 'center'
