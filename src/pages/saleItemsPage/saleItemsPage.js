@@ -396,7 +396,9 @@ export default function SaleItemsPage() {
                         <>
                             {
                                 filteredItems.map((item, index) => (
-                                    <div key={item._id} id={item._id}>
+                                    <div key={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
+                                    id={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
+                                    >
                                         <ItemCard
                                             item={item}
                                             type={"sale"}

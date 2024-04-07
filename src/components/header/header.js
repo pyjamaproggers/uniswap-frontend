@@ -420,7 +420,7 @@ export default function Header(props) {
 
                 <Navbar.Brand
                     onClick={() => {
-                        window.location.pathname = '/'
+                        navigate('/')
                     }}
                     css={{
                         '&:hover': {
@@ -559,7 +559,7 @@ export default function Header(props) {
                                         handleLogout()
                                     }
                                     else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
-                                        window.location.pathname = `/${actionKey}`
+                                        navigate(actionKey)
                                     }
                                     else if (actionKey === 'phoneAuth') {
                                         setShowNumberUpdateModal(true)
@@ -939,7 +939,7 @@ export default function Header(props) {
                                                 handleLogout()
                                             }
                                             else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
-                                                window.location.pathname = `/${actionKey}`
+                                                navigate(actionKey)
                                             }
                                             else if (actionKey === 'phoneAuth') {
                                                 setShowNumberUpdateModal(true)
