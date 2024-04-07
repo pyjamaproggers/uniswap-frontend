@@ -229,14 +229,15 @@ export default function ItemsPage(props) {
         // console.log(filteredItems)
         const currentItems = type === 'sale' || type === 'favourites' ? filteredItems : userItems;
         // console.log('currentItems: ', currentItems)
-    
+        const currentLiveItems = currentItems.filter(x=>x.live==='y')
         // Calculate the next set of items based on the last item index
-        const nextItems = currentItems.slice(lastItemIndex, lastItemIndex + ITEMS_PER_PAGE);
+        console.log('CURRNET LIVE ITEMS',currentLiveItems)
+        const nextItems = currentLiveItems.slice(lastItemIndex, lastItemIndex + ITEMS_PER_PAGE);
         // console.log(lastItemIndex)
         // console.log(lastItemIndex + ITEMS_PER_PAGE)
         // console.log(currentItems.slice(lastItemIndex, 5))
         // console.log('nextItems: ', nextItems)
-        if(currentItems.length===0){
+        if(currentLiveItems.length===0){
             console.log('its 0')
             setLastItemIndex(lastItemIndex);
         }
@@ -412,10 +413,10 @@ export default function ItemsPage(props) {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return;
+            if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 10) return;
             loadMoreItems(); // Load more items when the user scrolls to the bottom
         };
-    
+
         // Add the event listener
         window.addEventListener('scroll', handleScroll);
     
@@ -424,10 +425,11 @@ export default function ItemsPage(props) {
     }, [lastItemIndex]); // Dependency on lastItemIndex ensures the effect runs again when items are added
     
 
-    useEffect(() => {
-        // Temporary check to see if manually setting visibleItems works
-        setVisibleItems(allItems.slice(0, ITEMS_PER_PAGE));
-    }, [allItems]);
+    // useEffect(() => {
+    //     console.log('SETTING IT FROM HERE')
+    //     // Temporary check to see if manually setting visibleItems works
+    //     setVisibleItems(allItems.filter(x=>x.live==='y').slice(0, ITEMS_PER_PAGE));
+    // }, [allItems]);
 
     // const calculateListHeight = () => {
     //     if (type === 'sale') {
