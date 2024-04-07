@@ -44,7 +44,7 @@ export default function Header(props) {
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
     const [number, setNumber] = useState(0)
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
-
+    const [showFcmTokenWarning, setShowFcmTokenWarning] = useState(false);
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
 
@@ -142,7 +142,6 @@ export default function Header(props) {
         });
     }
     
-    // Function to check FCM token
     function checkFcmToken() {
         fetch(`${backend}/api/user/hasFcmToken`, {
             method: 'GET',
@@ -151,19 +150,16 @@ export default function Header(props) {
         .then(response => response.json())
         .then(data => {
             if (!data.hasFcmToken) {
-                toast.warn("Seems like you don't have notifications enabled. Press on your avatar and click on 'Enable Notifications' to turn them on.", {
-                    position: "top-center",
-                    autoClose: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    theme: "colored",
-                });
-                console.log("No token")
+                // If the user does not have an FCM token, show a warning Snackbar
+                setShowFcmTokenWarning(true);
             }
         })
-        .catch(error => console.error("Error checking FCM token:", error));
+        .catch(error => {
+            console.error("Error checking FCM token:", error);
+            // You might want to handle this error differently or just log it
+        });
     }
+    
     
 
     const updateContactNumber = () => {
@@ -1033,6 +1029,22 @@ export default function Header(props) {
                 theme="colored"
                 transition="Flip"
             /> */}
+
+<Snackbar
+    open={showFcmTokenWarning}
+    autoHideDuration={6000}
+    onClose={() => setShowFcmTokenWarning(false)}
+    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+>
+    <Alert
+        onClose={() => setShowFcmTokenWarning(false)}
+        severity="warning"
+        sx={{ width: '100%' }}
+    >
+        Seems like you don't have notifications enabled. Press on your avatar and click on 'Enable Notifications' to turn them on.
+    </Alert>
+</Snackbar>
+
 
             <Snackbar
                 anchorOrigin={{
