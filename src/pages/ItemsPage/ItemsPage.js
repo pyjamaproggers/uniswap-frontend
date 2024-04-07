@@ -174,7 +174,7 @@ export default function ItemsPage(props) {
     function filterItems(type) {
         setBackdropLoaderOpen(true)
         window.setTimeout(() => {
-            let result = type === 'sale' ? allItems : userItems;
+            let result = type === 'sale' || type === 'favourites' ? allItems : userItems;
 
             // Filter by price
             if (filtersApplied.price.length > 0) {
@@ -216,7 +216,7 @@ export default function ItemsPage(props) {
     }
 
     useEffect(() => {
-        if (type === 'sale') {
+        if (type === 'sale' || type === 'favourites') {
             filterItems(type);
         }
         else {
@@ -233,11 +233,18 @@ export default function ItemsPage(props) {
     const loadMoreItems = () => {
         // Determine the items to show based on the filters applied and type
         const currentItems = type === 'sale' || type === 'favourites' ? filteredItems : userItems;
-        const currentLiveItems = currentItems.filter(x => x.live === 'y');
+        let currentLiveItems = []
+        if(type === 'sale' || type === 'favourites'){
+            currentLiveItems = currentItems.filter(x => x.live === 'y');
+        }
+        else{
+            currentLiveItems = currentItems
+        }
         let nextItems = [];
     
         if (type === 'favourites') {
             // Filter to get only favourite items that are live
+            console.log('fv items: ', favouriteItems)
             let favouriteLiveItems = currentLiveItems.filter(liveItem => favouriteItems.includes(liveItem._id));
             
             // Filter out items that are already visible to avoid duplicates
@@ -283,6 +290,7 @@ export default function ItemsPage(props) {
     
             setAllItems(items);
             setFilteredItems(items); // Assuming you want to initially display all items regardless of type
+            loadMoreItems()
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);
         } finally {

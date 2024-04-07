@@ -26,6 +26,8 @@ export default function HomePage(props) {
 
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent); // Simple mobile detection
 
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches
+
     // Ref for scrolling to the PWA tutorial section
     const pwaTutorialRef = React.createRef();
 
@@ -135,18 +137,18 @@ export default function HomePage(props) {
                     </Col>
                 </div>
             </Grid.Container>
-            {isMobile && (
+            {isMobile && !isPWA && (
                 <div className="add-to-home-screen-tutorial" ref={pwaTutorialRef}>
                     <Text css={{ textAlign: 'center', color: '$white', padding: '20px', fontWeight: '$semibold' }}>
                         How do I "Add to Home Screen"?
                     </Text>
                     <div>
                         <img src={pwaStep1} alt="Step 1" style={{ width: '100%', padding: '10px' }} />
-                        <Text css={{ textAlign: 'center', color: '$white', fontWeight: '$medium', padding: '0px 20px 20px 20px' }}>Tap the 'Share' icon at the bottom of the screen, or the top right if you're using an iPad:</Text>
+                        <Text css={{ textAlign: 'center', color: '$white', fontWeight: '$medium', padding: '0px 20px 20px 20px' }}>Tap the 'Share' icon at the bottom of the screen, or the top right if you're using an iPad (top right 3 dots if adnroid):</Text>
                     </div>
                     <div>
                         <img src={pwaStep2} alt="Step 2" style={{ width: '100%', padding: '10px' }} />
-                        <Text css={{ textAlign: 'center', color: '$white', fontWeight: '$medium', padding: '0px 20px 20px 20px' }}>Scroll down and select 'Add to Home Screen':</Text>
+                        <Text css={{ textAlign: 'center', color: '$white', fontWeight: '$medium', padding: '0px 20px 20px 20px' }}>Scroll down and select 'Add to Home Screen' on ios or 'Install app' on android:</Text>
                     </div>
                     <div>
                         <img src={pwaStep3} alt="Step 3" style={{ width: '100%', padding: '10px' }} />

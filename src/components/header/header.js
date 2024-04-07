@@ -116,6 +116,7 @@ export default function Header(props) {
                         localStorage.setItem('userName', data.user.userName);
                         localStorage.setItem('userPicture', data.user.userPicture);
                         localStorage.setItem('contactNumber', data.user.contactNumber)
+                        localStorage.setItem('favouriteItems', JSON.stringify(data.user.favouriteItems))
 
                         setBackdropLoaderOpen(false);
                         requestNotificationPermission();
@@ -910,7 +911,7 @@ export default function Header(props) {
                                         <IconComponent
                                             key={navItem.path}
                                             size={28}
-                                            color={isSelected ? '#F31260' : '#3A3F42'}
+                                            color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
                                             onClick={() => window.location.pathname = navItem.path}
                                         />
                                     );
