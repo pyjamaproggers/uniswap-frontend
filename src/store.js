@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
-import saleItemsReducer from './features/saleItemsSlice';
-import favouriteItemsReducer from './features/favouriteItemsSlice';
-import userItemsReducer from './features/userItemsSlice';
+import saleItemsReducer from './slices/saleItemsSlice';
+import favouriteItemsReducer from './slices/favouriteItemsSlice';
+import userItemsReducer from './slices/userItemsSlice';
 
 export const store = configureStore({
   reducer: {
