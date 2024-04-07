@@ -99,7 +99,7 @@ export default function Header(props) {
         setBackdropLoaderOpen(true);
         var googleUserObject_ = jwt_decode(response.credential);
         setGoogleUserObject(response.credential); // This should be the actual token, not decoded object
-
+    
         // Call backend to verify token and check user's contact number status
         fetch(`${backend}/api/auth/google`, {
             method: 'POST',
@@ -107,69 +107,64 @@ export default function Header(props) {
             body: JSON.stringify({ token: response.credential }),
             credentials: 'include',
         })
-            .then(res => res.json())
-            .then(data => {
-
-                if (data.user && data.user.contactNumber) {
-                    if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
-                        localStorage.setItem('userEmail', data.user.userEmail);
-                        localStorage.setItem('userName', data.user.userName);
-                        localStorage.setItem('userPicture', data.user.userPicture);
-                        localStorage.setItem('contactNumber', data.user.contactNumber)
-                        localStorage.setItem('favouriteItems', JSON.stringify(data.user.favouriteItems))
-
-                        setBackdropLoaderOpen(false);
-                        requestNotificationPermission();
-                        setAppRender(true)
-                    }
-                    else {
-                        setShowAshokaOnlyModal(true)
-                        setBackdropLoaderOpen(false);
-
-                    }
-
+        .then(res => res.json())
+        .then(data => {
+            if (data.user && data.user.contactNumber) {
+                if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
+                    localStorage.setItem('userEmail', data.user.userEmail);
+                    localStorage.setItem('userName', data.user.userName);
+                    localStorage.setItem('userPicture', data.user.userPicture);
+                    localStorage.setItem('contactNumber', data.user.contactNumber)
+                    localStorage.setItem('favouriteItems', JSON.stringify(data.user.favouriteItems))
+    
+                    setBackdropLoaderOpen(false);
+                    setAppRender(true);
+    
+                    checkFcmToken();
                 } else {
-                    if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
-                        setBackdropLoaderOpen(false);
-                        console.log("User does not have a contact number, showing modal.",);
-                        setShowNumberModal(true);
-                    }
-                    else {
-                        setShowAshokaOnlyModal(true)
-                        setBackdropLoaderOpen(false);
-                    }
+                    setShowAshokaOnlyModal(true);
+                    setBackdropLoaderOpen(false);
                 }
-            })
-            .then(data => {
-                if (!data.hasFcmToken) {
-                    toast.warn("Seems like you don't have notifications enabled. Press on your avatar and click on 'Enable Notifications' to turn them on.", {
-                        position: "top-center",
-                        autoClose: false, 
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        theme: "colored",
-                    });
+            } else {
+                if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
+                    setBackdropLoaderOpen(false);
+                    console.log("User does not have a contact number, showing modal.");
+                    setShowNumberModal(true);
+                } else {
+                    setShowAshokaOnlyModal(true);
+                    setBackdropLoaderOpen(false);
                 }
-            })
-            
-            .catch(error => {
-                console.error('Error:', error);
-                setShowErrorSnackbar(true)
-                // toast.error(`${error}`, {
-                //     position: "top-center",
-                //     autoClose: 2000,
-                //     hideProgressBar: false,
-                //     closeOnClick: true,
-                //     pauseOnHover: true,
-                //     draggable: true,
-                //     progress: undefined,
-                //     theme: "colored",
-                //     transition: 'Flip',
-                // });
-
-            });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            setShowErrorSnackbar(true);
+        });
     }
+    
+    // Function to check FCM token
+    function checkFcmToken() {
+        fetch(`${backend}/api/user/hasFcmToken`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.hasFcmToken) {
+                toast.warn("Seems like you don't have notifications enabled. Press on your avatar and click on 'Enable Notifications' to turn them on.", {
+                    position: "top-center",
+                    autoClose: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "colored",
+                });
+                console.log("No token")
+            }
+        })
+        .catch(error => console.error("Error checking FCM token:", error));
+    }
+    
 
     const updateContactNumber = () => {
         const updatedPhoneNumber = number;
