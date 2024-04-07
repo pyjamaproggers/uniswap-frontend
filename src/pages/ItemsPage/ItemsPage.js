@@ -1,32 +1,19 @@
 import React, { useEffect, useState } from "react";
-import ReactDOMServer from 'react-dom/server';
 import { useNavigate } from 'react-router-dom';
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
-import { Button, Col, Grid, Input, Text, Row, Badge } from "@nextui-org/react";
-import { IoFilter } from "react-icons/io5";
+import { Col, Grid, Input, Text, Row, Badge } from "@nextui-org/react";
 import ItemCard from "../../components/items/itemCard";
 import Skeleton from '@mui/material/Skeleton';
 import { IoSearchSharp } from "react-icons/io5";
-import Drawer from '@mui/material/Drawer';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
-import Chip from '@mui/material/Chip';
 import './ItemsPage.css'
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useLocation } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { ImSpinner9 } from "react-icons/im";
-import { faSpinner, faV } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
-// import PullToRefresh from 'pulltorefreshjs';
 import PullToRefresh from 'react-simple-pull-to-refresh';
-import { FixedSizeList as List } from 'react-window';
-
 
 export default function ItemsPage(props) {
 
@@ -225,10 +212,6 @@ export default function ItemsPage(props) {
         setLastItemIndex(0)
         setVisibleItems([])
     }, [filtersApplied]);
-
-    // useEffect(()=>{
-    //     // run to refresh items
-    // }, [type])
 
     const loadMoreItems = () => {
         // Determine the items to show based on the filters applied and type

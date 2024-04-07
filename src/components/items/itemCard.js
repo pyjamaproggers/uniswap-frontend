@@ -46,9 +46,7 @@ export default function ItemCard(props) {
     let handleFavouriteItemToggle = props.handleFavouriteItemToggle
     let handleLiveToggle = props.handleLiveToggle
     let onItemDeleted = props.onItemDeleted
-    let shareItemViaWhatsApp = props.shareItemViaWhatsApp
-    // console.log(item.id, favouriteItems, favouriteItems.includes(item.id))
-    // console.log(props)
+    // let shareItemViaWhatsApp = props.shareItemViaWhatsApp
 
     const handleFavouriteButtonClick = async (favouriteItems, item) => {
         const itemIDToUpdate = item._id;
@@ -67,7 +65,7 @@ export default function ItemCard(props) {
             const data = await response.json();
             // Handle the response. For example, refresh the local favorites state
             if (response.ok) {
-                console.log('updating favs itemcard')
+                // console.log('updating favs itemcard')
                 handleFavouriteItemToggle(favouriteItems, itemIDToUpdate);
             } else {
                 // Handle failure (e.g., item not found, user not authenticated)
@@ -77,7 +75,6 @@ export default function ItemCard(props) {
             console.error('Failed to update favorite items:', error);
         }
     }
-
 
     const toggleLiveStatus = async (itemId, currentStatus) => {
         setBackdropLoaderOpen(true);
@@ -115,14 +112,6 @@ export default function ItemCard(props) {
             setBackdropLoaderOpen(false);
         }
     };
-
-
-    // const handleLiveStatusClick = () => {
-    //     if (window.confirm(`Are you sure you want to set this item as ${item.live === "y" ? "inactive" : "active"}?`)) {
-    //         toggleLiveStatus(item._id);
-    //     }
-    // };
-
 
     function getTimeDifference(dateString) {
         const itemDate = new Date(dateString);
@@ -431,13 +420,6 @@ export default function ItemCard(props) {
                                             }} />
                                     </Button>
                                 }
-                                <Button auto flat color={'primary'} className="collapse-buttons">
-                                    <IoPaperPlane size={'20px'} color={"#0072F5"} onClick={() => {
-                                        // share link to WA function
-                                        shareItemViaWhatsApp(item._id)
-                                    }} className="item-icon"
-                                    />
-                                </Button>
                             </Row>
                         }
                     </Row>

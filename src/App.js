@@ -16,6 +16,8 @@ import ErrorAuthPage from './pages/ErrorAuthPage/ErrorAuthPage';
 import { useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga4'
 import { store } from './store';
+import SaleItemsPage from './pages/saleItemsPage/saleItemsPage';
+
 
 function App() {
 
@@ -98,7 +100,8 @@ function App() {
                             <Header setAppRender={setAppRender}/>
                             <Routes>
                                 <Route exact path='/' element={<HomePage appRender={appRender}/>} />
-                                <Route exact path='/saleitems' element={<Itemspage type={'sale'} />} />
+                                {/* <Route exact path='/saleitems' element={<Itemspage type={'sale'} />} /> */}
+                                <Route exact path='/saleitems' element={<SaleItemsPage/>} />
                                 <Route exact path='/useritems' element={<Itemspage type={'user'} />} />
                                 <Route exact path='/favourites' element={<Itemspage type={'favourites'} />} />
                                 <Route exact path='/createsale' element={<CreateSalePage />} />
