@@ -1,6 +1,9 @@
 import { Button, Col, Grid, Row, Text } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import HomeBG from '../../assets/HomeImage.jpg'
+import pwaStep1 from '../../assets/pwa1.jpg';
+import pwaStep2 from '../../assets/pwa2.jpg';
+import pwaStep3 from '../../assets/pwa3.jpg';
 import './homePage.css'
 import BottomNavigation from '@mui/material/BottomNavigation';
 import { FaPlus, FaShoppingBag } from "react-icons/fa";
@@ -15,6 +18,17 @@ export default function HomePage(props) {
 
     const appRender = props.appRender
 
+    const [showPwaBanner, setShowPwaBanner] = useState(true); // State to show/hide the PWA banner
+
+    const scrollToPwaTutorial = () => {
+        pwaTutorialRef.current.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent); // Simple mobile detection
+
+    // Ref for scrolling to the PWA tutorial section
+    const pwaTutorialRef = React.createRef();
+
     console.log('home: ', localStorage.getItem('userEmail'))
 
     useEffect(() => {
@@ -22,6 +36,23 @@ export default function HomePage(props) {
     }, [isSignedIn, appRender])
 
     return (
+        <>
+         {isMobile && showPwaBanner && (
+                <Grid.Container css={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    padding: '10px',
+                    position: 'fixed',
+                    top: 0,
+                    zIndex: 1000,
+                    width: '100%',
+                }}>
+                    <Col>
+                        <Text css={{ color: '$white' }}>
+                            You can now get UniSwap as an app. <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={scrollToPwaTutorial}>Find out how</span> or <span style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => setShowPwaBanner(false)}>hide this message</span>
+                        </Text>
+                    </Col>
+                </Grid.Container>
+            )}
         <Grid.Container className="homebg" css={{
             jc: 'center',
             alignItems: '',
@@ -104,5 +135,28 @@ export default function HomePage(props) {
                 </Col>
             </div>
         </Grid.Container>
+        {isMobile && ( 
+                <div className="add-to-home-screen-tutorial" ref={pwaTutorialRef}>
+                    <Text css={{ textAlign: 'center', color: '$white', padding: '20px' }}>
+                        <strong>How to Add to Home Screen</strong>
+                    </Text>
+                    <div>
+                        <img src={pwaStep1} alt="Step 1" style={{ width: '100%', padding: '10px' }} />
+                        <Text css={{ textAlign: 'center', color: '$white' }}>Tap the 'Share' icon at the bottom of the screen, or the top right if you're using an iPad:</Text>
+                    </div>
+                    <div>
+                        <img src={pwaStep2} alt="Step 2" style={{ width: '100%', padding: '10px' }} />
+                        <Text css={{ textAlign: 'center', color: '$white' }}>Scroll down and select 'Add to Home Screen':</Text>
+                    </div>
+                    <div>
+                        <img src={pwaStep3} alt="Step 3" style={{ width: '100%', padding: '10px' }} />
+                        <Text css={{ textAlign: 'center', color: '$white' }}>Tap 'Add' on the top right.</Text>
+                    </div>
+                    <div>
+                        <Text css={{ textAlign: 'center', color: '$white' }}>Done! You can now enjoy UniSwap from your home screen.</Text>
+                    </div>
+                </div>
+            )}
+    </>
     )
 }
