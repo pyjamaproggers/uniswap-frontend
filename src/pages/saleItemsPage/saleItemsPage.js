@@ -26,6 +26,7 @@ export default function SaleItemsPage() {
     const dispatch = useDispatch();
     const saleItems = useSelector(state => state.saleItems);
     const favouriteItems = useSelector(state => state.favouriteItems);
+    const [localFavouriteItems, setLocalFavouriteItems] = useState(favouriteItems)
     const [filteredItems, setFilteredItems] = useState(saleItems);
     const [filtersApplied, setFiltersApplied] = useState({
         price: [],
@@ -91,7 +92,7 @@ export default function SaleItemsPage() {
 
     useEffect(() => {
         filterItems()
-    }, [filtersApplied, favouriteItems]);
+    }, [filtersApplied, favouriteItems, localFavouriteItems]);
 
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
@@ -194,7 +195,7 @@ export default function SaleItemsPage() {
         }
     };
 
-    const handleFavouriteItemToggle = (itemIDToUpdate) => {
+    const handleFavouriteItemToggle = (favouriteItemsFromCard, itemIDToUpdate) => {
         const isCurrentlyFavourite = favouriteItems.includes(itemIDToUpdate);
         let updatedFavouriteItems = [];
     
@@ -208,6 +209,8 @@ export default function SaleItemsPage() {
     
         // Update local storage
         localStorage.setItem('favouriteItems', JSON.stringify(updatedFavouriteItems));
+        console.log('Local Fav items in function: ',localFavouriteItems)
+        setLocalFavouriteItems(updatedFavouriteItems)
     
         setRender(prev => !prev); // Trigger re-render if necessary
     };
@@ -221,7 +224,7 @@ export default function SaleItemsPage() {
             aria-label='pulltorefresh'
         >
             <Grid.Container>
-                {/* {console.log('FavouriteItems: ', favouriteItems)} */}
+                {console.log('localFavouriteItems: ', localFavouriteItems)}
                 <Grid.Container css={{
                     padding: '4px 4px',
                     jc: 'center'
