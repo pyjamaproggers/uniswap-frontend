@@ -195,7 +195,7 @@ export default function FavouritesItemsPage() {
         }
     };
 
-    const handleFavouriteItemToggle = (itemIDToUpdate) => {
+    const handleFavouriteItemToggle = (favouriteItemsFromCard, itemIDToUpdate) => {
         const isCurrentlyFavourite = favouriteItems.includes(itemIDToUpdate);
         let updatedFavouriteItems = [];
     
