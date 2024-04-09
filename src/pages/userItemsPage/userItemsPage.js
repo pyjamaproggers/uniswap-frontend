@@ -35,6 +35,29 @@ export default function UserItemsPage() {
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
     const [fetchingAllItems, setFetchingAllItems] = useState(true)
     const [render, setRender] = useState(false)
+    const ITEMS_PER_PAGE = 10;
+    const [lastItemIndex, setLastItemIndex] = useState(0);
+    const [visibleItems, setVisibleItems] = useState([]);
+
+    const loadMoreItems = () => {
+
+        const nextItems = filteredItems.slice(lastItemIndex, lastItemIndex + ITEMS_PER_PAGE);
+
+        setVisibleItems(prevItems => [...prevItems, ...nextItems]);
+        setLastItemIndex(lastItemIndex + ITEMS_PER_PAGE);
+    };
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 20) return;
+            loadMoreItems(); // Load more items when the user scrolls to the bottom
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastItemIndex, filteredItems]);
+
 
     const [priceFilters, setPriceFilters] = useState([
         { key: '1', value: '₹0-₹100', chosen: false },
@@ -116,6 +139,7 @@ export default function UserItemsPage() {
 
     function filterItems() {
         // setBackdropLoaderOpen(true)
+        console.log("filtering")
         let result = userItems;
 
         const getPriceRange = (rangeStr) => {
@@ -164,10 +188,11 @@ export default function UserItemsPage() {
         result.forEach(item => {
             final.push(item)
         })
-
-        setFilteredItems(final);
-        // setBackdropLoaderOpen(false)
+        setFilteredItems(result); 
+        setVisibleItems(result.slice(0, ITEMS_PER_PAGE)); 
+        setLastItemIndex(ITEMS_PER_PAGE); 
     }
+
 
     const fetchAllItems = async (userEmail) => {
         setFetchingAllItems(true);
@@ -395,7 +420,7 @@ export default function UserItemsPage() {
                     {!fetchingAllItems && !backdropLoaderOpen && filteredItems &&
                         <>
                             {
-                                filteredItems.map((item, index) => (
+                                visibleItems.map((item, index) => (
                                     <div key={item._id} id={item._id}>
                                         <ItemCard
                                             item={item}
