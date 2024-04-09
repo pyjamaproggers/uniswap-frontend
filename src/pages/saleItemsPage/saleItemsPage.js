@@ -123,6 +123,7 @@ export default function SaleItemsPage() {
 
     function filterItems() {
         // setBackdropLoaderOpen(true)
+        console.log("filtering")
         let result = saleItems;
 
         const getPriceRange = (rangeStr) => {
@@ -171,9 +172,10 @@ export default function SaleItemsPage() {
         result.forEach(item => {
             final.push(item)
         })
-
-        setFilteredItems(final);
-        // setBackdropLoaderOpen(false)
+        console.log(filteredItems)
+        setFilteredItems(final)
+        setVisibleItems(final);
+        console.log(final)
     }
 
     const fetchAllItems = async () => {
