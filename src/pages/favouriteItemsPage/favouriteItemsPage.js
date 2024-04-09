@@ -122,7 +122,7 @@ export default function FavouritesItemsPage() {
     };
 
     function filterItems() {
-        console.log("filtering")
+        // console.log("filtering")
         let result = saleItems.filter(item => favouriteItems.includes(item._id));
 
         const getPriceRange = (rangeStr) => {

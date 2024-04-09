@@ -31,7 +31,7 @@ export default function HomePage(props) {
     // Ref for scrolling to the PWA tutorial section
     const pwaTutorialRef = React.createRef();
 
-    console.log('home: ', localStorage.getItem('userEmail'))
+    // console.log('home: ', localStorage.getItem('userEmail'))
 
     useEffect(() => {
         localStorage.getItem('userEmail') !== null ? setIsSignedIn(true) : setIsSignedIn(false)

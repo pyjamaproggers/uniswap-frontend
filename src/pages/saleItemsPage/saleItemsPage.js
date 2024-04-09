@@ -123,7 +123,7 @@ export default function SaleItemsPage() {
 
     function filterItems() {
         // setBackdropLoaderOpen(true)
-        console.log("filtering")
+        // console.log("filtering")
         let result = saleItems;
 
         const getPriceRange = (rangeStr) => {
