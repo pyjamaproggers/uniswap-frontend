@@ -172,10 +172,9 @@ export default function SaleItemsPage() {
         result.forEach(item => {
             final.push(item)
         })
-        console.log(filteredItems)
-        setFilteredItems(final)
-        setVisibleItems(final);
-        console.log(final)
+        setFilteredItems(result); 
+        setVisibleItems(result.slice(0, ITEMS_PER_PAGE)); 
+        setLastItemIndex(ITEMS_PER_PAGE); 
     }
 
     const fetchAllItems = async () => {
