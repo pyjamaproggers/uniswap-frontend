@@ -32,6 +32,10 @@ export default function FavouritesItemsPage() {
         category: [],
         searched: ''
     });
+
+    const ITEMS_PER_PAGE = 10;
+    const [lastItemIndex, setLastItemIndex] = useState(0);
+    const [visibleItems, setVisibleItems] = useState([]);
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
@@ -118,7 +122,7 @@ export default function FavouritesItemsPage() {
     };
 
     function filterItems() {
-        // setBackdropLoaderOpen(true)
+        console.log("filtering")
         let result = saleItems.filter(item => favouriteItems.includes(item._id));
 
         const getPriceRange = (rangeStr) => {
@@ -167,10 +171,11 @@ export default function FavouritesItemsPage() {
         result.forEach(item => {
             final.push(item)
         })
-
-        setFilteredItems(final);
-        // setBackdropLoaderOpen(false)
+        setFilteredItems(result); 
+        setVisibleItems(result.slice(0, ITEMS_PER_PAGE)); 
+        setLastItemIndex(ITEMS_PER_PAGE); 
     }
+
 
     const fetchAllItems = async () => {
         setFetchingAllItems(true);
@@ -212,6 +217,25 @@ export default function FavouritesItemsPage() {
     
         setRender(prev => !prev); // Trigger re-render if necessary
     };
+
+    const loadMoreItems = () => {
+
+        const nextItems = filteredItems.slice(lastItemIndex, lastItemIndex + ITEMS_PER_PAGE);
+
+        setVisibleItems(prevItems => [...prevItems, ...nextItems]);
+        setLastItemIndex(lastItemIndex + ITEMS_PER_PAGE);
+    };
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 20) return;
+            loadMoreItems(); // Load more items when the user scrolls to the bottom
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastItemIndex, filteredItems]);
     
 
     return (
@@ -394,7 +418,7 @@ export default function FavouritesItemsPage() {
                     {!fetchingAllItems && !backdropLoaderOpen && filteredItems &&
                         <>
                             {
-                                filteredItems.map((item, index) => (
+                                visibleItems.map((item, index) => (
                                     <div key={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
                                     id={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
                                     >
