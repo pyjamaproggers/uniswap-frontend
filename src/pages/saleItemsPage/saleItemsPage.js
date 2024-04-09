@@ -26,7 +26,6 @@ export default function SaleItemsPage() {
     const dispatch = useDispatch();
     const saleItems = useSelector(state => state.saleItems);
     const favouriteItems = useSelector(state => state.favouriteItems);
-    const [localFavouriteItems, setLocalFavouriteItems] = useState(favouriteItems)
     const [filteredItems, setFilteredItems] = useState(saleItems);
     const [filtersApplied, setFiltersApplied] = useState({
         price: [],
@@ -38,6 +37,10 @@ export default function SaleItemsPage() {
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
     const [fetchingAllItems, setFetchingAllItems] = useState(true)
     const [render, setRender] = useState(false)
+    const ITEMS_PER_PAGE = 10;
+    const [lastItemIndex, setLastItemIndex] = useState(0);
+    const [visibleItems, setVisibleItems] = useState([]);
+
 
     const [priceFilters, setPriceFilters] = useState([
         { key: '1', value: '₹0-₹100', chosen: false },
@@ -92,7 +95,7 @@ export default function SaleItemsPage() {
 
     useEffect(() => {
         filterItems()
-    }, [filtersApplied, favouriteItems, localFavouriteItems]);
+    }, [filtersApplied, favouriteItems]);
 
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
@@ -185,9 +188,11 @@ export default function SaleItemsPage() {
             let items = await response.json();
 
             items.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-
+            
             dispatch(setSaleItems(items));
             setFilteredItems(items);
+            setVisibleItems(items.slice(0,ITEMS_PER_PAGE))
+            setLastItemIndex(ITEMS_PER_PAGE)
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);
         } finally {
@@ -198,23 +203,39 @@ export default function SaleItemsPage() {
     const handleFavouriteItemToggle = (favouriteItemsFromCard, itemIDToUpdate) => {
         const isCurrentlyFavourite = favouriteItems.includes(itemIDToUpdate);
         let updatedFavouriteItems = [];
-    
+
         if (isCurrentlyFavourite) {
             updatedFavouriteItems = favouriteItems.filter(itemID => itemID !== itemIDToUpdate);
-            dispatch(removeFavouriteItem({id: itemIDToUpdate})); // Dispatching the action to remove
+            dispatch(removeFavouriteItem({ id: itemIDToUpdate })); // Dispatching the action to remove
         } else {
             updatedFavouriteItems = [...favouriteItems, itemIDToUpdate];
-            dispatch(addFavouriteItem({id: itemIDToUpdate})); // Dispatching the action to add
+            dispatch(addFavouriteItem({ id: itemIDToUpdate })); // Dispatching the action to add
         }
-    
+
         // Update local storage
         localStorage.setItem('favouriteItems', JSON.stringify(updatedFavouriteItems));
-        console.log('Local Fav items in function: ',localFavouriteItems)
-        setLocalFavouriteItems(updatedFavouriteItems)
-    
+
         setRender(prev => !prev); // Trigger re-render if necessary
     };
-    
+
+    const loadMoreItems = () => {
+
+        const nextItems = filteredItems.slice(lastItemIndex, lastItemIndex + ITEMS_PER_PAGE);
+
+        setVisibleItems(prevItems => [...prevItems, ...nextItems]);
+        setLastItemIndex(lastItemIndex + ITEMS_PER_PAGE);
+    };
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 20) return;
+            loadMoreItems(); // Load more items when the user scrolls to the bottom
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastItemIndex, filteredItems]);
 
     return (
         <PullToRefresh onRefresh={fetchAllItems}
@@ -224,7 +245,6 @@ export default function SaleItemsPage() {
             aria-label='pulltorefresh'
         >
             <Grid.Container>
-                {console.log('localFavouriteItems: ', localFavouriteItems)}
                 <Grid.Container css={{
                     padding: '4px 4px',
                     jc: 'center'
@@ -396,9 +416,9 @@ export default function SaleItemsPage() {
                     {!fetchingAllItems && !backdropLoaderOpen && filteredItems &&
                         <>
                             {
-                                filteredItems.map((item, index) => (
+                                visibleItems.map((item, index) => (
                                     <div key={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
-                                    id={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
+                                        id={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
                                     >
                                         <ItemCard
                                             item={item}

@@ -227,8 +227,8 @@ export default function ItemCard(props) {
                         alignItems: 'center',
                         padding: '0px 8px 8px 8px',
                         jc: 'space-between',
-                        width: '95%',
-                        maxWidth: '360px'
+                        width: '100%',
+                        maxWidth: '390px'
                     }}>
                         <Row css={{
                             alignItems: 'center',
@@ -237,7 +237,8 @@ export default function ItemCard(props) {
                             <Avatar
                                 color=""
                                 size="md"
-                                src={item.userPicture}
+                                // src={item.userPicture}
+                                src={`https://api.multiavatar.com/${item.userName}.png?apikey=Bvjs0QyHcCxZNe`}
                                 className="avatar"
                             />
                             <Text css={{
@@ -268,9 +269,9 @@ export default function ItemCard(props) {
                     </Row>
                     <Image src={item.itemPicture}
                         css={{
-                            height: '360px',
-                            width: '90vw',
-                            maxWidth: '360px',
+                            height: '400px',
+                            width: '97.5vw',
+                            maxWidth: '400px',
                             // '@xsMax': {
                             //     width: '90vw'
                             // },
@@ -281,8 +282,8 @@ export default function ItemCard(props) {
                             borderRadius: '4px'
                         }} />
                     <Collapse css={{
-                        width: '95%',
-                        maxWidth: '360px',
+                        width: '100%',
+                        maxWidth: '390px',
                         borderStyle: 'solid',
                         borderColor: '$gray100',
                         borderWidth: '0px 0px 1px 0px'
@@ -343,8 +344,8 @@ export default function ItemCard(props) {
                         </Text>
                     </Collapse>
                     <Row css={{
-                        width: '95%',
-                        maxWidth: '360px',
+                        width: '100%',
+                        maxWidth: '390px',
                         jc: 'space-between',
                         marginTop: '4px',
                         alignItems: 'normal',

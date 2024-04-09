@@ -147,7 +147,8 @@ export default function InputItemCard(props) {
                         <Avatar
                             color=""
                             size="md"
-                            src={item.userPicture}
+                            // src={item.userPicture}
+                            src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
                             className="avatar"
                         />
                         <Text css={{

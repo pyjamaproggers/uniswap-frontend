@@ -99,7 +99,7 @@ export default function Header(props) {
         setBackdropLoaderOpen(true);
         var googleUserObject_ = jwt_decode(response.credential);
         setGoogleUserObject(response.credential); // This should be the actual token, not decoded object
-    
+
         // Call backend to verify token and check user's contact number status
         fetch(`${backend}/api/auth/google`, {
             method: 'POST',
@@ -107,60 +107,60 @@ export default function Header(props) {
             body: JSON.stringify({ token: response.credential }),
             credentials: 'include',
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.user && data.user.contactNumber) {
-                if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
-                    localStorage.setItem('userEmail', data.user.userEmail);
-                    localStorage.setItem('userName', data.user.userName);
-                    localStorage.setItem('userPicture', data.user.userPicture);
-                    localStorage.setItem('contactNumber', data.user.contactNumber)
-                    localStorage.setItem('favouriteItems', JSON.stringify(data.user.favouriteItems))
-    
-                    setBackdropLoaderOpen(false);
-                    setAppRender(true);
-    
-                    checkFcmToken();
+            .then(res => res.json())
+            .then(data => {
+                if (data.user && data.user.contactNumber) {
+                    if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
+                        localStorage.setItem('userEmail', data.user.userEmail);
+                        localStorage.setItem('userName', data.user.userName);
+                        localStorage.setItem('userPicture', data.user.userPicture);
+                        localStorage.setItem('contactNumber', data.user.contactNumber)
+                        localStorage.setItem('favouriteItems', JSON.stringify(data.user.favouriteItems))
+
+                        setBackdropLoaderOpen(false);
+                        setAppRender(true);
+
+                        checkFcmToken();
+                    } else {
+                        setShowAshokaOnlyModal(true);
+                        setBackdropLoaderOpen(false);
+                    }
                 } else {
-                    setShowAshokaOnlyModal(true);
-                    setBackdropLoaderOpen(false);
+                    if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
+                        setBackdropLoaderOpen(false);
+                        console.log("User does not have a contact number, showing modal.");
+                        setShowNumberModal(true);
+                    } else {
+                        setShowAshokaOnlyModal(true);
+                        setBackdropLoaderOpen(false);
+                    }
                 }
-            } else {
-                if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
-                    setBackdropLoaderOpen(false);
-                    console.log("User does not have a contact number, showing modal.");
-                    setShowNumberModal(true);
-                } else {
-                    setShowAshokaOnlyModal(true);
-                    setBackdropLoaderOpen(false);
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            setShowErrorSnackbar(true);
-        });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setShowErrorSnackbar(true);
+            });
     }
-    
+
     function checkFcmToken() {
         fetch(`${backend}/api/user/hasFcmToken`, {
             method: 'GET',
             credentials: 'include',
         })
-        .then(response => response.json())
-        .then(data => {
-            if (!data.hasFcmToken) {
-                // If the user does not have an FCM token, show a warning Snackbar
-                setShowFcmTokenWarning(true);
-            }
-        })
-        .catch(error => {
-            console.error("Error checking FCM token:", error);
-            // You might want to handle this error differently or just log it
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (!data.hasFcmToken) {
+                    // If the user does not have an FCM token, show a warning Snackbar
+                    setShowFcmTokenWarning(true);
+                }
+            })
+            .catch(error => {
+                console.error("Error checking FCM token:", error);
+                // You might want to handle this error differently or just log it
+            });
     }
-    
-    
+
+
 
     const updateContactNumber = () => {
         const updatedPhoneNumber = number;
@@ -546,8 +546,8 @@ export default function Header(props) {
                                         as="button"
                                         color=""
                                         size="md"
-                                        // src={`https://api.multiavatar.com/${localStorage.getItem('userEmail')}.png?apikey=Bvjs0QyHcCxZNe`}
-                                        src={localStorage.getItem('userPicture')}
+                                        src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
+                                        // src={localStorage.getItem('userPicture')}
                                     />
                                 </Dropdown.Trigger>
                             </Navbar.Item>
@@ -917,7 +917,7 @@ export default function Header(props) {
                                             size={28}
                                             color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
                                             // onClick={() => window.location.pathname = navItem.path}
-                                            onClick={()=> navigate(navItem.path)}
+                                            onClick={() => navigate(navItem.path)}
                                         />
                                     );
                                 })}
@@ -927,8 +927,8 @@ export default function Header(props) {
                                             // as="button"
                                             color=""
                                             size="sm"
-                                            // src={`https://api.multiavatar.com/${localStorage.getItem('userEmail')}.png?apikey=Bvjs0QyHcCxZNe`}
-                                            src={localStorage.getItem('userPicture')}
+                                            src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
+                                            // src={localStorage.getItem('userPicture')}
                                         />
                                     </Dropdown.Trigger>
                                     <Dropdown.Menu
@@ -962,17 +962,6 @@ export default function Header(props) {
                                             <Text b color="inherit" css={{ d: "flex", fontSize: '$sm' }}>
                                                 {localStorage.getItem('contactNumber')}
                                             </Text>
-                                            {/* <Text b color="inherit" 
-                                    css={{ 
-                                        d: "flex", 
-                                        fontSize: '$sm',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis'
-                                    }}
-                                    >
-                                        {localStorage.getItem('userEmail')}
-                                    </Text> */}
                                         </Dropdown.Item>
                                         <Dropdown.Item key="createsale" withDivider color=""
                                             icon={<FaPlus size={16} />}>
@@ -1017,35 +1006,20 @@ export default function Header(props) {
                 <CircularProgress color="inherit" />
             </Backdrop>
 
-            {/* <ToastContainer
-                position="top-right"
-                autoClose={2000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="colored"
-                transition="Flip"
-            /> */}
-
-<Snackbar
-    open={showFcmTokenWarning}
-    autoHideDuration={6000}
-    onClose={() => setShowFcmTokenWarning(false)}
-    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
->
-    <Alert
-        onClose={() => setShowFcmTokenWarning(false)}
-        severity="warning"
-        sx={{ width: '100%' }}
-    >
-        Seems like you don't have notifications enabled. Press on your avatar and click on 'Enable Notifications' to turn them on.
-    </Alert>
-</Snackbar>
-
+            <Snackbar
+                open={showFcmTokenWarning}
+                autoHideDuration={6000}
+                onClose={() => setShowFcmTokenWarning(false)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() => setShowFcmTokenWarning(false)}
+                    severity="warning"
+                    sx={{ width: '100%' }}
+                >
+                    Seems like you don't have notifications enabled. Press on your avatar and click on 'Enable Notifications' to turn them on.
+                </Alert>
+            </Snackbar>
 
             <Snackbar
                 anchorOrigin={{
