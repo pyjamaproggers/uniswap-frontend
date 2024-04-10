@@ -963,7 +963,7 @@ export default function Header(props) {
                                     Next →
                                 </Button>
                             }
-                            {tutorialIndex >= 1 && tutorialIndex <= 3 &&
+                            {tutorialIndex >= 1 && tutorialIndex <= 2 &&
                                 <Row css={{
                                     width: 'max-content',
                                     jc: 'center',
@@ -984,7 +984,7 @@ export default function Header(props) {
                                     </Button>
                                 </Row>
                             }
-                            {tutorialIndex === 4 &&
+                            {tutorialIndex === 3 &&
                                 <Button auto light color={'error'}
                                     onClick={() => {
                                         requestNotificationPermission()
