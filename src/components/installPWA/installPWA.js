@@ -61,14 +61,14 @@ export default function InstallPWA({ isIOS, isAndroid }) {
                     '@xsMin': {
                         fontSize: '$lg'
                     },
-                    padding: '8px 32px'
+                    padding: '16px 32px'
                 }}>
                     To receive push notifications and enjoy a better experience install UniSwap on your Home screen.
                 </Text>
                 <Row css={{
                     alignItems: 'center',
                     width: 'max-content',
-                    padding: '4px 0px 8px'
+                    padding: '12px 0px 12px'
                 }}>
                     <Text css={{
                         fontWeight: '$medium',
@@ -134,7 +134,7 @@ export default function InstallPWA({ isIOS, isAndroid }) {
                     '@xsMin': {
                         fontSize: '$lg'
                     },
-                    padding: '0px 32px',
+                    padding: '8px 32px',
                 }}>
                     Surf, save, buy, sell. <span style={{ color: '#9750DD' }}> Go crazy!</span>
                 </Text>
