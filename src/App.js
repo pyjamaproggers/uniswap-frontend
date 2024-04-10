@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+import logo from './assets/UniSwap2.PNG';
 import './App.css';
 import Header from './components/header/header';
 import Footer from './components/footer/footer';
@@ -19,38 +19,41 @@ import { store } from './store';
 import SaleItemsPage from './pages/saleItemsPage/saleItemsPage';
 import UserItemsPage from './pages/userItemsPage/userItemsPage';
 import FavouritesItemsPage from './pages/favouriteItemsPage/favouriteItemsPage';
+import InstallPWA from './components/installPWA/installPWA';
 
 function App() {
 
-    // const [isLightMode, setIsLightMode] = useState(getPrefersColorScheme() ? 'light' : 'dark');
+    const [isLightMode, setIsLightMode] = useState(getPrefersColorScheme());
 
-    // function getPrefersColorScheme() {
-    //     return window.matchMedia('(prefers-color-scheme: light)').matches;
-    // }
+    function getPrefersColorScheme() {
+        return window.matchMedia('(prefers-color-scheme: light)').matches;
+    }
 
-    // useEffect(() => {
-    //     const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-    //     const handleChange = () => setIsLightMode(mediaQuery.matches ? 'light' : 'dark');
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+        console.log(mediaQuery.matches)
+        const handleChange = () => setIsLightMode(mediaQuery.matches);
 
-    //     mediaQuery.addEventListener('change', handleChange);
+        mediaQuery.addEventListener('change', handleChange);
 
-    //     // Cleanup
-    //     return () => mediaQuery.removeEventListener('change', handleChange);
-    // }, []);
+        // Cleanup
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
 
+    console.log('isLightMode: ',isLightMode)
 
-    // const theme = createTheme({
-    //     type: isLightMode ? 'light' : 'dark', // Adjusted this line
-    //     theme: {
-    //         colors: {
-    //             // Assuming these color configurations are correct; adjust as necessary.
-    //             white: isLightMode ? '#fff' : '#f0f0f0',
-    //             black: isLightMode ? '#000' : '#0c0c0c',
-    //             background: isLightMode ? '#fff' : '#0c0c0c',
-    //             text: isLightMode ? '#000' : '#f0f0f0'
-    //         }
-    //     }
-    // });
+    const theme = createTheme({
+        type: isLightMode ? 'light' : 'dark', // Adjusted this line
+        theme: {
+            colors: {
+                // Assuming these color configurations are correct; adjust as necessary.
+                white: isLightMode ? '#fff' : '#f0f0f0',
+                black: isLightMode ? '#000' : '#0c0c0c',
+                background: isLightMode ? '#fff' : '#0c0c0c',
+                text: isLightMode ? '#000' : '#f0f0f0'
+            }
+        }
+    });
 
     const [scriptLoaded, setScriptLoaded] = useState(false);
 
@@ -77,51 +80,64 @@ function App() {
         };
     }, []);
 
-    const theme = createTheme({
-        type: 'dark', // Adjusted this line
-        theme: {
-            colors: {
-                // Assuming these color configurations are correct; adjust as necessary.
-                white: '#f0f0f0',
-                black: '#0c0c0c',
-                background: '#0c0c0c',
-                text: '#f0f0f0'
-            }
-        }
-    });
+    // const theme = createTheme({
+    //     type: 'dark', // Adjusted this line
+    //     theme: {
+    //         colors: {
+    //             // Assuming these color configurations are correct; adjust as necessary.
+    //             white: '#f0f0f0',
+    //             black: '#0c0c0c',
+    //             background: '#0c0c0c',
+    //             text: '#f0f0f0'
+    //         }
+    //     }
+    // });
 
-
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isAndroid = /Android/i.test(navigator.userAgent);
 
     return (
+
         <>
-            {scriptLoaded ?
+            {isPWA ?
                 <>
-                    <NextUIProvider theme={theme}>
-                        <Router>
-                            <Header setAppRender={setAppRender}/>
-                            <Routes>
-                                <Route exact path='/' element={<HomePage appRender={appRender}/>} />
-                                {/* <Route exact path='/saleitems' element={<Itemspage type={'sale'} />} /> */}
-                                <Route exact path='/saleitems' element={<SaleItemsPage/>} />
-                                <Route exact path='/useritems' element={<UserItemsPage/>} />
-                                <Route exact path='/favourites' element={<FavouritesItemsPage/>} />
-                                <Route exact path='/createsale' element={<CreateSalePage />} />
-                                <Route exact path='/editsale' element={<EditSalePage />} />
-                                <Route exact path='/outlets' element={<OutletsPage />} />
-                                <Route exact path='/unauthorized' element={<ErrorAuthPage />} />
-                            </Routes>
-                        </Router>
-                        <Footer />
-                    </NextUIProvider>
+                    {scriptLoaded ?
+                        <>
+                            <NextUIProvider theme={theme}>
+                                <Router>
+                                    <Header setAppRender={setAppRender} />
+                                    <Routes>
+                                        <Route exact path='/' element={<HomePage appRender={appRender} />} />
+                                        {/* <Route exact path='/saleitems' element={<Itemspage type={'sale'} />} /> */}
+                                        <Route exact path='/saleitems' element={<SaleItemsPage />} />
+                                        <Route exact path='/useritems' element={<UserItemsPage />} />
+                                        <Route exact path='/favourites' element={<FavouritesItemsPage />} />
+                                        <Route exact path='/createsale' element={<CreateSalePage />} />
+                                        <Route exact path='/editsale' element={<EditSalePage />} />
+                                        <Route exact path='/outlets' element={<OutletsPage />} />
+                                        <Route exact path='/unauthorized' element={<ErrorAuthPage />} />
+                                    </Routes>
+                                </Router>
+                                <Footer />
+                            </NextUIProvider>
+                        </>
+                        :
+                        <>
+                            <Backdrop
+                                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: '#0c0c0c' }}
+                                open={!scriptLoaded}
+                            >
+                                <CircularProgress color="inherit" />
+                            </Backdrop>
+                        </>
+                    }
                 </>
                 :
                 <>
-                    <Backdrop
-                        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                        open={!scriptLoaded}
-                    >
-                        <CircularProgress color="inherit" />
-                    </Backdrop>
+                    <NextUIProvider theme={theme}>
+                        <InstallPWA isIOS={isIOS} isAndroid={isAndroid} />
+                    </NextUIProvider>
                 </>
             }
         </>

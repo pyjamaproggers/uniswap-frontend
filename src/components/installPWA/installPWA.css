@@ -1,0 +1,21 @@
+.pwa-dark-bg {
+  background-image: url("../../assets/PWA_BG_DARK.png");
+  /* Full height */
+  height: max-content;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.pwa-light-bg {
+    background-image: url("../../assets/PWA_BG_LIGHT.png");
+    /* Full height */
+    height: max-content;
+  
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }

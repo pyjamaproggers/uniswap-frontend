@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Col, Grid, Avatar, Text, Image, Row, Collapse, Button } from "@nextui-org/react";
+import { Badge, Col, Grid, Avatar, Text, Image, Row, Collapse, Button, useTheme } from "@nextui-org/react";
 import './itemCard.css'
 import { IoLogoWhatsapp } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
@@ -19,6 +19,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 export default function ItemCard(props) {
 
+    const theme = useTheme()
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
@@ -286,7 +287,7 @@ export default function ItemCard(props) {
                         maxWidth: '390px',
                         borderStyle: 'solid',
                         borderColor: '$gray100',
-                        borderWidth: '0px 0px 1px 0px'
+                        borderWidth: '0px 0px 0px 0px'
                     }}
                         divider={false}
                         title={
@@ -336,7 +337,7 @@ export default function ItemCard(props) {
                             '@xsMax': {
                                 fontSize: '$md'
                             },
-                            padding: '0px 8px 4px 8px',
+                            padding: '0px 8px 2px 8px',
                             color: '$gray800',
                             lineHeight: '1.25'
                         }}>
@@ -394,8 +395,8 @@ export default function ItemCard(props) {
                                     <Button auto flat color={'error'} className="collapse-buttons">
                                         <IoMdHeart size={20} style={{
                                             borderRadius: '12px',
-                                            color: '#ffffff',
-                                            opacity: '0.6'
+                                            color: '#fff',
+                                            opacity: theme.type==='light'?'1':'0.6'
                                         }} className="item-icon"
                                             onClick={() => {
                                                 handleFavouriteButtonClick(favouriteItems, item)

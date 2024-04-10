@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Icon from '../../assets/UniSwap2.PNG'
-import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col, Row, Switch, Input, Grid, Button } from "@nextui-org/react";
+import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col, Row, Switch, Input, Grid, Button, useTheme } from "@nextui-org/react";
 import { icons } from "../icons/icons.js";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
@@ -55,7 +55,7 @@ export default function Header(props) {
     const [firstTime, setFirstTime] = useState(false)
     const [showTutorial, setShowTutorial] = useState(false)
     const [tutorialIndex, setTutorialIndex] = useState(0)
-
+    const theme = useTheme()
 
     const setAppRender = props.setAppRender
 
@@ -125,10 +125,10 @@ export default function Header(props) {
                         localStorage.setItem('userPicture', data.user.userPicture);
                         localStorage.setItem('contactNumber', data.user.contactNumber)
                         localStorage.setItem('favouriteItems', JSON.stringify(data.user.favouriteItems))
-                        
+
                         setBackdropLoaderOpen(false);
                         setAppRender(true);
-                        
+
                         checkFcmToken();
                     } else {
                         setShowAshokaOnlyModal(true);
@@ -221,7 +221,7 @@ export default function Header(props) {
                 localStorage.setItem('userPicture', verifyData.user.userPicture);
                 localStorage.setItem('contactNumber', verifyData.user.contactNumber);
                 setBackdropLoaderOpen(false);
-                setShowTutorial(firstTime===true ? true : false)
+                setShowTutorial(firstTime === true ? true : false)
 
                 setRender((prev) => !prev);
 
@@ -279,10 +279,10 @@ export default function Header(props) {
     };
 
     const tutorialItems = [
-        {
-            image: T1,
-            text: 'Using the share button you can add the app to your homescreen for easier access!',
-        },
+        // {
+        //     image: T1,
+        //     text: 'Using the share button you can add the app to your homescreen for easier access!',
+        // },
         {
             image: T2,
             text: 'Search & filter for exactly what you are looking for. No need to scroll endlessly anymore.',
@@ -934,7 +934,7 @@ export default function Header(props) {
                             }}>
                                 {tutorialItems.map((item, index) => (
                                     <Text key={index} css={{
-                                        color: index===tutorialIndex? '$red600' : '$gray600',
+                                        color: index === tutorialIndex ? '$red600' : '$gray600',
                                         width: 'max-content',
                                         lineHeight: '1.1'
                                     }}>
@@ -1017,7 +1017,7 @@ export default function Header(props) {
                 }}>
                     <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
                         <BottomNavigation style={{
-                            backgroundColor: '#0c0c0c',
+                            backgroundColor: theme.type === 'light' ? '#fff' : '#0c0c0c',
                             width: '100vw',
                             height: 'max-content'
                         }}>
@@ -1032,13 +1032,25 @@ export default function Header(props) {
                                     const isSelected = location.pathname === navItem.path;
 
                                     return (
-                                        <IconComponent
-                                            key={navItem.path}
-                                            size={28}
-                                            color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
-                                            // onClick={() => window.location.pathname = navItem.path}
-                                            onClick={() => navigate(navItem.path)}
-                                        />
+                                        <>
+                                            {theme.type === 'light' ?
+                                                <IconComponent
+                                                    key={navItem.path}
+                                                    size={28}
+                                                    color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
+                                                    // onClick={() => window.location.pathname = navItem.path}
+                                                    onClick={() => navigate(navItem.path)}
+                                                />
+                                                :
+                                                <IconComponent
+                                                    key={navItem.path}
+                                                    size={28}
+                                                    color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
+                                                    // onClick={() => window.location.pathname = navItem.path}
+                                                    onClick={() => navigate(navItem.path)}
+                                                />
+                                            }
+                                        </>
                                     );
                                 })}
                                 <Dropdown placement="top-right">

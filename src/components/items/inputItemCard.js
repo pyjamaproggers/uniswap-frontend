@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, Link, Badge, Collapse, Modal } from "@nextui-org/react";
+import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, Link, Badge, Collapse, Modal, useTheme } from "@nextui-org/react";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
 import { IoTicket } from "react-icons/io5";
@@ -36,6 +36,7 @@ export default function InputItemCard(props) {
     const setPreviewUrl = props.setImageFile
 
     const type = props.type
+    const theme = useTheme()
 
     const [firstName, lastName] = item.userName.split(' ')
 
@@ -67,20 +68,20 @@ export default function InputItemCard(props) {
         { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
     ]
 
-    useEffect(() => {
-        document.querySelectorAll('input, select, textarea').forEach((element) => {
-            element.addEventListener('focus', (event) => event.preventDefault())
-        })
-        let priceInputElement = document.getElementsByClassName('sale-price-input')[0]
-        priceInputElement.addEventListener('focus', (event)=>event.preventDefault())
+    // useEffect(() => {
+    //     document.querySelectorAll('input, select, textarea').forEach((element) => {
+    //         element.addEventListener('focus', (event) => event.preventDefault())
+    //     })
+    //     let priceInputElement = document.getElementsByClassName('sale-price-input')[0]
+    //     priceInputElement.addEventListener('focus', (event)=>event.preventDefault())
 
-        let nameInputElement = document.getElementsByClassName('sale-itemName-input')[0]
-        nameInputElement.addEventListener('focus', (event)=>event.preventDefault())
+    //     let nameInputElement = document.getElementsByClassName('sale-itemName-input')[0]
+    //     nameInputElement.addEventListener('focus', (event)=>event.preventDefault())
 
-        let descInputElement = document.getElementsByClassName('sale-itemDesc-input')[0]
-        descInputElement.addEventListener('focus', (event)=>event.preventDefault())
+    //     let descInputElement = document.getElementsByClassName('sale-itemDesc-input')[0]
+    //     descInputElement.addEventListener('focus', (event)=>event.preventDefault())
 
-    }, [])
+    // }, [])
 
     const updateContactNumber = () => {
         const updatedPhoneNumber = number.trim();
@@ -303,7 +304,7 @@ export default function InputItemCard(props) {
                 <input
                     required
                     style={{fontSize:"16px"}}
-                    className="sale-itemName-input"
+                    className={theme.type==='light'?"sale-itemName-input-light":"sale-itemName-input-dark"}
                     placeholder="Corset / Cargos / Necklace..."
                     maxLength={40}
                     value={item.itemName}
@@ -317,7 +318,7 @@ export default function InputItemCard(props) {
 
                 <textarea
                     required
-                    className="sale-itemDesc-input"
+                    className={theme.type==='light'?"sale-itemName-input-light":"sale-itemName-input-dark"}
                     placeholder="Size M, blue colour, brand new..."
                     cols={50}
                     style={{fontSize:"16px"}}
