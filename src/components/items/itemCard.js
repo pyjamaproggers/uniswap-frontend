@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Col, Grid, Avatar, Text, Image, Row, Collapse, Button } from "@nextui-org/react";
+import { Badge, Col, Grid, Avatar, Text, Image, Row, Collapse, Button, useTheme } from "@nextui-org/react";
 import './itemCard.css'
 import { IoLogoWhatsapp } from "react-icons/io";
 import { FaRegHeart } from "react-icons/fa";
@@ -19,36 +19,34 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 export default function ItemCard(props) {
 
+    const theme = useTheme()
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
-
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
-
     const navigate = useNavigate()
     const backend = process.env.REACT_APP_BACKEND
-
     const [render, setRender] = useState(false)
-
-    // const [item, setItem] = useState({ ...props.item })
-
     const item = props.item
-
+    const type = props.type
     const [firstName, lastName] = item.userName.split(' ');
-
     const URL = 'https://wa.me'
     // let number = item.contactNumber.replace(/[^\w\s]/gi, '').replace(/ /g, '')
     let number = item.contactNumber
-
     let message = `Hi ${firstName}, this is regarding the ${item.itemName} you put on the UniSwap™ website priced at ${item.itemPrice}...`
     let url = `${URL}/${number}?text=${encodeURI(message)}`;
-
     let favouriteItems = props.favouriteItems
     let handleFavouriteItemToggle = props.handleFavouriteItemToggle
     let handleLiveToggle = props.handleLiveToggle
     let onItemDeleted = props.onItemDeleted
-    let shareItemViaWhatsApp = props.shareItemViaWhatsApp
-    // console.log(item.id, favouriteItems, favouriteItems.includes(item.id))
-    // console.log(props)
+    const categoryColors = {
+        apparel: 'error',
+        food: 'secondary',
+        tickets: 'primary',
+        stationery: 'success',
+        jewellry: 'warning',
+    };
+    const badgeColor = categoryColors[item.itemCategory] || 'default';
+    // let shareItemViaWhatsApp = props.shareItemViaWhatsApp
 
     const handleFavouriteButtonClick = async (favouriteItems, item) => {
         const itemIDToUpdate = item._id;
@@ -67,7 +65,7 @@ export default function ItemCard(props) {
             const data = await response.json();
             // Handle the response. For example, refresh the local favorites state
             if (response.ok) {
-                console.log('updating favs itemcard')
+                // console.log('updating favs itemcard')
                 handleFavouriteItemToggle(favouriteItems, itemIDToUpdate);
             } else {
                 // Handle failure (e.g., item not found, user not authenticated)
@@ -78,8 +76,7 @@ export default function ItemCard(props) {
         }
     }
 
-
-    const toggleLiveStatus = async (itemId, currentStatus) => {
+    const handleLiveButtonClick = async (itemId, currentStatus) => {
         setBackdropLoaderOpen(true);
         console.log('hi')
         try {
@@ -116,14 +113,6 @@ export default function ItemCard(props) {
         }
     };
 
-
-    // const handleLiveStatusClick = () => {
-    //     if (window.confirm(`Are you sure you want to set this item as ${item.live === "y" ? "inactive" : "active"}?`)) {
-    //         toggleLiveStatus(item._id);
-    //     }
-    // };
-
-
     function getTimeDifference(dateString) {
         const itemDate = new Date(dateString);
         const now = new Date();
@@ -150,7 +139,6 @@ export default function ItemCard(props) {
         }
     }
 
-
     function formatDate(date) {
         const day = date.getDate();
         const monthNames = ["January", "February", "March", "April", "May", "June",
@@ -171,7 +159,6 @@ export default function ItemCard(props) {
             default: return "th";
         }
     }
-
 
     const handleDeleteItem = async (itemId) => {
         if (window.confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
@@ -195,7 +182,7 @@ export default function ItemCard(props) {
                 console.log(`Item with ID ${itemId} deleted successfully.`);
                 setBackdropLoaderOpen(false);
                 // For example, you could call a prop function to refresh the items
-                onItemDeleted();
+                onItemDeleted(itemId);
 
             } catch (error) {
                 console.error('Error deleting the item:', error);
@@ -204,22 +191,6 @@ export default function ItemCard(props) {
             }
         }
     };
-    useEffect(() => {
-        console.log('Updated favouriteItems in ItemCard component')
-    }, [favouriteItems])
-
-    const categoryColors = {
-        apparel: 'error',
-        food: 'secondary',
-        tickets: 'primary',
-        stationery: 'success',
-        jewellry: 'warning',
-    };
-
-    const type = props.type
-
-    // Default to some color if item.category is not found in the mapping
-    const badgeColor = categoryColors[item.itemCategory] || 'default';
 
     if (item.live === 'n' && type === 'sale') {
         return null
@@ -257,8 +228,8 @@ export default function ItemCard(props) {
                         alignItems: 'center',
                         padding: '0px 8px 8px 8px',
                         jc: 'space-between',
-                        width: '95%',
-                        maxWidth: '360px'
+                        width: '100%',
+                        maxWidth: '390px'
                     }}>
                         <Row css={{
                             alignItems: 'center',
@@ -267,7 +238,8 @@ export default function ItemCard(props) {
                             <Avatar
                                 color=""
                                 size="md"
-                                src={item.userPicture}
+                                // src={item.userPicture}
+                                src={`https://api.multiavatar.com/${item.userName}.png?apikey=Bvjs0QyHcCxZNe`}
                                 className="avatar"
                             />
                             <Text css={{
@@ -298,9 +270,9 @@ export default function ItemCard(props) {
                     </Row>
                     <Image src={item.itemPicture}
                         css={{
-                            height: '360px',
-                            width: '90vw',
-                            maxWidth: '360px',
+                            height: '400px',
+                            width: '97.5vw',
+                            maxWidth: '400px',
                             // '@xsMax': {
                             //     width: '90vw'
                             // },
@@ -311,11 +283,11 @@ export default function ItemCard(props) {
                             borderRadius: '4px'
                         }} />
                     <Collapse css={{
-                        width: '95%',
-                        maxWidth: '360px',
+                        width: '100%',
+                        maxWidth: '390px',
                         borderStyle: 'solid',
                         borderColor: '$gray100',
-                        borderWidth: '0px 0px 1px 0px'
+                        borderWidth: '0px 0px 0px 0px'
                     }}
                         divider={false}
                         title={
@@ -365,7 +337,7 @@ export default function ItemCard(props) {
                             '@xsMax': {
                                 fontSize: '$md'
                             },
-                            padding: '0px 8px 4px 8px',
+                            padding: '0px 8px 2px 8px',
                             color: '$gray800',
                             lineHeight: '1.25'
                         }}>
@@ -373,8 +345,8 @@ export default function ItemCard(props) {
                         </Text>
                     </Collapse>
                     <Row css={{
-                        width: '95%',
-                        maxWidth: '360px',
+                        width: '100%',
+                        maxWidth: '390px',
                         jc: 'space-between',
                         marginTop: '4px',
                         alignItems: 'normal',
@@ -423,21 +395,14 @@ export default function ItemCard(props) {
                                     <Button auto flat color={'error'} className="collapse-buttons">
                                         <IoMdHeart size={20} style={{
                                             borderRadius: '12px',
-                                            color: '#ffffff',
-                                            opacity: '0.6'
+                                            color: '#fff',
+                                            opacity: theme.type==='light'?'1':'0.6'
                                         }} className="item-icon"
                                             onClick={() => {
                                                 handleFavouriteButtonClick(favouriteItems, item)
                                             }} />
                                     </Button>
                                 }
-                                <Button auto flat color={'primary'} className="collapse-buttons">
-                                    <IoPaperPlane size={'20px'} color={"#0072F5"} onClick={() => {
-                                        // share link to WA function
-                                        shareItemViaWhatsApp(item._id)
-                                    }} className="item-icon"
-                                    />
-                                </Button>
                             </Row>
                         }
                     </Row>
@@ -452,7 +417,7 @@ export default function ItemCard(props) {
                             {item.live === 'y' ?
                                 <Button auto flat color={"warning"}
                                     icon={<IoCloudOffline size={16} />}
-                                    onClick={() => { toggleLiveStatus(item._id) }}
+                                    onClick={() => { handleLiveButtonClick(item._id) }}
                                     css={{
                                         lineHeight: '2.2'
                                     }}>
@@ -461,7 +426,7 @@ export default function ItemCard(props) {
                                 :
                                 <Button auto flat color={"success"}
                                     icon={<FaCloud size={16} style={{}} />}
-                                    onClick={() => { toggleLiveStatus(item._id) }}
+                                    onClick={() => { handleLiveButtonClick(item._id) }}
                                     css={{
                                         lineHeight: '2.2'
                                     }}>

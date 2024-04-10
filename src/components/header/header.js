@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Icon from '../../assets/UniSwap2.PNG'
-import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col, Row, Switch, Input, Grid, Button } from "@nextui-org/react";
+import { Link, Text, Avatar, Dropdown, Image, Navbar, Modal, Col, Row, Switch, Input, Grid, Button, useTheme } from "@nextui-org/react";
 import { icons } from "../icons/icons.js";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
@@ -34,6 +34,11 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { GoBellFill } from "react-icons/go";
 import ReactGA from 'react-ga4'
+import T1 from '../../assets/Tutorial/AddToHomescreen.jpeg'
+import T2 from '../../assets/Tutorial/Searching&Filtering.png'
+import T3 from '../../assets/Tutorial/EditItem.png'
+import T4 from '../../assets/Tutorial/Outlet.png'
+import T5 from '../../assets/Grey.jpeg' //enable notif ss
 
 
 export default function Header(props) {
@@ -44,9 +49,13 @@ export default function Header(props) {
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
     const [number, setNumber] = useState(0)
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
-
+    const [showFcmTokenWarning, setShowFcmTokenWarning] = useState(false);
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
+    const [firstTime, setFirstTime] = useState(false)
+    const [showTutorial, setShowTutorial] = useState(false)
+    const [tutorialIndex, setTutorialIndex] = useState(0)
+    const theme = useTheme()
 
     const setAppRender = props.setAppRender
 
@@ -109,7 +118,6 @@ export default function Header(props) {
         })
             .then(res => res.json())
             .then(data => {
-
                 if (data.user && data.user.contactNumber) {
                     if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
                         localStorage.setItem('userEmail', data.user.userEmail);
@@ -119,42 +127,46 @@ export default function Header(props) {
                         localStorage.setItem('favouriteItems', JSON.stringify(data.user.favouriteItems))
 
                         setBackdropLoaderOpen(false);
-                        requestNotificationPermission();
-                        setAppRender(true)
-                    }
-                    else {
-                        setShowAshokaOnlyModal(true)
+                        setAppRender(true);
+
+                        checkFcmToken();
+                    } else {
+                        setShowAshokaOnlyModal(true);
                         setBackdropLoaderOpen(false);
-
                     }
-
                 } else {
                     if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
+                        setFirstTime(data.user.firstTime)
                         setBackdropLoaderOpen(false);
-                        console.log("User does not have a contact number, showing modal.",);
+                        console.log("User does not have a contact number, showing modal.");
                         setShowNumberModal(true);
-                    }
-                    else {
-                        setShowAshokaOnlyModal(true)
+                    } else {
+                        setShowAshokaOnlyModal(true);
                         setBackdropLoaderOpen(false);
                     }
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                setShowErrorSnackbar(true)
-                // toast.error(`${error}`, {
-                //     position: "top-center",
-                //     autoClose: 2000,
-                //     hideProgressBar: false,
-                //     closeOnClick: true,
-                //     pauseOnHover: true,
-                //     draggable: true,
-                //     progress: undefined,
-                //     theme: "colored",
-                //     transition: 'Flip',
-                // });
+                setShowErrorSnackbar(true);
+            });
+    }
 
+    function checkFcmToken() {
+        fetch(`${backend}/api/user/hasFcmToken`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.hasFcmToken) {
+                    // If the user does not have an FCM token, show a warning Snackbar
+                    setShowFcmTokenWarning(true);
+                }
+            })
+            .catch(error => {
+                console.error("Error checking FCM token:", error);
+                // You might want to handle this error differently or just log it
             });
     }
 
@@ -178,17 +190,7 @@ export default function Header(props) {
                 if (!response.ok) {
                     setBackdropLoaderOpen(false);
                     setShowErrorSnackbar(true)
-                    // toast.error('Failed to update phone, try again.', {
-                    //     position: "top-center",
-                    //     autoClose: 2000,
-                    //     hideProgressBar: false,
-                    //     closeOnClick: true,
-                    //     pauseOnHover: true,
-                    //     draggable: true,
-                    //     progress: undefined,
-                    //     theme: "colored",
-                    //     transition: 'Flip',
-                    // });
+                    handleLogout()
                 }
                 return response.json();
             })
@@ -201,38 +203,16 @@ export default function Header(props) {
             })
             .then(verifyResponse => {
                 if (!verifyResponse.ok) {
-                    // toast.error('Failed to verify user.', {
-                    //     position: "top-center",
-                    //     autoClose: 2000,
-                    //     hideProgressBar: false,
-                    //     closeOnClick: true,
-                    //     pauseOnHover: true,
-                    //     draggable: true,
-                    //     progress: undefined,
-                    //     theme: "colored",
-                    //     transition: 'Flip',
-                    // });
                     setShowErrorSnackbar(true)
                     setBackdropLoaderOpen(false);
                     setShowNumberUpdateModal(false);
                     setShowNumberModal(false);
+                    handleLogout()
                 }
                 return verifyResponse.json();
             })
             .then(verifyData => {
                 console.log('User verified, and cookie updated:', verifyData);
-
-                // toast.success('Number updated and user verified successfully.', {
-                //     position: "top-center",
-                //     autoClose: 2000,
-                //     hideProgressBar: false,
-                //     closeOnClick: true,
-                //     pauseOnHover: true,
-                //     draggable: true,
-                //     progress: undefined,
-                //     theme: "colored",
-                //     transition: 'Flip',
-                // });
 
                 setShowSuccessSnackbar(true)
 
@@ -241,6 +221,7 @@ export default function Header(props) {
                 localStorage.setItem('userPicture', verifyData.user.userPicture);
                 localStorage.setItem('contactNumber', verifyData.user.contactNumber);
                 setBackdropLoaderOpen(false);
+                setShowTutorial(firstTime === true ? true : false)
 
                 setRender((prev) => !prev);
 
@@ -255,19 +236,9 @@ export default function Header(props) {
                 setBackdropLoaderOpen(false);
                 console.error('Error:', error);
                 setShowErrorSnackbar(true)
-                // toast.error('Some error... please try again', {
-                //     position: "top-center",
-                //     autoClose: 2000,
-                //     hideProgressBar: false,
-                //     closeOnClick: true,
-                //     pauseOnHover: true,
-                //     draggable: true,
-                //     progress: undefined,
-                //     theme: "colored",
-                //     transition: 'Flip',
-                // });
                 setShowNumberUpdateModal(false);
                 setShowNumberModal(false);
+                handleLogout()
             });
 
         setShowNumberUpdateModal(false);
@@ -307,7 +278,28 @@ export default function Header(props) {
             .catch((error) => console.error("Error sending FCM token to server:", error));
     };
 
-
+    const tutorialItems = [
+        // {
+        //     image: T1,
+        //     text: 'Using the share button you can add the app to your homescreen for easier access!',
+        // },
+        {
+            image: T2,
+            text: 'Search & filter for exactly what you are looking for. No need to scroll endlessly anymore.',
+        },
+        {
+            image: T3,
+            text: "Unpublish items when sold so people don't keep spamming you. Edit if you made a mistake.",
+        },
+        {
+            image: T4,
+            text: `"Can someone send rasananda number?" "What's the THC website?" We have all of it right here.`,
+        },
+        {
+            image: T5,
+            text: "Enable notifications so you don't miss a single item! You will only be notified of items being posted.",
+        },
+    ]
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -416,7 +408,7 @@ export default function Header(props) {
 
                 <Navbar.Brand
                     onClick={() => {
-                        window.location.pathname = '/'
+                        navigate('/')
                     }}
                     css={{
                         '&:hover': {
@@ -542,8 +534,8 @@ export default function Header(props) {
                                         as="button"
                                         color=""
                                         size="md"
-                                        // src={`https://api.multiavatar.com/${localStorage.getItem('userEmail')}.png?apikey=Bvjs0QyHcCxZNe`}
-                                        src={localStorage.getItem('userPicture')}
+                                        src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
+                                    // src={localStorage.getItem('userPicture')}
                                     />
                                 </Dropdown.Trigger>
                             </Navbar.Item>
@@ -555,7 +547,7 @@ export default function Header(props) {
                                         handleLogout()
                                     }
                                     else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
-                                        window.location.pathname = `/${actionKey}`
+                                        navigate(actionKey)
                                     }
                                     else if (actionKey === 'phoneAuth') {
                                         setShowNumberUpdateModal(true)
@@ -677,6 +669,7 @@ export default function Header(props) {
             <Modal
                 open={showAshokaOnlyModal}
                 closeButton
+                aria-label="ashoka-modal"
             >
                 <Modal.Header
                     css={{
@@ -718,6 +711,7 @@ export default function Header(props) {
             <Modal
                 open={showNumberModal}
                 preventClose
+                aria-label="phone-save-modal"
             >
                 <Grid.Container css={{
                     jc: 'center',
@@ -808,6 +802,7 @@ export default function Header(props) {
                 onClose={() => {
                     setShowNumberUpdateModal(false)
                 }}
+                aria-label="phone-update-modal"
             >
                 <Grid.Container css={{
                     jc: 'center',
@@ -877,6 +872,135 @@ export default function Header(props) {
                 </Grid.Container>
             </Modal>
 
+            <Modal
+                open={showTutorial}
+                preventClose
+                aria-label="tutorial-modal"
+            >
+                <Grid.Container css={{
+                    jc: 'center',
+                    alignItems: '',
+                    padding: '12px 0px',
+                }}>
+                    <Col css={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}>
+                        <Text css={{
+                            '@xsMin': {
+                                fontSize: '$xl'
+                            },
+                            '@xsMax': {
+                                fontSize: '$lg'
+                            },
+                            fontWeight: '$medium',
+                            paddingBottom: '6px',
+                            borderStyle: 'solid',
+                            borderColor: '$gray600',
+                            borderWidth: '0px 0px 1px 0px',
+                            width: 318,
+                            marginBottom: '12px'
+                        }}>
+                            Welcome To UniSwap!
+                        </Text>
+
+                        <Col css={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center'
+                        }}>
+                            <Image
+                                src={tutorialItems[tutorialIndex].image}
+                                width={320}
+                                height={358}
+                                css={{
+                                    objectFit: 'cover',
+                                    borderRadius: '0px 0px 12px 12px'
+                                }}
+                            />
+
+                            <Row css={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                jc: 'center',
+                                width: 'max-content',
+                                gap: 4,
+                                padding: '0px 8px',
+                                borderRadius: '8px',
+                                backgroundColor: '$gray300',
+                                alignItems: 'center',
+                                marginTop: '12px',
+                            }}>
+                                {tutorialItems.map((item, index) => (
+                                    <Text key={index} css={{
+                                        color: index === tutorialIndex ? '$red600' : '$gray600',
+                                        width: 'max-content',
+                                        lineHeight: '1.1'
+                                    }}>
+                                        •
+                                    </Text>
+                                ))}
+                            </Row>
+
+                            <Text css={{
+                                fontSize: '$md',
+                                fontWeight: '$medium',
+                                jc: 'center',
+                                alignItems: 'center',
+                                padding: '8px 24px 6px 24px'
+                            }}>
+                                {tutorialItems[tutorialIndex].text}
+                            </Text>
+
+
+                            {tutorialIndex === 0 &&
+                                <Button auto light color={'error'}
+                                    onClick={() => {
+                                        setTutorialIndex(prev => prev + 1)
+                                    }}
+                                >
+                                    Next →
+                                </Button>
+                            }
+                            {tutorialIndex >= 1 && tutorialIndex <= 3 &&
+                                <Row css={{
+                                    width: 'max-content',
+                                    jc: 'center',
+                                }}>
+                                    <Button auto light color={'default'}
+                                        onClick={() => {
+                                            setTutorialIndex(prev => prev - 1)
+                                        }}
+                                    >
+                                        ← Previous
+                                    </Button>
+                                    <Button auto light color={'error'}
+                                        onClick={() => {
+                                            setTutorialIndex(prev => prev + 1)
+                                        }}
+                                    >
+                                        Next →
+                                    </Button>
+                                </Row>
+                            }
+                            {tutorialIndex === 4 &&
+                                <Button auto light color={'error'}
+                                    onClick={() => {
+                                        requestNotificationPermission()
+                                        setShowTutorial(false)
+                                    }}
+                                >
+                                    Done ✔️
+                                </Button>
+                            }
+
+                        </Col>
+
+                    </Col>
+                </Grid.Container>
+            </Modal>
+
             {!(window.location.pathname === '/unauthorised' || Object.keys(localStorage).length <= 4) ?
                 <Grid.Container css={{
                     '@xsMin': {
@@ -893,7 +1017,7 @@ export default function Header(props) {
                 }}>
                     <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
                         <BottomNavigation style={{
-                            backgroundColor: '#0c0c0c',
+                            backgroundColor: theme.type === 'light' ? '#fff' : '#0c0c0c',
                             width: '100vw',
                             height: 'max-content'
                         }}>
@@ -908,12 +1032,25 @@ export default function Header(props) {
                                     const isSelected = location.pathname === navItem.path;
 
                                     return (
-                                        <IconComponent
-                                            key={navItem.path}
-                                            size={28}
-                                            color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
-                                            onClick={() => window.location.pathname = navItem.path}
-                                        />
+                                        <>
+                                            {theme.type === 'light' ?
+                                                <IconComponent
+                                                    key={navItem.path}
+                                                    size={28}
+                                                    color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
+                                                    // onClick={() => window.location.pathname = navItem.path}
+                                                    onClick={() => navigate(navItem.path)}
+                                                />
+                                                :
+                                                <IconComponent
+                                                    key={navItem.path}
+                                                    size={28}
+                                                    color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
+                                                    // onClick={() => window.location.pathname = navItem.path}
+                                                    onClick={() => navigate(navItem.path)}
+                                                />
+                                            }
+                                        </>
                                     );
                                 })}
                                 <Dropdown placement="top-right">
@@ -922,8 +1059,8 @@ export default function Header(props) {
                                             // as="button"
                                             color=""
                                             size="sm"
-                                            // src={`https://api.multiavatar.com/${localStorage.getItem('userEmail')}.png?apikey=Bvjs0QyHcCxZNe`}
-                                            src={localStorage.getItem('userPicture')}
+                                            src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
+                                        // src={localStorage.getItem('userPicture')}
                                         />
                                     </Dropdown.Trigger>
                                     <Dropdown.Menu
@@ -934,7 +1071,7 @@ export default function Header(props) {
                                                 handleLogout()
                                             }
                                             else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
-                                                window.location.pathname = `/${actionKey}`
+                                                navigate(actionKey)
                                             }
                                             else if (actionKey === 'phoneAuth') {
                                                 setShowNumberUpdateModal(true)
@@ -957,17 +1094,6 @@ export default function Header(props) {
                                             <Text b color="inherit" css={{ d: "flex", fontSize: '$sm' }}>
                                                 {localStorage.getItem('contactNumber')}
                                             </Text>
-                                            {/* <Text b color="inherit" 
-                                    css={{ 
-                                        d: "flex", 
-                                        fontSize: '$sm',
-                                        whiteSpace: 'nowrap',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis'
-                                    }}
-                                    >
-                                        {localStorage.getItem('userEmail')}
-                                    </Text> */}
                                         </Dropdown.Item>
                                         <Dropdown.Item key="createsale" withDivider color=""
                                             icon={<FaPlus size={16} />}>
@@ -1012,19 +1138,20 @@ export default function Header(props) {
                 <CircularProgress color="inherit" />
             </Backdrop>
 
-            {/* <ToastContainer
-                position="top-right"
-                autoClose={2000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="colored"
-                transition="Flip"
-            /> */}
+            <Snackbar
+                open={showFcmTokenWarning}
+                autoHideDuration={6000}
+                onClose={() => setShowFcmTokenWarning(false)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() => setShowFcmTokenWarning(false)}
+                    severity="warning"
+                    sx={{ width: '100%' }}
+                >
+                    Seems like you don't have notifications enabled. Press on your avatar and click on 'Enable Notifications' to turn them on.
+                </Alert>
+            </Snackbar>
 
             <Snackbar
                 anchorOrigin={{

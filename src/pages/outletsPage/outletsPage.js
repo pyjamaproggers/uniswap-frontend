@@ -88,7 +88,7 @@ export default function OutletsPage() {
             name: 'THC',
             timing: '12pm To 4am',
             picture: THC,
-            phone: '+918104213125',
+            phone: '+918199991183',
             menu: [THC1, THC2, THC3, THC4, THC5, THC6, THC7, THC8, THC9, THC10, THC11, THC12, THC13, THC14, THC15, THC16, THC17, THC18, THC19, THC20, THC21, THC22, THC23, THC24, THC25],
             location: 'Mess Ground Floor',
             website: 'https://thehungercycle.petpooja.com/orders/menu'
