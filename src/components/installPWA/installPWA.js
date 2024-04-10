@@ -12,7 +12,7 @@ export default function InstallPWA({ isIOS, isAndroid }) {
             css={{
                 jc: 'center',
                 alignItems: 'center',
-                height: '100vh',
+                height: '80vh',
                 backgroundColor: theme.type==='light' ? '#f6f6f6' : ''
             }}
         >
