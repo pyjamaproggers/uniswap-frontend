@@ -39,7 +39,7 @@ export default function HomePage(props) {
 
     return (
         <>
-            {isMobile && showPwaBanner && (
+            {isMobile && showPwaBanner && !isPWA && (
                 <Grid.Container css={{
                     backgroundColor: 'rgba(0, 0, 0, 0.9)',
                     padding: '10px',
@@ -58,7 +58,7 @@ export default function HomePage(props) {
             <Grid.Container className="homebg" css={{
                 jc: 'center',
                 alignItems: '',
-                height: window.screen.height - 200,
+                height: window.screen.height - 250,
                 paddingTop: '25%'
                 // padding: '10% 0px 40% 0'
             }}>
@@ -137,7 +137,7 @@ export default function HomePage(props) {
                     </Col>
                 </div>
             </Grid.Container>
-            {isMobile && !isPWA && (
+            {!isPWA && (
                 <div className="add-to-home-screen-tutorial" ref={pwaTutorialRef}>
                     <Text css={{ textAlign: 'center', color: '$white', padding: '20px', fontWeight: '$semibold' }}>
                         How do I "Add to Home Screen"?

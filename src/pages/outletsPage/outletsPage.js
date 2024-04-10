@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import Rasananda from '../../assets/Rasananda.jpeg';
 import Dhaba from '../../assets/Dhaba.jpeg';
 import RotiBoti from '../../assets/RotiBotiOrder.jpeg';
@@ -71,6 +71,13 @@ import S1 from '../../assets/OutletMenus/Subway/S1.jpg'
 import S2 from '../../assets/OutletMenus/Subway/S2.jpg'
 import S3 from '../../assets/OutletMenus/Subway/S3.jpg'
 import S4 from '../../assets/OutletMenus/Subway/S4.jpg'
+import FV1 from '../../assets/OutletMenus/Food Village/FV1.jpeg'
+import FV2 from '../../assets/OutletMenus/Food Village/FV2.jpeg'
+import R1 from '../../assets/OutletMenus/Rasananda/R1.png'
+import R2 from '../../assets/OutletMenus/Rasananda/R2.png'
+import R3 from '../../assets/OutletMenus/Rasananda/R3.png'
+import { MdArrowOutward } from "react-icons/md";
+
 
 export default function OutletsPage() {
 
@@ -79,8 +86,8 @@ export default function OutletsPage() {
             name: 'Rasananda',
             timing: '12pm To 3am',
             picture: Rasananda,
-            phone: '+918104213125',
-            menu: [Grey, Grey, Grey, Grey],
+            phone: '+917082928377',
+            menu: [R1,R2,R3],
             location: 'Food Street (Next To Tennis Court)',
             website: 'https://rasaanandaonline.petpooja.com/'
         },
@@ -106,17 +113,17 @@ export default function OutletsPage() {
             name: 'Shuddh Desi Dhaba',
             timing: '12pm To 12am',
             picture: Dhaba,
-            phone: '+918104213125',
+            phone: '+918059410499',
             menu: [D1, D2],
             location: 'Food Street (Next To Basketball Court)',
             website: ''
         },
         {
             name: 'Food Village',
-            timing: '12pm To 2am',
+            timing: '4pm To 2am',
             picture: FoodVillage,
-            phone: '+918104213125',
-            menu: [Grey, Grey, Grey, Grey],
+            phone: '+919896950018',
+            menu: [FV1, FV2],
             location: 'Food Street (Next To Tennis Court)',
             website: ''
         },
@@ -124,7 +131,7 @@ export default function OutletsPage() {
             name: 'Subway',
             timing: '24/7',
             picture: Subway,
-            phone: '+918104213125',
+            phone: '+918199989788',
             menu: [S1, S2, S3, S4],
             location: 'Mess First Floor',
             website: ''
@@ -133,7 +140,7 @@ export default function OutletsPage() {
             name: 'Chicago Pizza',
             timing: '12pm To 11pm',
             picture: ChicagoPizza,
-            phone: '+918104213125',
+            phone: '+919711806438',
             menu: [CP1, CP2],
             location: 'Mess (RH1 Entry)',
             website: ''
@@ -147,47 +154,47 @@ export default function OutletsPage() {
             location: 'Between AC02 & AC03',
             website: ''
         },
-        {
-            name: 'Fuel Zone',
-            timing: '12pm To 3am',
-            picture: FuelZone,
-            phone: '+918104213125',
-            menu: [FZ1, FZ2],
-            location: 'Mess Ground Floor (Near Lawns)',
-            website: ''
-        },
-        {
-            name: 'Dosai',
-            timing: '12pm To 11pm',
-            picture: Dosai,
-            phone: '+918104213125',
-            menu: [Do1, Do2, Do3, Do4, Do5, Do6, Do7, Do8],
-            location: 'Food Street (Next To Frisbee Field)',
-            website: ''
-        },
-        {
-            name: 'Amul',
-            timing: '12pm To 11pm',
-            picture: Amul,
-            phone: '+918104213125',
-            menu: [Grey, Grey, Grey, Grey],
-            location: 'Mess (AC01 Entry)',
-            website: ''
-        },
-        {
-            name: 'LocoMoko',
-            timing: '12pm To 11pm',
-            picture: LocoMoko,
-            phone: '+918104213125',
-            menu: [Grey, Grey, Grey, Grey],
-            location: 'Mess Ground Floor',
-            website: ''
-        },
+        // {
+        //     name: 'Fuel Zone',
+        //     timing: '12pm To 3am',
+        //     picture: FuelZone,
+        //     phone: '+918104213125',
+        //     menu: [FZ1, FZ2],
+        //     location: 'Mess Ground Floor (Near Lawns)',
+        //     website: ''
+        // },
+        // {
+        //     name: 'Dosai',
+        //     timing: '12pm To 11pm',
+        //     picture: Dosai,
+        //     phone: '+918104213125',
+        //     menu: [Do1, Do2, Do3, Do4, Do5, Do6, Do7, Do8],
+        //     location: 'Food Street (Next To Frisbee Field)',
+        //     website: ''
+        // },
+        // {
+        //     name: 'Amul',
+        //     timing: '12pm To 11pm',
+        //     picture: Amul,
+        //     phone: '+918104213125',
+        //     menu: [Grey, Grey, Grey, Grey],
+        //     location: 'Mess (AC01 Entry)',
+        //     website: ''
+        // },
+        // {
+        //     name: 'LocoMoko',
+        //     timing: '12pm To 11pm',
+        //     picture: LocoMoko,
+        //     phone: '+918104213125',
+        //     menu: [Grey, Grey, Grey, Grey],
+        //     location: 'Mess Ground Floor',
+        //     website: ''
+        // },
     ]
 
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     // const verifyUserSession = () => {
     //     fetch(`${backend}/api/auth/verify`, {
@@ -215,7 +222,7 @@ export default function OutletsPage() {
     // useEffect(() => {
     //     verifyUserSession();
     // }, []);
-    
+
     const [isGalleryOpen, setIsGalleryOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [currentMenuImages, setCurrentMenuImages] = useState([]);
@@ -346,26 +353,32 @@ export default function OutletsPage() {
                                         padding: '0px 12px',
                                     }}>
                                         {outlet.website.length > 0 ?
-                                            <Link 
-                                                href={outlet.website}
-                                                target="_blank" 
-                                                rel="noopener noreferrer"
-                                                css={{
-                                                    '@xsMin': {
-                                                        fontSize: '$lg'
-                                                    },
-                                                    '@xsMax': {
-                                                        fontSize: '$base'
-                                                    },
-                                                    fontWeight: '$semibold',
-                                                    whiteSpace: 'nowrap',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    maxW: '100px'
-                                                }}
-                                            >
-                                                {outlet.name}
-                                            </Link>
+                                            <Row css={{
+                                                maxW: '110px',
+                                                alignItems: 'center'
+                                            }}>
+                                                <Link
+                                                    href={outlet.website}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    css={{
+                                                        '@xsMin': {
+                                                            fontSize: '$lg'
+                                                        },
+                                                        '@xsMax': {
+                                                            fontSize: '$base'
+                                                        },
+                                                        fontWeight: '$semibold',
+                                                        whiteSpace: 'nowrap',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        maxW: '100px'
+                                                    }}
+                                                >
+                                                    {outlet.name}
+                                                </Link>
+                                                <MdArrowOutward color="#0072F5" size={20}/>
+                                            </Row>
                                             :
                                             <Text css={{
                                                 '@xsMin': {

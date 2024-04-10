@@ -38,9 +38,7 @@ function App() {
 
         // Cleanup
         return () => mediaQuery.removeEventListener('change', handleChange);
-    }, []);
-
-    console.log('isLightMode: ',isLightMode)
+    }, [isLightMode]);
 
     const theme = createTheme({
         type: isLightMode ? 'light' : 'dark', // Adjusted this line
@@ -125,7 +123,9 @@ function App() {
                         :
                         <>
                             <Backdrop
-                                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: '#0c0c0c' }}
+                                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1, 
+                                backgroundColor: isLightMode ? '#f0f0f0':'#0c0c0c' 
+                            }}
                                 open={!scriptLoaded}
                             >
                                 <CircularProgress color="inherit" />

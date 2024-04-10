@@ -38,7 +38,7 @@ import T1 from '../../assets/Tutorial/AddToHomescreen.jpeg'
 import T2 from '../../assets/Tutorial/Searching&Filtering.png'
 import T3 from '../../assets/Tutorial/EditItem.png'
 import T4 from '../../assets/Tutorial/Outlet.png'
-import T5 from '../../assets/Grey.jpeg' //enable notif ss
+import T5 from '../../assets/Tutorial/Notifications.jpeg'
 
 
 export default function Header(props) {
@@ -950,7 +950,7 @@ export default function Header(props) {
                                 fontWeight: '$medium',
                                 jc: 'center',
                                 alignItems: 'center',
-                                padding: '8px 24px 6px 24px'
+                                padding: '8px 16px 6px 16px'
                             }}>
                                 {tutorialItems[tutorialIndex].text}
                             </Text>
@@ -965,7 +965,7 @@ export default function Header(props) {
                                     Next →
                                 </Button>
                             }
-                            {tutorialIndex >= 1 && tutorialIndex <= 3 &&
+                            {tutorialIndex >= 1 && tutorialIndex <= 2 &&
                                 <Row css={{
                                     width: 'max-content',
                                     jc: 'center',
@@ -986,15 +986,27 @@ export default function Header(props) {
                                     </Button>
                                 </Row>
                             }
-                            {tutorialIndex === 4 &&
-                                <Button auto light color={'error'}
-                                    onClick={() => {
-                                        requestNotificationPermission()
-                                        setShowTutorial(false)
-                                    }}
-                                >
-                                    Done ✔️
-                                </Button>
+                            {tutorialIndex === 3 &&
+                                <Row css={{
+                                    width: 'max-content',
+                                    jc: 'center',
+                                }}>
+                                    <Button auto light color={'default'}
+                                        onClick={() => {
+                                            setTutorialIndex(prev => prev - 1)
+                                        }}
+                                    >
+                                        ← Previous
+                                    </Button>
+                                    <Button auto light color={'error'}
+                                        onClick={() => {
+                                            requestNotificationPermission()
+                                            setShowTutorial(false)
+                                        }}
+                                    >
+                                        Done ✔️
+                                    </Button>
+                                </Row>
                             }
 
                         </Col>

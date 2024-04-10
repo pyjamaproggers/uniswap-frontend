@@ -311,6 +311,14 @@ export default function ItemsPage(props) {
         })
 
         setUserItems(newUserItems)
+
+        var newVisibleItems = visibleItems.map((visibleItem) => {
+            if (visibleItem._id === itemIDToUpdate) {
+                return { ...visibleItem, live: newStatus };
+            }
+            return visibleItem;
+        })
+        setVisibleItems(newVisibleItems)
         setRender((prev) => (!prev))
     };
 

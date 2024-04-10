@@ -39,7 +39,7 @@ export default function SaleItemsPage() {
     const [render, setRender] = useState(false)
     const ITEMS_PER_PAGE = 10;
     const [lastItemIndex, setLastItemIndex] = useState(0);
-    const [visibleItems, setVisibleItems] = useState([]);
+    const [visibleItems, setVisibleItems] = useState();
 
 
     const [priceFilters, setPriceFilters] = useState([
@@ -419,12 +419,12 @@ export default function SaleItemsPage() {
 
                     </Grid.Container>
 
-                    {!fetchingAllItems && !backdropLoaderOpen && filteredItems &&
+                    {!fetchingAllItems && !backdropLoaderOpen && visibleItems && favouriteItems &&
                         <>
                             {
                                 visibleItems.map((item, index) => (
-                                    <div key={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
-                                        id={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
+                                    <div key={item._id}
+                                        id={item._id}
                                     >
                                         <ItemCard
                                             item={item}
