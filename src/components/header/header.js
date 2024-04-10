@@ -296,10 +296,6 @@ export default function Header(props) {
             image: T5,
             text: "Enable notifications so you don't miss a single item! You will only be notified of items being posted.",
         },
-        {
-            image: T1,
-            text: 'Using the share button you can add the app to your homescreen for easier access!',
-        },
     ]
 
     useEffect(() => {
@@ -1004,7 +1000,7 @@ export default function Header(props) {
                                             setShowTutorial(false)
                                         }}
                                     >
-                                        Done ✔️
+                                        Enable Notifications ✔️
                                     </Button>
                                 </Row>
                             }
