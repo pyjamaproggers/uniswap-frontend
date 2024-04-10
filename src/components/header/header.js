@@ -948,7 +948,7 @@ export default function Header(props) {
                                 fontWeight: '$medium',
                                 jc: 'center',
                                 alignItems: 'center',
-                                padding: '8px 24px 6px 24px'
+                                padding: '8px 16px 6px 16px'
                             }}>
                                 {tutorialItems[tutorialIndex].text}
                             </Text>
@@ -985,14 +985,26 @@ export default function Header(props) {
                                 </Row>
                             }
                             {tutorialIndex === 3 &&
-                                <Button auto light color={'error'}
-                                    onClick={() => {
-                                        requestNotificationPermission()
-                                        setShowTutorial(false)
-                                    }}
-                                >
-                                    Done ✔️
-                                </Button>
+                                <Row css={{
+                                    width: 'max-content',
+                                    jc: 'center',
+                                }}>
+                                    <Button auto light color={'default'}
+                                        onClick={() => {
+                                            setTutorialIndex(prev => prev - 1)
+                                        }}
+                                    >
+                                        ← Previous
+                                    </Button>
+                                    <Button auto light color={'error'}
+                                        onClick={() => {
+                                            requestNotificationPermission()
+                                            setShowTutorial(false)
+                                        }}
+                                    >
+                                        Done ✔️
+                                    </Button>
+                                </Row>
                             }
 
                         </Col>
