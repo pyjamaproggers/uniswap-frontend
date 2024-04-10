@@ -100,8 +100,8 @@ function App() {
     return (
 
         <>
-            {isPWA ?
-                <>
+            {/* {isPWA ?
+                <> */}
                     {scriptLoaded ?
                         <>
                             <NextUIProvider theme={theme}>
@@ -134,14 +134,14 @@ function App() {
                             </Backdrop>
                         </>
                     }
-                </>
+                {/* </>
                 :
                 <>
                     <NextUIProvider theme={theme}>
                         <InstallPWA isIOS={isIOS} isAndroid={isAndroid} />
                     </NextUIProvider>
                 </>
-            }
+            } */}
         </>
     );
 }
