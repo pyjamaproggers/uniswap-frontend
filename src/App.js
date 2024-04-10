@@ -40,8 +40,6 @@ function App() {
         return () => mediaQuery.removeEventListener('change', handleChange);
     }, [isLightMode]);
 
-    console.log('isLightMode: ',isLightMode)
-
     const theme = createTheme({
         type: isLightMode ? 'light' : 'dark', // Adjusted this line
         theme: {
@@ -100,8 +98,8 @@ function App() {
     return (
 
         <>
-            {/* {isPWA ?
-                <> */}
+            {isPWA ?
+                <>
                     {scriptLoaded ?
                         <>
                             <NextUIProvider theme={theme}>
@@ -134,14 +132,14 @@ function App() {
                             </Backdrop>
                         </>
                     }
-                {/* </>
+                </>
                 :
                 <>
                     <NextUIProvider theme={theme}>
                         <InstallPWA isIOS={isIOS} isAndroid={isAndroid} />
                     </NextUIProvider>
                 </>
-            } */}
+            }
         </>
     );
 }
