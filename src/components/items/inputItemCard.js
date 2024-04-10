@@ -228,6 +228,7 @@ export default function InputItemCard(props) {
                             className="sale-price-input"
                             placeholder="0"
                             maxLength={10}
+                            style={{fontSize:"16px"}}
                             value={item.itemPrice.toString()} // Convert to string for input value
                             onChange={(e) => {
                                 // Directly update itemPrice with the new value, or fallback to 0 if not a number
@@ -301,6 +302,7 @@ export default function InputItemCard(props) {
 
                 <input
                     required
+                    style={{fontSize:"16px"}}
                     className="sale-itemName-input"
                     placeholder="Corset / Cargos / Necklace..."
                     maxLength={40}
@@ -318,6 +320,7 @@ export default function InputItemCard(props) {
                     className="sale-itemDesc-input"
                     placeholder="Size M, blue colour, brand new..."
                     cols={50}
+                    style={{fontSize:"16px"}}
                     maxLength={150}
                     value={item.itemDescription}
                     onChange={(e) => {
@@ -399,7 +402,8 @@ export default function InputItemCard(props) {
 
                         <Input css={{
                             width: '200px',
-                            backgroundColor: '#697177'
+                            backgroundColor: '#697177',
+                            fontSize:"16px"
                         }}
                             labelLeft={
                                 <IoLogoWhatsapp size={24} color="#25D366" />
