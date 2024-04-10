@@ -38,7 +38,7 @@ function App() {
 
         // Cleanup
         return () => mediaQuery.removeEventListener('change', handleChange);
-    }, []);
+    }, [isLightMode]);
 
     console.log('isLightMode: ',isLightMode)
 

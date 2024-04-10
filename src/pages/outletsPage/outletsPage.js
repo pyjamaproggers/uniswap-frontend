@@ -354,7 +354,7 @@ export default function OutletsPage() {
                                     }}>
                                         {outlet.website.length > 0 ?
                                             <Row css={{
-                                                maxW: '100px',
+                                                maxW: '110px',
                                                 alignItems: 'center'
                                             }}>
                                                 <Link
