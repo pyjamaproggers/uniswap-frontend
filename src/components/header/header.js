@@ -38,7 +38,7 @@ import T1 from '../../assets/Tutorial/AddToHomescreen.jpeg'
 import T2 from '../../assets/Tutorial/Searching&Filtering.png'
 import T3 from '../../assets/Tutorial/EditItem.png'
 import T4 from '../../assets/Tutorial/Outlet.png'
-import T5 from '../../assets/Grey.jpeg' //enable notif ss
+import T5 from '../../assets/Notifications.jpeg'
 
 
 export default function Header(props) {
