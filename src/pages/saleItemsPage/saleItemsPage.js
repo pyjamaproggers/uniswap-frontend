@@ -61,7 +61,12 @@ export default function SaleItemsPage() {
     ]);
 
     useEffect(() => {
-        dispatch(setFavouriteItems(JSON.parse(localStorage.getItem('favouriteItems'))))
+
+        if(localStorage.getItem('favouriteItems')==null)
+        {
+            dispatch(setFavouriteItems(JSON.parse(localStorage.getItem('favouriteItems'))))
+        }
+
         verifyUserSession()
         fetchAllItems()
 

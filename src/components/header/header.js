@@ -56,7 +56,6 @@ export default function Header(props) {
     const [showTutorial, setShowTutorial] = useState(false)
     const [tutorialIndex, setTutorialIndex] = useState(0)
     const theme = useTheme()
-
     const setAppRender = props.setAppRender
 
     const backend = process.env.REACT_APP_BACKEND
@@ -118,6 +117,7 @@ export default function Header(props) {
         })
             .then(res => res.json())
             .then(data => {
+                console.log("fetching")
                 if (data.user && data.user.contactNumber) {
                     if (data.user.userEmail.split('@')[1] === 'ashoka.edu.in') {
                         localStorage.setItem('userEmail', data.user.userEmail);
@@ -125,7 +125,7 @@ export default function Header(props) {
                         localStorage.setItem('userPicture', data.user.userPicture);
                         localStorage.setItem('contactNumber', data.user.contactNumber)
                         localStorage.setItem('favouriteItems', JSON.stringify(data.user.favouriteItems))
-
+                        console.log(localStorage)
                         setBackdropLoaderOpen(false);
                         setAppRender(true);
 
@@ -203,7 +203,7 @@ export default function Header(props) {
             })
             .then(verifyResponse => {
                 if (!verifyResponse.ok) {
-                    setShowErrorSnackbar(true)
+                    setShowErrorSnackbar(true);
                     setBackdropLoaderOpen(false);
                     setShowNumberUpdateModal(false);
                     setShowNumberModal(false);
@@ -215,11 +215,12 @@ export default function Header(props) {
                 console.log('User verified, and cookie updated:', verifyData);
 
                 setShowSuccessSnackbar(true)
-
+                console.log("local")
                 localStorage.setItem('userEmail', verifyData.user.userEmail);
                 localStorage.setItem('userName', verifyData.user.userName);
                 localStorage.setItem('userPicture', verifyData.user.userPicture);
                 localStorage.setItem('contactNumber', verifyData.user.contactNumber);
+                localStorage.setItem('favouriteItems', JSON.stringify(verifyData.user.favouriteItems))
                 setBackdropLoaderOpen(false);
                 setShowTutorial(firstTime === true ? true : false)
 
@@ -279,10 +280,6 @@ export default function Header(props) {
     };
 
     const tutorialItems = [
-        // {
-        //     image: T1,
-        //     text: 'Using the share button you can add the app to your homescreen for easier access!',
-        // },
         {
             image: T2,
             text: 'Search & filter for exactly what you are looking for. No need to scroll endlessly anymore.',
@@ -299,6 +296,10 @@ export default function Header(props) {
             image: T5,
             text: "Enable notifications so you don't miss a single item! You will only be notified of items being posted.",
         },
+        {
+            image: T1,
+            text: 'Using the share button you can add the app to your homescreen for easier access!',
+        },
     ]
 
     useEffect(() => {
@@ -311,6 +312,7 @@ export default function Header(props) {
                     const favoriteItemsResponse = await fetch(`${backend}/api/user/favorites`, { credentials: 'include' });
                     const favoriteItems = await favoriteItemsResponse.json();
                     localStorage.setItem('favouriteItems', JSON.stringify(favoriteItems));
+
                 } catch (error) {
                     console.error('Failed to fetch user-specific data:', error);
                 }
