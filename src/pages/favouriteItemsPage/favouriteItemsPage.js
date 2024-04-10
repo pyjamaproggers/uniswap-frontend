@@ -193,6 +193,7 @@ export default function FavouritesItemsPage() {
 
             dispatch(setSaleItems(items));
             setFilteredItems(items);
+            setVisibleItems(items.slice(0, ITEMS_PER_PAGE)); 
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);
         } finally {
