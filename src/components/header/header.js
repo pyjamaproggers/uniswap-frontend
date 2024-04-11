@@ -170,6 +170,10 @@ export default function Header(props) {
             });
     }
 
+    useEffect(()=>{
+        checkFcmToken()
+    }, [])
+
     const updateContactNumber = () => {
         const updatedPhoneNumber = number;
         setBackdropLoaderOpen(true);
