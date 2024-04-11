@@ -49,10 +49,11 @@ export default function Header(props) {
     const [showNumberUpdateModal, setShowNumberUpdateModal] = useState(false)
     const [number, setNumber] = useState(0)
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
-    const [showFcmTokenWarning, setShowFcmTokenWarning] = useState(false);
+    const [showFcmTokenWarning, setShowFcmTokenWarning] = useState(false)
+    const [hasFCMToken, setHasFCMToken] = useState(false)
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
-    const [firstTime, setFirstTime] = useState(false)
+    const [firstTime, setFirstTime] = useState()
     const [showTutorial, setShowTutorial] = useState(false)
     const [tutorialIndex, setTutorialIndex] = useState(0)
     const theme = useTheme()
@@ -128,7 +129,7 @@ export default function Header(props) {
                         console.log(localStorage)
                         setBackdropLoaderOpen(false);
                         setAppRender(true);
-
+                        setFirstTime(false)
                         checkFcmToken();
                     } else {
                         setShowAshokaOnlyModal(true);
@@ -162,6 +163,10 @@ export default function Header(props) {
                 if (!data.hasFcmToken) {
                     // If the user does not have an FCM token, show a warning Snackbar
                     setShowFcmTokenWarning(true);
+                    setHasFCMToken(false)
+                }
+                else{
+                    setHasFCMToken(true)
                 }
             })
             .catch(error => {
@@ -170,7 +175,7 @@ export default function Header(props) {
             });
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         checkFcmToken()
     }, [])
 
@@ -277,6 +282,7 @@ export default function Header(props) {
         })
             .then(response => response.json())
             .then(data => {
+                setHasFCMToken(true)
                 setRender((prev) => !prev);
                 // window.location.pathname = '/';
             })
@@ -299,6 +305,13 @@ export default function Header(props) {
         {
             image: T5,
             text: "Enable notifications so you don't miss a single item! You will only be notified of items being posted.",
+        },
+    ]
+
+    const fcmTokenWarning = [
+        {
+            image: T5,
+            text: "Must be a glitch but we are unable to send notifications to you, please enable them again.",
         },
     ]
 
@@ -600,11 +613,13 @@ export default function Header(props) {
                                     icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
                                     Update Phone
                                 </Dropdown.Item>
-                                <Dropdown.Item key="enablenotif" color=""
-                                    icon={<GoBellFill size={16} />}
-                                >
-                                    Enable Notifications
-                                </Dropdown.Item>
+                                {!hasFCMToken &&
+                                    <Dropdown.Item key="enablenotif" color=""
+                                        icon={<GoBellFill size={16} />}
+                                    >
+                                        Enable Notifications
+                                    </Dropdown.Item>
+                                }
                                 <Dropdown.Item key="logout" withDivider color="error"
                                     icon={<IoLogOut size={16} />}>
                                     Log Out
@@ -1015,6 +1030,83 @@ export default function Header(props) {
                 </Grid.Container>
             </Modal>
 
+            <Modal
+                open={showFcmTokenWarning && !firstTime && Object.keys(localStorage).length>=3}
+                closeButton
+                onClose={() => {
+                    setShowFcmTokenWarning(false)
+                }}
+                aria-label="fcm-token-modal"
+            >
+                <Grid.Container css={{
+                    jc: 'center',
+                    alignItems: '',
+                    padding: '12px 0px',
+                }}>
+                    <Col css={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}>
+                        <Text css={{
+                            '@xsMin': {
+                                fontSize: '$xl'
+                            },
+                            '@xsMax': {
+                                fontSize: '$lg'
+                            },
+                            fontWeight: '$medium',
+                            paddingBottom: '6px',
+                            borderStyle: 'solid',
+                            borderColor: '$gray600',
+                            borderWidth: '0px 0px 1px 0px',
+                            width: 318,
+                            marginBottom: '12px'
+                        }}>
+                            Attention!!!
+                        </Text>
+
+                        <Col css={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center'
+                        }}>
+                            <Image
+                                src={fcmTokenWarning[0].image}
+                                width={320}
+                                height={358}
+                                css={{
+                                    objectFit: 'cover',
+                                    borderRadius: '0px 0px 12px 12px'
+                                }}
+                            />
+
+                            <Text css={{
+                                fontSize: '$md',
+                                fontWeight: '$medium',
+                                jc: 'center',
+                                alignItems: 'center',
+                                padding: '8px 16px 6px 16px'
+                            }}>
+                                {fcmTokenWarning[0].text}
+                            </Text>
+
+
+                            <Button auto light color={'error'}
+                                onClick={() => {
+                                    requestNotificationPermission()
+                                    setShowFcmTokenWarning(false)
+                                }}
+                            >
+                                Enable Notifications ✔️
+                            </Button>
+
+                        </Col>
+
+                    </Col>
+                </Grid.Container>
+            </Modal>
+
             {!(window.location.pathname === '/unauthorised' || Object.keys(localStorage).length <= 4) ?
                 <Grid.Container css={{
                     '@xsMin': {
@@ -1125,11 +1217,13 @@ export default function Header(props) {
                                             icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
                                             Update Phone
                                         </Dropdown.Item>
-                                        <Dropdown.Item key="enablenotif" color=""
-                                            icon={<GoBellFill size={16} />}
-                                        >
-                                            Enable Notifications
-                                        </Dropdown.Item>
+                                        {!hasFCMToken &&
+                                            <Dropdown.Item key="enablenotif" color=""
+                                                icon={<GoBellFill size={16} />}
+                                            >
+                                                Enable Notifications
+                                            </Dropdown.Item>
+                                        }
                                         <Dropdown.Item key="logout" withDivider color="error"
                                             icon={<IoLogOut size={16} />}>
                                             Log Out
@@ -1152,7 +1246,7 @@ export default function Header(props) {
                 <CircularProgress color="inherit" />
             </Backdrop>
 
-            <Snackbar
+            {/* <Snackbar
                 open={showFcmTokenWarning}
                 autoHideDuration={6000}
                 onClose={() => setShowFcmTokenWarning(false)}
@@ -1165,7 +1259,7 @@ export default function Header(props) {
                 >
                     Seems like you don't have notifications enabled. Press on your avatar and click on 'Enable Notifications' to turn them on.
                 </Alert>
-            </Snackbar>
+            </Snackbar> */}
 
             <Snackbar
                 anchorOrigin={{
