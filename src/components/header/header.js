@@ -39,6 +39,7 @@ import T2 from '../../assets/Tutorial/Searching&Filtering.png'
 import T3 from '../../assets/Tutorial/EditItem.png'
 import T4 from '../../assets/Tutorial/Outlet.png'
 import T5 from '../../assets/Tutorial/Notifications.jpeg'
+import { IoFastFood } from "react-icons/io5";
 
 
 export default function Header(props) {
@@ -75,13 +76,15 @@ export default function Header(props) {
 
     const collapseItemsLoggedOut = [
         { key: '/outlets', value: "Outlets" },
-        { key: '/about', value: "About" },
+        // { key: '/about', value: "About" },
     ];
 
     const collapseItemsLoggedIn = [
         { key: 'saleitems', value: "Sale Items" },
+        { key: 'favourites', value: "Favourites" },
+        { key: 'useritems', value: "My Sale Items" },
         { key: 'outlets', value: "Outlets" },
-        { key: 'about', value: "About" },
+        // { key: 'about', value: "About" },
         { key: 'logout', value: "Log Out" },
     ];
 
@@ -165,7 +168,7 @@ export default function Header(props) {
                     setShowFcmTokenWarning(true);
                     setHasFCMToken(false)
                 }
-                else{
+                else {
                     setHasFCMToken(true)
                 }
             })
@@ -561,7 +564,7 @@ export default function Header(props) {
                                     if (actionKey === 'logout') {
                                         handleLogout()
                                     }
-                                    else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
+                                    else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale' || 'outlets') {
                                         navigate(actionKey)
                                     }
                                     else if (actionKey === 'phoneAuth') {
@@ -597,18 +600,22 @@ export default function Header(props) {
                                         {localStorage.getItem('userEmail')}
                                     </Text> */}
                                 </Dropdown.Item>
-                                <Dropdown.Item key="createsale" withDivider color=""
+                                {/* <Dropdown.Item key="createsale" withDivider color=""
                                     icon={<FaPlus size={16} />}>
                                     Create Sale
+                                </Dropdown.Item> */}
+                                <Dropdown.Item key="outlets" withDivider color=""
+                                    icon={<IoFastFood size={16} />}>
+                                    Outlets
                                 </Dropdown.Item>
                                 <Dropdown.Item key="useritems" color=""
                                     icon={<FaBagShopping size={16} />}>
                                     My Sale Items
                                 </Dropdown.Item>
-                                <Dropdown.Item key="favourites" color=""
+                                {/* <Dropdown.Item key="favourites" color=""
                                     icon={<IoMdHeart size={16} />}>
                                     Favourites
-                                </Dropdown.Item>
+                                </Dropdown.Item> */}
                                 <Dropdown.Item key="phoneAuth" color=""
                                     icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
                                     Update Phone
@@ -1031,7 +1038,7 @@ export default function Header(props) {
             </Modal>
 
             <Modal
-                open={showFcmTokenWarning && !firstTime && Object.keys(localStorage).length>=3}
+                open={showFcmTokenWarning && !firstTime && Object.keys(localStorage).length >= 3}
                 closeButton
                 onClose={() => {
                     setShowFcmTokenWarning(false)
@@ -1201,18 +1208,22 @@ export default function Header(props) {
                                                 {localStorage.getItem('contactNumber')}
                                             </Text>
                                         </Dropdown.Item>
-                                        <Dropdown.Item key="createsale" withDivider color=""
+                                        <Dropdown.Item withDivider key="outlets" color=""
+                                            icon={<IoFastFood size={16} />}>
+                                            Outlets
+                                        </Dropdown.Item>
+                                        {/* <Dropdown.Item key="createsale" withDivider color=""
                                             icon={<FaPlus size={16} />}>
                                             Create Sale
-                                        </Dropdown.Item>
+                                        </Dropdown.Item> */}
                                         <Dropdown.Item key="useritems" color=""
                                             icon={<FaBagShopping size={16} />}>
                                             My Sale Items
                                         </Dropdown.Item>
-                                        <Dropdown.Item key="favourites" color=""
+                                        {/* <Dropdown.Item key="favourites" color=""
                                             icon={<IoMdHeart size={16} />}>
                                             Favourites
-                                        </Dropdown.Item>
+                                        </Dropdown.Item> */}
                                         <Dropdown.Item key="phoneAuth" color=""
                                             icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
                                             Update Phone
