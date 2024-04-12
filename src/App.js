@@ -20,6 +20,7 @@ import SaleItemsPage from './pages/saleItemsPage/saleItemsPage';
 import UserItemsPage from './pages/userItemsPage/userItemsPage';
 import FavouritesItemsPage from './pages/favouriteItemsPage/favouriteItemsPage';
 import InstallPWA from './components/installPWA/installPWA';
+import {RemoveScrollBar} from 'react-remove-scroll-bar';
 
 function App() {
 
@@ -78,7 +79,7 @@ function App() {
         };
     }, []);
 
-    const isPWA = (window.matchMedia('(display-mode: standalone)').matches)
+    const isPWA = !(window.matchMedia('(display-mode: standalone)').matches)
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isAndroid = /Android/i.test(navigator.userAgent);
 
@@ -90,6 +91,7 @@ function App() {
                     {scriptLoaded ?
                         <>
                             <NextUIProvider theme={theme}>
+                            {/* <RemoveScrollBar /> */}
                                 <Router>
                                     <Header setAppRender={setAppRender} setIsLightMode={setIsLightMode} isLightMode={isLightMode}/>
                                     <Routes>

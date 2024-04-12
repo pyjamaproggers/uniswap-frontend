@@ -17,3 +17,8 @@
 .horizontal-scroller > * {
     flex: 0 0 auto; /* Prevents flex items from growing or shrinking */
 }
+
+/* This styles the main scrollbar (width, etc.) */
+.saleitems::-webkit-scrollbar {
+    display: none;
+}

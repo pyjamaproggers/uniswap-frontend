@@ -321,7 +321,7 @@ export default function SaleItemsPage() {
             pullDownThreshold={60}
             aria-label='pulltorefresh'
         >
-            <Grid.Container>
+            <Grid.Container className="saleitems">
                 <Grid.Container css={{
                     padding: '4px 4px',
                     jc: 'center',

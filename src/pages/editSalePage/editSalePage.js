@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, useTheme } from "@nextui-org/react";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
@@ -22,6 +22,9 @@ import InputItemCard from "../../components/items/inputItemCard";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { FaChevronLeft } from "react-icons/fa";
+import getCroppedImg from '../../components/items/cropImage'
+import Paper from '@mui/material/Paper';
+import BottomNavigation from '@mui/material/BottomNavigation';
 
 export default function EditSalePage() {
 
@@ -29,6 +32,7 @@ export default function EditSalePage() {
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
 
     const theme = useTheme()
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     const location = useLocation()
     const backend = process.env.REACT_APP_BACKEND
@@ -53,52 +57,52 @@ export default function EditSalePage() {
             alert('Item name is required.');
             return false;
         }
-    
+
         // itemPrice: Required and must be an integer
         if (!Number.isInteger(item.itemPrice)) {
             alert('Item price must be a number.');
             return false;
         }
-    
+
         // itemCategory: Required and must be a non-empty string
         if (!item.itemCategory || typeof item.itemCategory !== 'string' || item.itemCategory.trim().length === 0) {
             alert('Item category is required.');
             return false;
         }
-    
+
         // contactNumber: Required and must be a non-empty string
         // Additional validation can be added here, e.g., regex for phone numbers
         // if (!item.contactNumber || typeof item.contactNumber !== 'string' || item.contactNumber.trim().length === 0) {
         //     alert('Contact number is required.');
         //     return false;
         // }
-    
+
         // If all checks pass
         return true;
     };
 
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
             method: 'GET',
             credentials: 'include', // Necessary to include the cookie in the request
         })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Session expired or user not logged in');
-            }
-        })
-        .then(data => {
-            console.log('User session verified:', data);
-            // Optionally update the UI or state based on the response
-        })
-        .catch(error => {
-            console.error('Error verifying user session:', error);
-            // Redirect to login page or show an error page
-            navigate('/unauthorized'); // Adjust the path as necessary
-        });
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Session expired or user not logged in');
+                }
+            })
+            .then(data => {
+                console.log('User session verified:', data);
+                // Optionally update the UI or state based on the response
+            })
+            .catch(error => {
+                console.error('Error verifying user session:', error);
+                // Redirect to login page or show an error page
+                navigate('/unauthorized'); // Adjust the path as necessary
+            });
     };
 
     useEffect(() => {
@@ -107,17 +111,17 @@ export default function EditSalePage() {
 
     const sendItem = async () => {
         setBackdropLoaderOpen(true);
-    if (!checkForm()) {
-        alert('Please fill in all required fields correctly.');
-        setBackdropLoaderOpen(false);
-        return;
-    }
+        if (!checkForm()) {
+            setBackdropLoaderOpen(false);
+            return;
+        }
 
         let imageUrl = originalItemPicture; // Default to the original picture URL
 
         if (imageFile && typeof imageFile === 'object' && imageFile.size) { // Check if imageFile is a file object
             try {
                 // Obtain the pre-signed URL from your backend
+                const finalImage = await getCroppedImg(previewUrl, croppedAreaPixels)
                 const uploadResponse = await fetch(`${backend}/api/upload`, { credentials: 'include' });
                 const uploadData = await uploadResponse.json();
                 const { url, key } = uploadData;
@@ -128,7 +132,7 @@ export default function EditSalePage() {
                     headers: {
                         'Content-Type': 'image/jpeg', // Adjust according to your image's MIME type
                     },
-                    body: imageFile,
+                    body: finalImage,
                 });
 
                 if (!putResponse.ok) throw new Error('Failed to upload image to S3.');
@@ -165,14 +169,14 @@ export default function EditSalePage() {
             setShowErrorSnackbar(true)
         }
     };
-    
+
     useEffect(() => {
-        if (typeof(imageFile)==='object' && imageFile) {
-            console.log('editsalepage: ',imageFile)
+        if (typeof (imageFile) === 'object' && imageFile) {
+            console.log('editsalepage: ', imageFile)
             const url = URL.createObjectURL(imageFile);
             // console.log(url)
             setPreviewUrl(url);
-    
+
             // Cleanup function to revoke the object URL
             return () => URL.revokeObjectURL(url);
         }
@@ -188,7 +192,7 @@ export default function EditSalePage() {
             <Grid.Container css={{
                 display: 'flex',
                 flexDirection: 'column',
-                padding: '16px 0px 24px',
+                padding: '16px 0px 104px',
                 jc: 'center',
                 alignItems: 'center'
             }}>
@@ -197,8 +201,8 @@ export default function EditSalePage() {
                     top: '98px',
                     left: '15px'
                 }}
-                onClick={() => navigate(-1)}>
-                    <FaChevronLeft size={16} color={theme.type==='light' ? "#0c0c0c" : "#f0f0f0"}/>
+                    onClick={() => navigate(-1)}>
+                    <FaChevronLeft size={16} color={theme.type === 'light' ? "#0c0c0c" : "#f0f0f0"} />
                 </div>
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -220,41 +224,66 @@ export default function EditSalePage() {
                     Edit Your Sale
                 </Text>
 
-                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'editsale'} setCroppedAreaPixels={setCroppedAreaPixels}/>
+                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'editsale'} setCroppedAreaPixels={setCroppedAreaPixels} />
 
-                <Button auto flat css={{
-                    margin: '0px 0px 104px 0px',
-                    padding: '6px 12px',
-                    height: 'max-content'
-                }}
-                    onClick={() => {
-                        if (checkForm()) {
-                            sendItem()
-                        }
-                        else {
-                            window.alert('You seem to have missed something')
-                        }
-                    }}>
-                    <Row css={{
-                        alignItems: 'center',
-                        gap: 8
-                    }}>
-                        <Text css={{
-                            '@xsMin': {
-                                fontSize: '$md'
-                            },
-                            '@xsMax': {
-                                fontSize: '$sm'
-                            },
-                            fontWeight: '$regular',
-                            color: '$blue600'
+                <Grid.Container css={{
+                    '@xsMin': {
+                        display: 'none'
+                    },
+                    '@xsMax': {
+                        display: 'flex'
+                    },
+                    zIndex: '1000',
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0
+                }}>
+                    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
+                        <BottomNavigation style={{
+                            backgroundColor: theme.type === 'light' ? '#fff' : '#0c0c0c',
+                            width: '100vw',
+                            height: 'max-content',
+                            alignItems: 'center'
                         }}>
-                            Update
-                        </Text>
-                        <IoSendSharp size={16} />
-                    </Row>
-                </Button>
-                
+                            <Button auto flat css={{
+                                marginTop: '8px',
+                                marginBottom: isIOS? '48px' : '8px',
+                                height: 'max-content',
+                                padding: '6px 12px',
+                                width: '100%',
+                                marginLeft: '24px',
+                                marginRight: '24px'
+                            }}
+                                onClick={() => {
+                                    if (checkForm()) {
+                                        sendItem()
+                                    }
+                                }}>
+                                <Row css={{
+                                    alignItems: 'center',
+                                    gap: 8
+                                }}>
+                                    <Text css={{
+                                        '@xsMin': {
+                                            fontSize: '$md'
+                                        },
+                                        '@xsMax': {
+                                            fontSize: '$md'
+                                        },
+                                        fontWeight: '$medium',
+                                        color: '$blue600'
+                                    }}>
+                                        Update
+                                    </Text>
+                                    <IoSendSharp size={16} style={{  }} />
+                                </Row>
+                            </Button>
+                        </BottomNavigation>
+                    </Paper>
+                </Grid.Container>
+
+
                 <Snackbar
                     anchorOrigin={{
                         vertical: 'top',

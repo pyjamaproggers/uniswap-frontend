@@ -22,6 +22,9 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { FaChevronLeft } from "react-icons/fa";
 import getCroppedImg from '../../components/items/cropImage'
+import Paper from '@mui/material/Paper';
+import BottomNavigation from '@mui/material/BottomNavigation';
+
 
 export default function CreateSalePage() {
 
@@ -32,7 +35,7 @@ export default function CreateSalePage() {
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
 
     const theme = useTheme()
-
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const [render, setRender] = useState(false)
 
     const navigate = useNavigate();
@@ -163,7 +166,7 @@ export default function CreateSalePage() {
     const sendItem = async () => {
         setBackdropLoaderOpen(true)
         if (!checkForm()) {
-            alert('Please fill in all required fields correctly.');
+            setBackdropLoaderOpen(false)
             return;
         }
 
@@ -233,7 +236,7 @@ export default function CreateSalePage() {
             <Grid.Container css={{
                 display: 'flex',
                 flexDirection: 'column',
-                padding: '16px 0px 24px',
+                padding: '16px 0px 104px 0px',
                 jc: 'center',
                 alignItems: 'center'
             }}>
@@ -242,8 +245,8 @@ export default function CreateSalePage() {
                     top: '98px',
                     left: '15px'
                 }}
-                onClick={() => navigate(-1)}>
-                    <FaChevronLeft size={16} color={theme.type==='light' ? "#0c0c0c" : "#f0f0f0"}/>
+                    onClick={() => navigate(-1)}>
+                    <FaChevronLeft size={16} color={theme.type === 'light' ? "#0c0c0c" : "#f0f0f0"} />
                 </div>
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -281,40 +284,64 @@ export default function CreateSalePage() {
                     Complete your item, upload your sale and people will directly contact you - it's that simple!
                 </Text>
 
-                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createsale'} setCroppedAreaPixels={setCroppedAreaPixels}/>
+                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createsale'} setCroppedAreaPixels={setCroppedAreaPixels} />
 
-                <Button auto flat css={{
-                    margin: '0px 0px 104px 0px',
-                    height: 'max-content',
-                    padding: '6px 12px'
-                }}
-                    onClick={() => {
-                        if (checkForm()) {
-                            sendItem()
-                        }
-                        else {
-                            window.alert('You seem to have missed something')
-                        }
-                    }}>
-                    <Row css={{
-                        alignItems: 'center',
-                        gap: 8
-                    }}>
-                        <Text css={{
-                            '@xsMin': {
-                                fontSize: '$md'
-                            },
-                            '@xsMax': {
-                                fontSize: '$sm'
-                            },
-                            fontWeight: '$regular',
-                            color: '$blue600'
+                <Grid.Container css={{
+                    '@xsMin': {
+                        display: 'none'
+                    },
+                    '@xsMax': {
+                        display: 'flex'
+                    },
+                    zIndex: '1000',
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                    right: 0
+                }}>
+                    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
+                        <BottomNavigation style={{
+                            backgroundColor: theme.type === 'light' ? '#fff' : '#0c0c0c',
+                            width: '100vw',
+                            height: 'max-content',
+                            alignItems: 'center'
                         }}>
-                            Upload
-                        </Text>
-                        <IoSendSharp size={16} />
-                    </Row>
-                </Button>
+                            <Button auto flat css={{
+                                marginTop: '8px',
+                                marginBottom: isIOS? '48px' : '8px',
+                                height: 'max-content',
+                                padding: '6px 12px',
+                                width: '100%',
+                                marginLeft: '24px',
+                                marginRight: '24px'
+                            }}
+                                onClick={() => {
+                                    if (checkForm()) {
+                                        sendItem()
+                                    }
+                                }}>
+                                <Row css={{
+                                    alignItems: 'center',
+                                    gap: 8
+                                }}>
+                                    <Text css={{
+                                        '@xsMin': {
+                                            fontSize: '$md'
+                                        },
+                                        '@xsMax': {
+                                            fontSize: '$md'
+                                        },
+                                        fontWeight: '$medium',
+                                        color: '$blue600'
+                                    }}>
+                                        Upload
+                                    </Text>
+                                    <IoSendSharp size={16} style={{  }} />
+                                </Row>
+                            </Button>
+                        </BottomNavigation>
+                    </Paper>
+                </Grid.Container>
 
                 <Snackbar
                     anchorOrigin={{

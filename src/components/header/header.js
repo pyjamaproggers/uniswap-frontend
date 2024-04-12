@@ -1143,7 +1143,11 @@ export default function Header(props) {
                 </Grid.Container>
             </Modal>
 
-            {!(window.location.pathname === '/unauthorised' || Object.keys(localStorage).length <= 4) ?
+            {!(window.location.pathname === '/unauthorised' 
+            || Object.keys(localStorage).length <= 4 
+            || window.location.pathname === '/createsale' 
+            || window.location.pathname === '/editsale' 
+            ) ?
                 <Grid.Container css={{
                     '@xsMin': {
                         display: 'none'
