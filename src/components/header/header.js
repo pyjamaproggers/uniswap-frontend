@@ -62,6 +62,7 @@ export default function Header(props) {
     const [tutorialIndex, setTutorialIndex] = useState(0)
     const theme = useTheme()
     const setAppRender = props.setAppRender
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
@@ -1156,7 +1157,10 @@ export default function Header(props) {
                             <Row css={{
                                 maxW: '330px',
                                 justifyContent: 'space-between',
-                                padding: '10px 8px 52px 8px',
+                                paddingTop: '10px',
+                                paddingLeft: '8px',
+                                paddingRight: '8px',
+                                paddingBottom: isIOS ? '52px' : '16px',
                                 alignItems: 'center'
                             }}>
                                 {navigationItems.map(navItem => {

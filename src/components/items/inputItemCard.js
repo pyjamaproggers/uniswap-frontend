@@ -36,7 +36,7 @@ export default function InputItemCard(props) {
     const previewUrl = props.previewUrl
     const setPreviewUrl = props.setImageFile
     const [scale, setScale] = useState(1);
-    const [startScale, setStartScale] = useState(1); // to remember the scale when touches start
+    const [initialDistance, setInitialDistance] = useState(null);
     const imageRef = useRef(null);
     const containerRef = useRef(null);
     const canvasRef = useRef(null);
@@ -118,68 +118,57 @@ export default function InputItemCard(props) {
             });
     };
 
-    const handleTouchStart = (event) => {
-        if (event.touches.length === 2) {
-            setStartScale(scale); // set current scale as start scale
-        }
-    };
-
     const handleTouchMove = (event) => {
         if (event.touches.length === 2) {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
             const distance = Math.sqrt(
-                Math.pow(touch2.pageX - touch1.pageX, 2) +
-                Math.pow(touch2.pageY - touch1.pageY, 2)
+                (touch2.pageX - touch1.pageX) ** 2 + (touch2.pageY - touch1.pageY) ** 2
             );
 
-            if (startScale && distance) {
-                const newScale = Math.max(startScale * (distance / 200), 1); // Calculate new scale from the initial touch distance and limit to not zoom out below original size
+            if (!initialDistance) {
+                setInitialDistance(distance);
+            } else {
+                const scaleChange = distance / initialDistance;
+                const newScale = Math.max(1, scale * scaleChange); // Ensure minimum scale is 1
                 setScale(newScale);
+                setInitialDistance(distance);  // Update the initial distance for the next move event
             }
-
             event.preventDefault();
         }
     };
 
-    const handleTouchEnd = (event) => {
-        // When touches end, save the image if it was zoomed
+    const handleTouchEnd = () => {
         if (scale !== 1) {
             cropAndSaveImage();
         }
+        setInitialDistance(null); // Reset initial distance for the next touch
     };
 
     const cropAndSaveImage = () => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
         const image = imageRef.current;
-        const rect = containerRef.current.getBoundingClientRect();
+        const container = containerRef.current;
 
-        const cropWidth = rect.width;
-        const cropHeight = rect.height;
-        const startX = (image.naturalWidth * scale - cropWidth) / 2 / scale;
-        const startY = (image.naturalHeight * scale - cropHeight) / 2 / scale;
+        // Calculate crop dimensions
+        const sx = (image.width - container.offsetWidth / scale) / 2;
+        const sy = (image.height - container.offsetHeight / scale) / 2;
+        const sWidth = container.offsetWidth / scale;
+        const sHeight = container.offsetHeight / scale;
 
-        canvas.width = cropWidth;
-        canvas.height = cropHeight;
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
 
-        context.clearRect(0, 0, cropWidth, cropHeight);
-        context.drawImage(image, startX, startY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+        // Draw cropped image
+        context.drawImage(image, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
 
         canvas.toBlob(blob => {
-            const newFile = new File([blob], 'cropped-image.jpeg', { type: 'image/jpeg' });
+            const newFile = new File([blob], 'cropped-image.jpg', { type: 'image/jpeg' });
             props.setImageFile(newFile);
             props.setPreviewUrl(URL.createObjectURL(newFile));
         }, 'image/jpeg');
-    };
-
-    const imageStyle = {
-        transform: `scale(${scale})`,
-        transformOrigin: 'center center',
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover'
     };
 
     return (
@@ -300,11 +289,9 @@ export default function InputItemCard(props) {
 
                 </Row>
 
-                <div ref={containerRef} style={{ position: 'relative', overflow: 'hidden', maxWidth: '400px', height: '400px', width: '97.5vw' }}
-                    onTouchStart={handleTouchStart}
+                <div ref={containerRef} style={{ position: 'relative', width: '97.5vw', height: '400px', overflow: 'hidden' }}
                     onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                >
+                    onTouchEnd={handleTouchEnd}>
 
                     {/* {previewUrl === null ?
                         <Image src={type === 'createSale' ? Grey : item.itemPicture} width={'330px'} height={'300px'} css={{
@@ -319,8 +306,13 @@ export default function InputItemCard(props) {
                             objectFit: 'cover'
                         }} />
                     } */}
-                    <img ref={imageRef} src={previewUrl || Grey} style={imageStyle} alt="Preview" />
-                    <canvas ref={canvasRef} style={{ display: 'none', maxWidth: '400px', width: '97.5vw', height: '400px' }}></canvas>
+                    <img ref={imageRef} src={props.previewUrl || Grey} alt="Preview" style={{
+                        width: `${100 * scale}%`,
+                        height: 'auto',
+                        transform: `translate(-50%, -50%) scale(${scale})`,
+                        transformOrigin: 'center center'
+                    }} />
+                    <canvas ref={canvasRef} style={{ display: 'none' }} />
 
                     <label className="custom-file-upload" style={{
                         position: 'absolute', // Position the label absolutely within the relative container
