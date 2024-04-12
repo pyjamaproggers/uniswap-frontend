@@ -149,7 +149,7 @@ export default function OutletsPage() {
             name: 'Nescafe',
             timing: '12pm To 2am',
             picture: Nescafe,
-            phone: '+918104213125',
+            phone: '+91',
             menu: [N1, N2, N3, N4, N5, N6],
             location: 'Between AC02 & AC03',
             website: ''
