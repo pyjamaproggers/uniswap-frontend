@@ -12,7 +12,7 @@ import { MdOutlineQuestionMark } from "react-icons/md";
 import jwt_decode from "jwt-decode";
 import Skeleton from '@mui/material/Skeleton';
 import { FaPlus } from "react-icons/fa";
-import { FaBagShopping } from "react-icons/fa6";
+import { FaBagShopping, FaShop } from "react-icons/fa6";
 import { MdStorefront } from 'react-icons/md';
 import { IoMdHeart } from "react-icons/io";
 import { IoLogOut } from "react-icons/io5";
@@ -40,6 +40,7 @@ import T3 from '../../assets/Tutorial/EditItem.png'
 import T4 from '../../assets/Tutorial/Outlet.png'
 import T5 from '../../assets/Tutorial/Notifications.jpeg'
 import { IoFastFood } from "react-icons/io5";
+import { MdOutgoingMail } from "react-icons/md";
 
 
 export default function Header(props) {
@@ -54,6 +55,8 @@ export default function Header(props) {
     const [hasFCMToken, setHasFCMToken] = useState(false)
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
+    const [errorSnackBarMessage, setErrorSnackbarMessage] = useState('')
+    const [successSnackbarMessage, setSuccessSnackbarMessage] = useState('')
     const [firstTime, setFirstTime] = useState()
     const [showTutorial, setShowTutorial] = useState(false)
     const [tutorialIndex, setTutorialIndex] = useState(0)
@@ -68,10 +71,12 @@ export default function Header(props) {
     // const toggleMode = props.toggleMode
 
     const navigationItems = [
-        { path: '/', icon: GoHomeFill },
+        // { path: '/', icon: GoHomeFill },
         { path: '/saleitems', icon: MdStorefront },
+        { path: '/useritems', icon: FaShop },
         { path: '/createsale', icon: FaPlus },
-        { path: '/favourites', icon: IoMdHeart }
+        // { path: '/favourites', icon: IoMdHeart },
+        { path: '/outlets', icon: IoFastFood },
     ];
 
     const collapseItemsLoggedOut = [
@@ -80,10 +85,11 @@ export default function Header(props) {
     ];
 
     const collapseItemsLoggedIn = [
-        { key: 'saleitems', value: "Sale Items" },
-        { key: 'favourites', value: "Favourites" },
-        { key: 'useritems', value: "My Sale Items" },
-        { key: 'outlets', value: "Outlets" },
+        { key: '/', value: "Home" },
+        { key: '/saleitems', value: "Sale Items" },
+        { key: '/useritems', value: "My Sale Items" },
+        { key: '/favourites', value: "Favourites" },
+        { key: '/outlets', value: "Outlets" },
         // { key: 'about', value: "About" },
         { key: 'logout', value: "Log Out" },
     ];
@@ -152,6 +158,7 @@ export default function Header(props) {
             })
             .catch(error => {
                 console.error('Error:', error);
+                setErrorSnackbarMessage('Error logging in, maybe check internet and try again?')
                 setShowErrorSnackbar(true);
             });
     }
@@ -201,6 +208,7 @@ export default function Header(props) {
             .then(response => {
                 if (!response.ok) {
                     setBackdropLoaderOpen(false);
+                    setErrorSnackbarMessage('Some issue updating your number, maybe check internet?')
                     setShowErrorSnackbar(true)
                     handleLogout()
                 }
@@ -215,6 +223,7 @@ export default function Header(props) {
             })
             .then(verifyResponse => {
                 if (!verifyResponse.ok) {
+                    setErrorSnackbarMessage(`Couldn't verify your identity...`)
                     setShowErrorSnackbar(true);
                     setBackdropLoaderOpen(false);
                     setShowNumberUpdateModal(false);
@@ -225,7 +234,7 @@ export default function Header(props) {
             })
             .then(verifyData => {
                 console.log('User verified, and cookie updated:', verifyData);
-
+                setSuccessSnackbarMessage('Successfully updated')
                 setShowSuccessSnackbar(true)
                 console.log("local")
                 localStorage.setItem('userEmail', verifyData.user.userEmail);
@@ -248,6 +257,7 @@ export default function Header(props) {
             .catch(error => {
                 setBackdropLoaderOpen(false);
                 console.error('Error:', error);
+                setErrorSnackbarMessage('Some error, maybe check internet/reload app and try again?')
                 setShowErrorSnackbar(true)
                 setShowNumberUpdateModal(false);
                 setShowNumberModal(false);
@@ -564,7 +574,7 @@ export default function Header(props) {
                                     if (actionKey === 'logout') {
                                         handleLogout()
                                     }
-                                    else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale' || 'outlets') {
+                                    else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale' || actionKey === 'outlets') {
                                         navigate(actionKey)
                                     }
                                     else if (actionKey === 'phoneAuth') {
@@ -572,6 +582,9 @@ export default function Header(props) {
                                     }
                                     else if (actionKey === 'enablenotif') {
                                         requestNotificationPermission()
+                                    }
+                                    else if (actionKey === 'contactDev') {
+                                        window.open('mailto:pyjamaprogrammers@gmail.com?subject="UniSwap Issue/Bug/Suggestion"')
                                     }
                                     else {
                                         console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
@@ -604,21 +617,25 @@ export default function Header(props) {
                                     icon={<FaPlus size={16} />}>
                                     Create Sale
                                 </Dropdown.Item> */}
-                                <Dropdown.Item key="outlets" withDivider color=""
+                                {/* <Dropdown.Item key="outlets" withDivider color=""
                                     icon={<IoFastFood size={16} />}>
                                     Outlets
-                                </Dropdown.Item>
-                                <Dropdown.Item key="useritems" color=""
+                                </Dropdown.Item> */}
+                                {/* <Dropdown.Item key="useritems" color=""
                                     icon={<FaBagShopping size={16} />}>
                                     My Sale Items
-                                </Dropdown.Item>
-                                {/* <Dropdown.Item key="favourites" color=""
+                                </Dropdown.Item> */}
+                                <Dropdown.Item key="favourites" color=""
                                     icon={<IoMdHeart size={16} />}>
                                     Favourites
-                                </Dropdown.Item> */}
+                                </Dropdown.Item>
                                 <Dropdown.Item key="phoneAuth" color=""
                                     icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
                                     Update Phone
+                                </Dropdown.Item>
+                                <Dropdown.Item key="contactDev" color=""
+                                    icon={<MdOutgoingMail size={16} style={{ margin: '2px' }} />}>
+                                    Contact Developers
                                 </Dropdown.Item>
                                 {!hasFCMToken &&
                                     <Dropdown.Item key="enablenotif" color=""
@@ -1183,7 +1200,7 @@ export default function Header(props) {
                                             if (actionKey === 'logout') {
                                                 handleLogout()
                                             }
-                                            else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale'|| actionKey == 'outlets') {
+                                            else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale' || actionKey == 'outlets') {
                                                 navigate(actionKey)
                                             }
                                             else if (actionKey === 'phoneAuth') {
@@ -1191,6 +1208,9 @@ export default function Header(props) {
                                             }
                                             else if (actionKey === 'enablenotif') {
                                                 requestNotificationPermission()
+                                            }
+                                            else if (actionKey === 'contactDev') {
+                                                window.open('mailto:pyjamaprogrammers@gmail.com?subject="UniSwap Issue/Bug/Suggestion"')
                                             }
                                             else {
                                                 console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
@@ -1208,25 +1228,29 @@ export default function Header(props) {
                                                 {localStorage.getItem('contactNumber')}
                                             </Text>
                                         </Dropdown.Item>
-                                        <Dropdown.Item withDivider key="outlets" color=""
+                                        {/* <Dropdown.Item withDivider key="outlets" color=""
                                             icon={<IoFastFood size={16} />}>
                                             Outlets
-                                        </Dropdown.Item>
+                                        </Dropdown.Item> */}
                                         {/* <Dropdown.Item key="createsale" withDivider color=""
                                             icon={<FaPlus size={16} />}>
                                             Create Sale
                                         </Dropdown.Item> */}
-                                        <Dropdown.Item key="useritems" color=""
+                                        {/* <Dropdown.Item key="useritems" color=""
                                             icon={<FaBagShopping size={16} />}>
                                             My Sale Items
-                                        </Dropdown.Item>
-                                        {/* <Dropdown.Item key="favourites" color=""
+                                        </Dropdown.Item> */}
+                                        <Dropdown.Item key="favourites" withDivider color=""
                                             icon={<IoMdHeart size={16} />}>
                                             Favourites
-                                        </Dropdown.Item> */}
+                                        </Dropdown.Item>
                                         <Dropdown.Item key="phoneAuth" color=""
                                             icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
                                             Update Phone
+                                        </Dropdown.Item>
+                                        <Dropdown.Item key="contactDev" color=""
+                                            icon={<MdOutgoingMail size={16} style={{ margin: '2px' }} />}>
+                                            Contact Developers
                                         </Dropdown.Item>
                                         {!hasFCMToken &&
                                             <Dropdown.Item key="enablenotif" color=""
@@ -1279,16 +1303,16 @@ export default function Header(props) {
                 }}
                 open={showSuccessSnackbar}
                 autoHideDuration={1500}
-                onClose={() => { setShowSuccessSnackbar(false) }}
+                onClose={() => { setShowSuccessSnackbar(false); setSuccessSnackbarMessage('') }}
             >
                 <Alert
-                    onClose={() => { setShowSuccessSnackbar(false) }}
+                    onClose={() => { setShowSuccessSnackbar(false); setSuccessSnackbarMessage('') }}
                     severity="success"
                     variant="filled"
                     color="success"
                     sx={{ width: '100%' }}
                 >
-                    Success
+                    {successSnackbarMessage}
                 </Alert>
             </Snackbar>
 
@@ -1299,16 +1323,16 @@ export default function Header(props) {
                 }}
                 open={showErrorSnackbar}
                 autoHideDuration={1500}
-                onClose={() => { setShowErrorSnackbar(false) }}
+                onClose={() => { setShowErrorSnackbar(false); setErrorSnackbarMessage('') }}
             >
                 <Alert
-                    onClose={() => { setShowErrorSnackbar(false) }}
+                    onClose={() => { setShowErrorSnackbar(false); setErrorSnackbarMessage('') }}
                     severity="error"
                     variant="filled"
                     color="error"
                     sx={{ width: '100%' }}
                 >
-                    Error
+                    {errorSnackBarMessage}
                 </Alert>
             </Snackbar>
 

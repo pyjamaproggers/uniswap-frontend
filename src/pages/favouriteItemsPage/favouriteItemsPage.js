@@ -256,14 +256,14 @@ export default function FavouritesItemsPage() {
                     jc: 'center'
                 }}>
                     <Text css={{
-                        fontWeight: '$semibold',
+                        fontWeight: '$medium',
                         '@xsMin': {
                             fontSize: '$3xl',
                             padding: '1% 2%'
                         },
                         '@xsMax': {
-                            fontSize: '$2xl',
-                            padding: '4%'
+                            fontSize: '$xl',
+                            padding: '2%'
                         },
                         width: 'max-content'
                     }}>
@@ -419,7 +419,7 @@ export default function FavouritesItemsPage() {
 
                     </Grid.Container>
 
-                    {!fetchingAllItems && !backdropLoaderOpen && filteredItems &&
+                    {!fetchingAllItems && !backdropLoaderOpen && filteredItems && visibleItems &&
                         <>
                             {
                                 visibleItems.map((item, index) => (
@@ -437,7 +437,6 @@ export default function FavouritesItemsPage() {
                             }
                         </>
                     }
-
 
                 </Grid.Container>
 

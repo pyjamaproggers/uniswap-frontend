@@ -58,7 +58,7 @@ export default function HomePage(props) {
             <Grid.Container className="homebg" css={{
                 jc: 'center',
                 alignItems: '',
-                height: window.screen.height - 250,
+                height: window.screen.height - 170,
                 paddingTop: '25%'
                 // padding: '10% 0px 40% 0'
             }}>
