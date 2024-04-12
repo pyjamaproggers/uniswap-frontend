@@ -36,7 +36,7 @@ export default function InputItemCard(props) {
     const previewUrl = props.previewUrl
     const setPreviewUrl = props.setImageFile
     const [scale, setScale] = useState(1);
-    const [lastTouchDistance, setLastTouchDistance] = useState(null);
+    const [startScale, setStartScale] = useState(1); // to remember the scale when touches start
     const imageRef = useRef(null);
     const containerRef = useRef(null);
     const canvasRef = useRef(null);
@@ -118,6 +118,12 @@ export default function InputItemCard(props) {
             });
     };
 
+    const handleTouchStart = (event) => {
+        if (event.touches.length === 2) {
+            setStartScale(scale); // set current scale as start scale
+        }
+    };
+
     const handleTouchMove = (event) => {
         if (event.touches.length === 2) {
             const touch1 = event.touches[0];
@@ -128,20 +134,20 @@ export default function InputItemCard(props) {
                 Math.pow(touch2.pageY - touch1.pageY, 2)
             );
 
-            if (lastTouchDistance && distance !== lastTouchDistance) {
-                const scaleChange = distance / lastTouchDistance;
-                const newScale = Math.max(scale * scaleChange, 1); // Restrict scale so image width does not go below 400px
+            if (startScale && distance) {
+                const newScale = Math.max(startScale * (distance / 200), 1); // Calculate new scale from the initial touch distance and limit to not zoom out below original size
                 setScale(newScale);
             }
 
-            setLastTouchDistance(distance);
             event.preventDefault();
         }
     };
 
-    const handleTouchEnd = () => {
-        setLastTouchDistance(null);
-        cropAndSaveImage();
+    const handleTouchEnd = (event) => {
+        // When touches end, save the image if it was zoomed
+        if (scale !== 1) {
+            cropAndSaveImage();
+        }
     };
 
     const cropAndSaveImage = () => {
@@ -150,31 +156,21 @@ export default function InputItemCard(props) {
         const image = imageRef.current;
         const rect = containerRef.current.getBoundingClientRect();
 
-        // Calculate the crop area
         const cropWidth = rect.width;
         const cropHeight = rect.height;
-        const startX = (image.width * scale - cropWidth) / 2 / scale;
-        const startY = (image.height * scale - cropHeight) / 2 / scale;
+        const startX = (image.naturalWidth * scale - cropWidth) / 2 / scale;
+        const startY = (image.naturalHeight * scale - cropHeight) / 2 / scale;
 
-        // Set canvas size to the crop area
         canvas.width = cropWidth;
         canvas.height = cropHeight;
 
-        // Clear the canvas and reset transformations
         context.clearRect(0, 0, cropWidth, cropHeight);
-        context.resetTransform();
-
-        // Draw the scaled image to the canvas
         context.drawImage(image, startX, startY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
 
-        // Convert canvas to a data URL
-        const croppedImageDataURL = canvas.toDataURL('image/jpeg');
-
-        // Create a blob from the data URL
         canvas.toBlob(blob => {
             const newFile = new File([blob], 'cropped-image.jpeg', { type: 'image/jpeg' });
-            props.setImageFile(newFile); // Assuming `setImageFile` accepts a File object
-            props.setPreviewUrl(URL.createObjectURL(newFile)); // Set the preview URL to the cropped image
+            props.setImageFile(newFile);
+            props.setPreviewUrl(URL.createObjectURL(newFile));
         }, 'image/jpeg');
     };
 
@@ -185,7 +181,6 @@ export default function InputItemCard(props) {
         height: '100%',
         objectFit: 'cover'
     };
-
 
     return (
         <Grid css={{
@@ -306,6 +301,7 @@ export default function InputItemCard(props) {
                 </Row>
 
                 <div ref={containerRef} style={{ position: 'relative', overflow: 'hidden', maxWidth: '400px', height: '400px', width: '97.5vw' }}
+                    onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
                 >
@@ -324,7 +320,7 @@ export default function InputItemCard(props) {
                         }} />
                     } */}
                     <img ref={imageRef} src={previewUrl || Grey} style={imageStyle} alt="Preview" />
-                    <canvas ref={canvasRef} style={{ display: 'none' }} width="330" height="300"></canvas>
+                    <canvas ref={canvasRef} style={{ display: 'none', maxWidth: '400px', width: '97.5vw', height: '400px' }}></canvas>
 
                     <label className="custom-file-upload" style={{
                         position: 'absolute', // Position the label absolutely within the relative container
