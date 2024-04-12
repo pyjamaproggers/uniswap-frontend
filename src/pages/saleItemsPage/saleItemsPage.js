@@ -311,7 +311,6 @@ export default function SaleItemsPage() {
             .catch((error) => console.error("Error sending FCM token to server:", error));
     };
 
-
     return (
         <PullToRefresh onRefresh={fetchAllItems}
             pullingContent={''}
@@ -322,7 +321,8 @@ export default function SaleItemsPage() {
             <Grid.Container>
                 <Grid.Container css={{
                     padding: '4px 4px',
-                    jc: 'center'
+                    jc: 'center',
+                    marginBottom: '100px'
                 }}>
                     <Text css={{
                         fontWeight: '$medium',

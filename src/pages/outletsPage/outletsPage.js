@@ -302,7 +302,8 @@ export default function OutletsPage() {
         <Grid.Container css={{
             width: '100vw',
             jc: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            marginBottom: '100px'
         }}>
             <Text css={{
                 '@xsMin': {

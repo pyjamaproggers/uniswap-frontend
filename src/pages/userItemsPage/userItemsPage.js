@@ -251,7 +251,8 @@ export default function UserItemsPage() {
                 {/* {console.log('FavouriteItems: ', favouriteItems)} */}
                 <Grid.Container css={{
                     padding: '4px 4px',
-                    jc: 'center'
+                    jc: 'center',
+                    marginBottom: '100px'
                 }}>
                     <Text css={{
                         fontWeight: '$medium',
