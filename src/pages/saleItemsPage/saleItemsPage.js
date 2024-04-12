@@ -266,12 +266,10 @@ export default function SaleItemsPage() {
             .then(data => {
                 if (!data.hasFcmToken) {
                     // If the user does not have an FCM token, show a warning Snackbar
-                    Notification.requestPermission().then((permission)=>{
-                        if(permission === 'granted'){
-                            setShowFcmTokenWarning(true);
-                            setHasFCMToken(false)
-                        }
-                    })
+                    if(Notification.permission==='granted'){
+                        setShowFcmTokenWarning(true);
+                        setHasFCMToken(false)
+                    }
                 }
                 else {
                     setHasFCMToken(true)
