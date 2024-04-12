@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, Link, Badge, Collapse, Modal } from "@nextui-org/react";
+import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, Link, Badge, Collapse, Modal, useTheme } from "@nextui-org/react";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
 import { IoTicket } from "react-icons/io5";
@@ -21,6 +21,7 @@ import InputItemCard from "../../components/items/inputItemCard";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { FaChevronLeft } from "react-icons/fa";
+import getCroppedImg from '../../components/items/cropImage'
 
 export default function CreateSalePage() {
 
@@ -29,6 +30,8 @@ export default function CreateSalePage() {
 
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
+
+    const theme = useTheme()
 
     const [render, setRender] = useState(false)
 
@@ -83,6 +86,7 @@ export default function CreateSalePage() {
 
     const [imageFile, setImageFile] = useState(null)
     const [previewUrl, setPreviewUrl] = useState(null)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
     const checkForm = () => {
         // itemName: Required and must be a non-empty string
@@ -118,7 +122,6 @@ export default function CreateSalePage() {
         // If all checks pass
         return true;
     };
-
 
     const postItemToBackend = async (itemData) => {
         console.log(`${backend}/api/items`)
@@ -166,6 +169,9 @@ export default function CreateSalePage() {
 
         try {
             // Get presigned URL from your backend
+            // console.log(croppedAreaPixels)
+            const finalImage = await getCroppedImg(previewUrl, croppedAreaPixels)
+            // console.log(finalImage)
             const uploadResponse = await fetch(`${backend}/api/upload`, { credentials: 'include' });
             const uploadData = await uploadResponse.json();
             const { url, key } = uploadData; // Assuming your backend provides the key
@@ -176,7 +182,7 @@ export default function CreateSalePage() {
                 headers: {
                     'Content-Type': 'image/jpeg', // Make sure this matches your file's type
                 },
-                body: imageFile, // Directly use the file as the body
+                body: finalImage, // Directly use the file as the body
             });
 
             if (putResponse.ok) {
@@ -237,7 +243,7 @@ export default function CreateSalePage() {
                     left: '15px'
                 }}
                 onClick={() => navigate(-1)}>
-                    <FaChevronLeft size={16} color="#f0f0f0"/>
+                    <FaChevronLeft size={16} color={theme.type==='light' ? "#0c0c0c" : "#f0f0f0"}/>
                 </div>
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -275,7 +281,7 @@ export default function CreateSalePage() {
                     Complete your item, upload your sale and people will directly contact you - it's that simple!
                 </Text>
 
-                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createSale'} />
+                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createsale'} setCroppedAreaPixels={setCroppedAreaPixels}/>
 
                 <Button auto flat css={{
                     margin: '0px 0px 104px 0px',

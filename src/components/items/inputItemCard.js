@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, Link, Badge, Collapse, Modal, useTheme } from "@nextui-org/react";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
@@ -20,7 +20,9 @@ import imageCompression from 'browser-image-compression';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import './itemCard.css'
-
+import Cropper from 'react-easy-crop';
+import getCroppedImg from './cropImage'; // You'll need this helper function for cropping
+import { debounce } from 'lodash';
 
 export default function InputItemCard(props) {
 
@@ -34,12 +36,11 @@ export default function InputItemCard(props) {
     const setImageFile = props.setImageFile
 
     const previewUrl = props.previewUrl
-    const setPreviewUrl = props.setImageFile
-    const [scale, setScale] = useState(1);
-    const [startScale, setStartScale] = useState(1);
-    const imageRef = useRef(null);
-    const containerRef = useRef(null);
-    const canvasRef = useRef(null);
+    const setPreviewUrl = props.setPreviewUrl
+    const setCroppedAreaPixels = props.setCroppedAreaPixels
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+
 
     const type = props.type
     const theme = useTheme()
@@ -60,6 +61,10 @@ export default function InputItemCard(props) {
         jewellry: 'warning',
         lostandfound: 'neutral',
     };
+
+    useEffect(()=>{
+        console.log(previewUrl)
+    },[previewUrl])
 
     // Default to some color if item.category is not found in the mapping
     const badgeColor = categoryColors[item.itemCategory] || 'neutral';
@@ -118,74 +123,28 @@ export default function InputItemCard(props) {
             });
     };
 
-    const handleTouchStart = (event) => {
-        if (event.touches.length === 2) {
-            const touch1 = event.touches[0];
-            const touch2 = event.touches[1];
+    const onCropAreaChange = useCallback((croppedArea, croppedAreaPixels) => {
+        // console.log(croppedAreaPixels)
+        setCroppedAreaPixels(croppedAreaPixels);
+        // console.log('cropping')
+        // handleSaveCroppedImage();
+    }, []);
 
-            // Calculate the initial distance between two points
-            const initialDistance = Math.sqrt(
-                Math.pow(touch2.pageX - touch1.pageX, 2) +
-                Math.pow(touch2.pageY - touch1.pageY, 2)
-            );
-
-            setStartScale({ scale: scale, distance: initialDistance });
-        }
-    };
-
-    const handleTouchMove = (event) => {
-        if (event.touches.length === 2) {
-            const touch1 = event.touches[0];
-            const touch2 = event.touches[1];
-
-            const newDistance = Math.sqrt(
-                Math.pow(touch2.pageX - touch1.pageX, 2) +
-                Math.pow(touch2.pageY - touch1.pageY, 2)
-            );
-
-            if (startScale.distance) {
-                const distanceRatio = newDistance / startScale.distance;
-                const newScale = Math.max(1, Math.min(5, startScale.scale * distanceRatio)); // Set a maximum scale limit
-                setScale(newScale);
+    const handleImageChange = (event) => {
+        if (event.target.files && event.target.files[0]) {
+            // console.log(event.target.files[0].size/1000/1000)
+            // console.log(event.target.files[0])
+            if (event.target.files[0].size > (20 * 1000 * 1000)) {
+                window.alert('Maximum file size: 20mb!');
+            } else {
+                setImageFile(event.target.files[0]);
+                // Assuming you have logic here to create a preview URL
             }
-
-            event.preventDefault(); // Prevent the default action to ensure smooth zooming
+        } else {
+            setImageFile(null); // Reset state if no file is selected
+            setPreviewUrl(null); // Also reset the preview URL
         }
     };
-
-    const handleTouchEnd = (event) => {
-        // Reset the start scale when the touch ends
-        setStartScale({ scale: scale, distance: null });
-        cropAndSaveImage(); // Trigger cropping and saving the image
-    };
-
-    const cropAndSaveImage = () => {
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
-        const image = imageRef.current;
-        const rect = containerRef.current.getBoundingClientRect();
-
-        // Set canvas dimensions to the crop area
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-
-        // Calculate the portion of the image to draw onto the canvas
-        const startX = (image.width * scale - rect.width) / 2 / scale;
-        const startY = (image.height * scale - rect.height) / 2 / scale;
-        const width = rect.width / scale;
-        const height = rect.height / scale;
-
-        // Draw the image segment on the canvas
-        context.drawImage(image, startX, startY, width, height, 0, 0, rect.width, rect.height);
-
-        // Convert the canvas to a blob and then to a File object
-        canvas.toBlob(blob => {
-            const newFile = new File([blob], 'cropped-image.jpeg', { type: 'image/jpeg' });
-            setImageFile(newFile);  // Assuming setImageFile is a state setter for storing the file
-            setPreviewUrl(URL.createObjectURL(newFile));  // Update the preview URL to show the cropped image
-        }, 'image/jpeg');
-    };
-
 
     return (
         <Grid css={{
@@ -305,33 +264,58 @@ export default function InputItemCard(props) {
 
                 </Row>
 
-                <div ref={containerRef}
-                    style={{ position: 'relative', width: '97.5vw', height: '400px', overflow: 'hidden' }}
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}>
-
-
-                    {/* {previewUrl === null ?
-                        <Image src={type === 'createSale' ? Grey : item.itemPicture} width={'330px'} height={'300px'} css={{
-                            borderRadius: '4px',
-                            opacity: type === 'createSale' ? '0.25' : '1',
-                            objectFit: 'cover'
-                        }} />
+                <div style={{ position: 'relative', 
+                height: window.screen.width > 400 ? '400px' : '97.5vw', 
+                width: window.screen.width > 400 ? '400px' : '97.5vw'
+                }}>
+                    {(previewUrl === null) ?
+                        <>
+                            {type === 'editsale' ?
+                                <>
+                                    <Cropper
+                                        image={item.itemPicture}
+                                        crop={crop}
+                                        zoom={zoom}
+                                        aspect={1} // Set to 1 for a square aspect ratio
+                                        onCropChange={setCrop}
+                                        onZoomChange={setZoom}
+                                        onCropAreaChange={onCropAreaChange}
+                                        cropShape="rect"
+                                        showGrid={true}
+                                        objectFit="horizontal-cover"
+                                        // onMediaLoaded={(mediaSize) => {
+                                        //     // Adapt zoom based on media size to fit max height
+                                        //     setZoom(400 / mediaSize.naturalHeight)
+                                        //   }}
+                                    />
+                                </>
+                                :
+                                <>
+                                    <Image src={Grey} width={window.screen.width > 400 ? '400px' : '97.5vw'} height={window.screen.width > 400 ? '400px' : '97.5vw'} css={{
+                                        borderRadius: '4px',
+                                        opacity: '0.25',
+                                        objectFit: 'cover',
+                                    }}
+                                    />
+                                </>
+                            }
+                        </>
                         :
-                        <Image src={previewUrl} width={'330px'} height={'300px'} css={{
-                            borderRadius: '4px',
-                            opacity: '1',
-                            objectFit: 'cover'
-                        }} />
-                    } */}
-                    <img ref={imageRef} src={props.previewUrl || Grey} alt="Preview" style={{
-                        width: `${100 * scale}%`,
-                        height: '400px',
-                        transform: `translate(-50%, -50%) scale(${scale})`,
-                        transformOrigin: 'center center'
-                    }} />
-                    <canvas ref={canvasRef} style={{ display: 'none' }} />
+                        <div>
+                            <Cropper
+                                image={previewUrl}
+                                crop={crop}
+                                zoom={zoom}
+                                aspect={1} // Set to 1 for a square aspect ratio
+                                onCropChange={setCrop}
+                                onZoomChange={setZoom}
+                                onCropAreaChange={onCropAreaChange}
+                                cropShape="rect"
+                                showGrid={true}
+                                objectFit="horizontal-cover"
+                            />
+                        </div>
+                    }
 
                     <label className="custom-file-upload" style={{
                         position: 'absolute', // Position the label absolutely within the relative container
@@ -349,23 +333,10 @@ export default function InputItemCard(props) {
                         cursor: 'pointer', // Change cursor to pointer to indicate it's clickable
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        zIndex: 1000
+                        whiteSpace: 'nowrap'
                     }}>
                         <input onChange={(event) => {
-                            if (event.target.files && event.target.files[0]) {
-                                // console.log(event.target.files[0].size/1000/1000)
-                                // console.log(event.target.files[0])
-                                if (event.target.files[0].size > (20 * 1000 * 1000)) {
-                                    window.alert('Maximum file size: 20mb!');
-                                } else {
-                                    setImageFile(event.target.files[0]);
-                                    // Assuming you have logic here to create a preview URL
-                                }
-                            } else {
-                                setImageFile(null); // Reset state if no file is selected
-                                setPreviewUrl(null); // Also reset the preview URL
-                            }
+                            handleImageChange(event)
                         }} className="photobtn" type='file' accept="image/*" required style={{ display: 'none' }} />
                         {imageFile === null ?
                             "Upload Picture +"
@@ -374,6 +345,7 @@ export default function InputItemCard(props) {
                         }
                     </label>
                 </div>
+
 
                 <input
                     required

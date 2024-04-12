@@ -31,7 +31,7 @@ function App() {
 
     useEffect(() => {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-        console.log(mediaQuery.matches)
+        // console.log(mediaQuery.matches)
         const handleChange = () => setIsLightMode(mediaQuery.matches);
 
         mediaQuery.addEventListener('change', handleChange);
@@ -78,19 +78,6 @@ function App() {
         };
     }, []);
 
-    // const theme = createTheme({
-    //     type: 'dark', // Adjusted this line
-    //     theme: {
-    //         colors: {
-    //             // Assuming these color configurations are correct; adjust as necessary.
-    //             white: '#f0f0f0',
-    //             black: '#0c0c0c',
-    //             background: '#0c0c0c',
-    //             text: '#f0f0f0'
-    //         }
-    //     }
-    // });
-
     const isPWA = (window.matchMedia('(display-mode: standalone)').matches)
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isAndroid = /Android/i.test(navigator.userAgent);
@@ -104,7 +91,7 @@ function App() {
                         <>
                             <NextUIProvider theme={theme}>
                                 <Router>
-                                    <Header setAppRender={setAppRender} />
+                                    <Header setAppRender={setAppRender} setIsLightMode={setIsLightMode} isLightMode={isLightMode}/>
                                     <Routes>
                                         <Route exact path='/' element={<HomePage appRender={appRender} />} />
                                         {/* <Route exact path='/saleitems' element={<Itemspage type={'sale'} />} /> */}

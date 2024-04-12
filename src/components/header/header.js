@@ -62,6 +62,8 @@ export default function Header(props) {
     const [tutorialIndex, setTutorialIndex] = useState(0)
     const theme = useTheme()
     const setAppRender = props.setAppRender
+    const isLightMode = props.isLightMode
+    const setIsLightMode = props.setIsLightMode
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     const backend = process.env.REACT_APP_BACKEND
@@ -173,7 +175,7 @@ export default function Header(props) {
             .then(data => {
                 if (!data.hasFcmToken) {
                     // If the user does not have an FCM token, show a warning Snackbar
-                    if(Notification.permission==='granted'){
+                    if (Notification.permission === 'granted') {
                         setShowFcmTokenWarning(true);
                         setHasFCMToken(false)
                     }
@@ -589,6 +591,9 @@ export default function Header(props) {
                                     else if (actionKey === 'contactDev') {
                                         window.open('mailto:pyjamaprogrammers@gmail.com?subject="UniSwap Issue/Bug/Suggestion"')
                                     }
+                                    else if (actionKey === 'toggleMode') {
+                                        setIsLightMode(!isLightMode)
+                                    }
                                     else {
                                         console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
                                     }
@@ -637,7 +642,7 @@ export default function Header(props) {
                                     Update Phone
                                 </Dropdown.Item>
                                 <Dropdown.Item key="contactDev" color=""
-                                    icon={<MdOutgoingMail size={16} style={{ margin: '2px' }} />}>
+                                    icon={<MdOutgoingMail size={16} />}>
                                     Contact Developers
                                 </Dropdown.Item>
                                 {!hasFCMToken &&
@@ -647,6 +652,10 @@ export default function Header(props) {
                                         Enable Notifications
                                     </Dropdown.Item>
                                 }
+                                <Dropdown.Item key="toggleMode" color=""
+                                    icon={<MdOutlinePhoneIphone size={16} />}>
+                                    Go {isLightMode ? 'Dark' : 'Light'}
+                                </Dropdown.Item>
                                 <Dropdown.Item key="logout" withDivider color="error"
                                     icon={<IoLogOut size={16} />}>
                                     Log Out
@@ -1218,6 +1227,9 @@ export default function Header(props) {
                                             else if (actionKey === 'contactDev') {
                                                 window.open('mailto:pyjamaprogrammers@gmail.com?subject="UniSwap Issue/Bug/Suggestion"')
                                             }
+                                            else if (actionKey === 'toggleMode') {
+                                                setIsLightMode(!isLightMode)
+                                            }
                                             else {
                                                 console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
                                             }
@@ -1255,7 +1267,7 @@ export default function Header(props) {
                                             Update Phone
                                         </Dropdown.Item>
                                         <Dropdown.Item key="contactDev" color=""
-                                            icon={<MdOutgoingMail size={16} style={{ margin: '2px' }} />}>
+                                            icon={<MdOutgoingMail size={16}/>}>
                                             Contact Developers
                                         </Dropdown.Item>
                                         {!hasFCMToken &&
@@ -1265,6 +1277,10 @@ export default function Header(props) {
                                                 Enable Notifications
                                             </Dropdown.Item>
                                         }
+                                        <Dropdown.Item key="toggleMode" color=""
+                                            icon={<MdOutlinePhoneIphone size={16} />}>
+                                            Go {isLightMode ? 'Dark' : 'Light'}
+                                        </Dropdown.Item>
                                         <Dropdown.Item key="logout" withDivider color="error"
                                             icon={<IoLogOut size={16} />}>
                                             Log Out

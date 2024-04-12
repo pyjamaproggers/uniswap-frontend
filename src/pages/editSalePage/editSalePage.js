@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
 import { useNavigate } from 'react-router-dom'; 
-import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar } from "@nextui-org/react";
+import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, useTheme } from "@nextui-org/react";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
 import { IoTicket } from "react-icons/io5";
@@ -28,6 +28,8 @@ export default function EditSalePage() {
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
 
+    const theme = useTheme()
+
     const location = useLocation()
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
@@ -39,6 +41,7 @@ export default function EditSalePage() {
 
     const [imageFile, setImageFile] = useState(item.itemPicture)
     const [previewUrl, setPreviewUrl] = useState(null)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
     document.querySelectorAll('input, select, textarea').forEach((element) => {
         element.addEventListener('focus', (event) => event.preventDefault());
@@ -162,13 +165,14 @@ export default function EditSalePage() {
             setShowErrorSnackbar(true)
         }
     };
-
+    
     useEffect(() => {
-        if (typeof(imageFile)=='object') {
+        if (typeof(imageFile)==='object' && imageFile) {
+            console.log('editsalepage: ',imageFile)
             const url = URL.createObjectURL(imageFile);
             // console.log(url)
             setPreviewUrl(url);
-
+    
             // Cleanup function to revoke the object URL
             return () => URL.revokeObjectURL(url);
         }
@@ -184,7 +188,7 @@ export default function EditSalePage() {
             <Grid.Container css={{
                 display: 'flex',
                 flexDirection: 'column',
-                padding: '16px 12px 24px',
+                padding: '16px 0px 24px',
                 jc: 'center',
                 alignItems: 'center'
             }}>
@@ -194,7 +198,7 @@ export default function EditSalePage() {
                     left: '15px'
                 }}
                 onClick={() => navigate(-1)}>
-                    <FaChevronLeft size={16} color="#f0f0f0"/>
+                    <FaChevronLeft size={16} color={theme.type==='light' ? "#0c0c0c" : "#f0f0f0"}/>
                 </div>
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -216,7 +220,7 @@ export default function EditSalePage() {
                     Edit Your Sale
                 </Text>
 
-                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'editSale'}/>
+                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'editsale'} setCroppedAreaPixels={setCroppedAreaPixels}/>
 
                 <Button auto flat css={{
                     margin: '0px 0px 104px 0px',

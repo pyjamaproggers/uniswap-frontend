@@ -16,7 +16,8 @@ input[type="file"] {
 }
 
 .sale-itemName-input-dark{
-    width: 330px;
+    width: 97.5vw;
+    max-width: 400px;
     font-weight: 600;
     font-size: 14px;
     border-width: 0px 0px 0.5px 0px;
@@ -25,7 +26,8 @@ input[type="file"] {
 }
 
 .sale-itemName-input-light{
-    width: 330px;
+    width: 97.5vw;
+    max-width: 400px;
     font-weight: 600;
     font-size: 14px;
     border-width: 0px 0px 0.5px 0px;
@@ -44,7 +46,8 @@ input[type="file"] {
 }
 
 .sale-itemDesc-input-dark{
-    max-width: 330px;
+    width: 97.5vw;
+    max-width: 400px;
     min-width: 330px;
     max-height: 100px;
     min-height: 50px;
@@ -56,7 +59,8 @@ input[type="file"] {
     margin: 4px 0px
 }
 .sale-itemDesc-input-light{
-    max-width: 330px;
+    width: 97.5vw;
+    max-width: 400px;
     min-width: 330px;
     max-height: 100px;
     min-height: 50px;
@@ -123,4 +127,3 @@ input[type="file"] {
     font-weight: 600;
     color: #0072f5;
 }
-
