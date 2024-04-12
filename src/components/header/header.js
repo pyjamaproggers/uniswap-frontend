@@ -172,8 +172,12 @@ export default function Header(props) {
             .then(data => {
                 if (!data.hasFcmToken) {
                     // If the user does not have an FCM token, show a warning Snackbar
-                    setShowFcmTokenWarning(true);
-                    setHasFCMToken(false)
+                    Notification.requestPermission().then((permission)=>{
+                        if(permission === 'granted'){
+                            setShowFcmTokenWarning(true);
+                            setHasFCMToken(false)
+                        }
+                    })
                 }
                 else {
                     setHasFCMToken(true)
