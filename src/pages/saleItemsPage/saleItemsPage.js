@@ -196,6 +196,7 @@ export default function SaleItemsPage() {
     }
 
     const fetchAllItems = async () => {
+        checkFcmToken()
         setFetchingAllItems(true);
         try {
             const response = await fetch(`${backend}/items`, {
