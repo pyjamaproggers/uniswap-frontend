@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Col, Grid, Input, Text, Row, Textarea, Dropdown, Image, Avatar, Link, Badge, Collapse, Modal, useTheme } from "@nextui-org/react";
 import { GiClothes } from "react-icons/gi";
 import { IoFastFoodSharp } from "react-icons/io5";
@@ -19,6 +19,7 @@ import { IoCloudOffline } from "react-icons/io5";
 import imageCompression from 'browser-image-compression';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import './itemCard.css'
 
 
 export default function InputItemCard(props) {
@@ -34,6 +35,11 @@ export default function InputItemCard(props) {
 
     const previewUrl = props.previewUrl
     const setPreviewUrl = props.setImageFile
+    const [scale, setScale] = useState(1);
+    const [lastTouchDistance, setLastTouchDistance] = useState(null);
+    const imageRef = useRef(null);
+    const containerRef = useRef(null);
+    const canvasRef = useRef(null);
 
     const type = props.type
     const theme = useTheme()
@@ -67,21 +73,6 @@ export default function InputItemCard(props) {
         { key: 'lostandfound', value: 'Lost & Found', icon: <MdOutlineQuestionMark size={24} color="#889096" />, description: 'Anything and everything lost around campus.' }, // Grey
         { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
     ]
-
-    // useEffect(() => {
-    //     document.querySelectorAll('input, select, textarea').forEach((element) => {
-    //         element.addEventListener('focus', (event) => event.preventDefault())
-    //     })
-    //     let priceInputElement = document.getElementsByClassName('sale-price-input')[0]
-    //     priceInputElement.addEventListener('focus', (event)=>event.preventDefault())
-
-    //     let nameInputElement = document.getElementsByClassName('sale-itemName-input')[0]
-    //     nameInputElement.addEventListener('focus', (event)=>event.preventDefault())
-
-    //     let descInputElement = document.getElementsByClassName('sale-itemDesc-input')[0]
-    //     descInputElement.addEventListener('focus', (event)=>event.preventDefault())
-
-    // }, [])
 
     const updateContactNumber = () => {
         const updatedPhoneNumber = number.trim();
@@ -127,9 +118,78 @@ export default function InputItemCard(props) {
             });
     };
 
+    const handleTouchMove = (event) => {
+        if (event.touches.length === 2) {
+            const touch1 = event.touches[0];
+            const touch2 = event.touches[1];
+
+            const distance = Math.sqrt(
+                Math.pow(touch2.pageX - touch1.pageX, 2) +
+                Math.pow(touch2.pageY - touch1.pageY, 2)
+            );
+
+            if (lastTouchDistance && distance !== lastTouchDistance) {
+                const scaleChange = distance / lastTouchDistance;
+                const newScale = Math.max(scale * scaleChange, 1); // Restrict scale so image width does not go below 400px
+                setScale(newScale);
+            }
+
+            setLastTouchDistance(distance);
+            event.preventDefault();
+        }
+    };
+
+    const handleTouchEnd = () => {
+        setLastTouchDistance(null);
+        cropAndSaveImage();
+    };
+
+    const cropAndSaveImage = () => {
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        const image = imageRef.current;
+        const rect = containerRef.current.getBoundingClientRect();
+
+        // Calculate the crop area
+        const cropWidth = rect.width;
+        const cropHeight = rect.height;
+        const startX = (image.width * scale - cropWidth) / 2 / scale;
+        const startY = (image.height * scale - cropHeight) / 2 / scale;
+
+        // Set canvas size to the crop area
+        canvas.width = cropWidth;
+        canvas.height = cropHeight;
+
+        // Clear the canvas and reset transformations
+        context.clearRect(0, 0, cropWidth, cropHeight);
+        context.resetTransform();
+
+        // Draw the scaled image to the canvas
+        context.drawImage(image, startX, startY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+        // Convert canvas to a data URL
+        const croppedImageDataURL = canvas.toDataURL('image/jpeg');
+
+        // Create a blob from the data URL
+        canvas.toBlob(blob => {
+            const newFile = new File([blob], 'cropped-image.jpeg', { type: 'image/jpeg' });
+            props.setImageFile(newFile); // Assuming `setImageFile` accepts a File object
+            props.setPreviewUrl(URL.createObjectURL(newFile)); // Set the preview URL to the cropped image
+        }, 'image/jpeg');
+    };
+
+    const imageStyle = {
+        transform: `scale(${scale})`,
+        transformOrigin: 'center center',
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover'
+    };
+
+
     return (
         <Grid css={{
-            margin: '24px 24px'
+            margin: '24px 0px'
         }}>
             <Col css={{
                 display: 'flex',
@@ -229,7 +289,7 @@ export default function InputItemCard(props) {
                             className="sale-price-input"
                             placeholder="0"
                             maxLength={10}
-                            style={{fontSize:"16px"}}
+                            style={{ fontSize: "16px" }}
                             value={item.itemPrice.toString()} // Convert to string for input value
                             onChange={(e) => {
                                 // Directly update itemPrice with the new value, or fallback to 0 if not a number
@@ -245,8 +305,12 @@ export default function InputItemCard(props) {
 
                 </Row>
 
-                <div style={{ position: 'relative', width: '330px', height: '300px' }}>
-                    {previewUrl === null ?
+                <div ref={containerRef} style={{ position: 'relative', overflow: 'hidden', maxWidth: '400px', height: '400px', width: '97.5vw' }}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                >
+
+                    {/* {previewUrl === null ?
                         <Image src={type === 'createSale' ? Grey : item.itemPicture} width={'330px'} height={'300px'} css={{
                             borderRadius: '4px',
                             opacity: type === 'createSale' ? '0.25' : '1',
@@ -258,7 +322,9 @@ export default function InputItemCard(props) {
                             opacity: '1',
                             objectFit: 'cover'
                         }} />
-                    }
+                    } */}
+                    <img ref={imageRef} src={previewUrl || Grey} style={imageStyle} alt="Preview" />
+                    <canvas ref={canvasRef} style={{ display: 'none' }} width="330" height="300"></canvas>
 
                     <label className="custom-file-upload" style={{
                         position: 'absolute', // Position the label absolutely within the relative container
@@ -276,7 +342,8 @@ export default function InputItemCard(props) {
                         cursor: 'pointer', // Change cursor to pointer to indicate it's clickable
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
+                        whiteSpace: 'nowrap',
+                        zIndex: 1000
                     }}>
                         <input onChange={(event) => {
                             if (event.target.files && event.target.files[0]) {
@@ -303,8 +370,8 @@ export default function InputItemCard(props) {
 
                 <input
                     required
-                    style={{fontSize:"16px"}}
-                    className={theme.type==='light'?"sale-itemName-input-light":"sale-itemName-input-dark"}
+                    style={{ fontSize: "16px" }}
+                    className={theme.type === 'light' ? "sale-itemName-input-light" : "sale-itemName-input-dark"}
                     placeholder="Corset / Cargos / Necklace..."
                     maxLength={40}
                     value={item.itemName}
@@ -318,10 +385,10 @@ export default function InputItemCard(props) {
 
                 <textarea
                     required
-                    className={theme.type==='light'?"sale-itemName-input-light":"sale-itemName-input-dark"}
+                    className={theme.type === 'light' ? "sale-itemName-input-light" : "sale-itemName-input-dark"}
                     placeholder="Size M, blue colour, brand new..."
                     cols={50}
-                    style={{fontSize:"16px"}}
+                    style={{ fontSize: "16px" }}
                     maxLength={150}
                     value={item.itemDescription}
                     onChange={(e) => {
@@ -404,7 +471,7 @@ export default function InputItemCard(props) {
                         <Input css={{
                             width: '200px',
                             backgroundColor: '#697177',
-                            fontSize:"16px"
+                            fontSize: "16px"
                         }}
                             labelLeft={
                                 <IoLogoWhatsapp size={24} color="#25D366" />
