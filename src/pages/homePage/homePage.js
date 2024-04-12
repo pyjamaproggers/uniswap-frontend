@@ -82,7 +82,7 @@ export default function HomePage(props) {
                             textAlign: 'center',
                             color: '$white'
                         }}>
-                            Official UniSwap™ Website
+                            UniSwap™
                         </Text>
                         {isSignedIn ?
                             <>
