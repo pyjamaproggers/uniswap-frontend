@@ -91,7 +91,7 @@ function App() {
     //     }
     // });
 
-    const isPWA = !(window.matchMedia('(display-mode: standalone)').matches)
+    const isPWA = (window.matchMedia('(display-mode: standalone)').matches)
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isAndroid = /Android/i.test(navigator.userAgent);
 
