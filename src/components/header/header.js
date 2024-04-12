@@ -1183,7 +1183,7 @@ export default function Header(props) {
                                             if (actionKey === 'logout') {
                                                 handleLogout()
                                             }
-                                            else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale') {
+                                            else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale'|| actionKey == 'outlets') {
                                                 navigate(actionKey)
                                             }
                                             else if (actionKey === 'phoneAuth') {
