@@ -4,7 +4,7 @@ import { addFavouriteItem, removeFavouriteItem, setFavouriteItems } from '../../
 import { setSaleItems } from '../../slices/saleItemsSlice';
 import { useNavigate } from 'react-router-dom';
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
-import { Col, Grid, Input, Text, Row, Badge } from "@nextui-org/react";
+import { Col, Grid, Input, Text, Row, Badge, Modal, Image, Button } from "@nextui-org/react";
 import ItemCard from "../../components/items/itemCard";
 import Skeleton from '@mui/material/Skeleton';
 import { IoSearchSharp } from "react-icons/io5";
@@ -17,6 +17,9 @@ import Alert from '@mui/material/Alert';
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import PullToRefresh from 'react-simple-pull-to-refresh';
+import messaging from "../../firebase.js";
+import T5 from '../../assets/Tutorial/Notifications.jpeg'
+import { getToken } from "firebase/messaging";
 
 export default function SaleItemsPage() {
 
@@ -40,7 +43,15 @@ export default function SaleItemsPage() {
     const ITEMS_PER_PAGE = 10;
     const [lastItemIndex, setLastItemIndex] = useState(0);
     const [visibleItems, setVisibleItems] = useState();
+    const [showFcmTokenWarning, setShowFcmTokenWarning] = useState(false)
+    const [hasFCMToken, setHasFCMToken] = useState(false)
 
+    const fcmTokenWarning = [
+        {
+            image: T5,
+            text: "Must be a glitch but we are unable to send notifications to you, please enable them again.",
+        },
+    ]
 
     const [priceFilters, setPriceFilters] = useState([
         { key: '1', value: '₹0-₹100', chosen: false },
@@ -61,6 +72,8 @@ export default function SaleItemsPage() {
     ]);
 
     useEffect(() => {
+
+        checkFcmToken()
 
         if(localStorage.getItem('favouriteItems')==null)
         {
@@ -242,6 +255,62 @@ export default function SaleItemsPage() {
 
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastItemIndex, filteredItems]);
+
+    function checkFcmToken() {
+        fetch(`${backend}/api/user/hasFcmToken`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.hasFcmToken) {
+                    // If the user does not have an FCM token, show a warning Snackbar
+                    setShowFcmTokenWarning(true);
+                    setHasFCMToken(false)
+                }
+                else {
+                    setHasFCMToken(true)
+                }
+            })
+            .catch(error => {
+                console.error("Error checking FCM token:", error);
+                // You might want to handle this error differently or just log it
+            });
+    }
+
+    const requestNotificationPermission = () => {
+        Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+                getToken(messaging, { vapidKey: "BDiwlGg-uzE3Q5y94jyh_bSPo-b2v0A1thC9ePGnk7nt7E_3yuyGGf-Uqi4p6OSVG7tqdmhBU_T5CXOuoFJMACo" }).then((currentToken) => {
+                    if (currentToken) {
+                        console.log("FCM Token:", currentToken);
+                        sendTokenToServer(currentToken);
+                    }
+                }).catch((err) => console.log("An error occurred while retrieving token. ", err));
+            }
+            else {
+                setRender((prev) => !prev);
+                window.location.pathname = '/';
+            }
+        });
+    };
+
+    const sendTokenToServer = (currentToken) => {
+        fetch(`${backend}/api/user/token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: currentToken }),
+            credentials: 'include',
+        })
+            .then(response => response.json())
+            .then(data => {
+                setHasFCMToken(true)
+                setRender((prev) => !prev);
+                // window.location.pathname = '/';
+            })
+            .catch((error) => console.error("Error sending FCM token to server:", error));
+    };
+
 
     return (
         <PullToRefresh onRefresh={fetchAllItems}
@@ -489,6 +558,83 @@ export default function SaleItemsPage() {
                 </Snackbar>
 
             </Grid.Container>
+
+            <Modal
+                open={showFcmTokenWarning}
+                closeButton
+                onClose={() => {
+                    setShowFcmTokenWarning(false)
+                }}
+                aria-label="fcm-token-modal"
+            >
+                <Grid.Container css={{
+                    jc: 'center',
+                    alignItems: '',
+                    padding: '12px 0px',
+                }}>
+                    <Col css={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}>
+                        <Text css={{
+                            '@xsMin': {
+                                fontSize: '$xl'
+                            },
+                            '@xsMax': {
+                                fontSize: '$lg'
+                            },
+                            fontWeight: '$medium',
+                            paddingBottom: '6px',
+                            borderStyle: 'solid',
+                            borderColor: '$gray600',
+                            borderWidth: '0px 0px 1px 0px',
+                            width: 318,
+                            marginBottom: '12px'
+                        }}>
+                            Attention!!!
+                        </Text>
+
+                        <Col css={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center'
+                        }}>
+                            <Image
+                                src={fcmTokenWarning[0].image}
+                                width={320}
+                                height={358}
+                                css={{
+                                    objectFit: 'cover',
+                                    borderRadius: '0px 0px 12px 12px'
+                                }}
+                            />
+
+                            <Text css={{
+                                fontSize: '$md',
+                                fontWeight: '$medium',
+                                jc: 'center',
+                                alignItems: 'center',
+                                padding: '8px 16px 6px 16px'
+                            }}>
+                                {fcmTokenWarning[0].text}
+                            </Text>
+
+
+                            <Button auto light color={'error'}
+                                onClick={() => {
+                                    requestNotificationPermission()
+                                    setShowFcmTokenWarning(false)
+                                }}
+                            >
+                                Enable Notifications ✔️
+                            </Button>
+
+                        </Col>
+
+                    </Col>
+                </Grid.Container>
+            </Modal>
 
         </PullToRefresh>
     )

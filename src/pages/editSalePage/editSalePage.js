@@ -219,7 +219,7 @@ export default function EditSalePage() {
                 <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'editSale'}/>
 
                 <Button auto flat css={{
-                    margin: '0px 0px 36px 0px',
+                    margin: '0px 0px 104px 0px',
                     padding: '6px 12px',
                     height: 'max-content'
                 }}

@@ -266,7 +266,7 @@ export default function CreateSalePage() {
                         fontSize: '$md'
                     },
                     fontWeight: '$medium',
-                    marginBottom: '12px',
+                    marginBottom: '0px',
                     color: '$gray600',
                     padding: '0px 12px',
                     textAlign: 'center',
@@ -278,7 +278,7 @@ export default function CreateSalePage() {
                 <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createSale'} />
 
                 <Button auto flat css={{
-                    margin: '0px 0px 36px 0px',
+                    margin: '0px 0px 104px 0px',
                     height: 'max-content',
                     padding: '6px 12px'
                 }}

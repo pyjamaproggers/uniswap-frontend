@@ -334,7 +334,7 @@ export default function InputItemCard(props) {
 
                 <Row css={{
                     jc: 'space-between',
-                    margin: '4px 0px 24px 0px',
+                    margin: '4px 0px 0px 0px',
                     alignItems: 'normal'
                 }}>
                     <Col css={{
