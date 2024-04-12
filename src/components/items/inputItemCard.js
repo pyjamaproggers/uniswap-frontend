@@ -36,7 +36,7 @@ export default function InputItemCard(props) {
     const previewUrl = props.previewUrl
     const setPreviewUrl = props.setImageFile
     const [scale, setScale] = useState(1);
-    const [initialDistance, setInitialDistance] = useState(null);
+    const [startScale, setStartScale] = useState(1);
     const imageRef = useRef(null);
     const containerRef = useRef(null);
     const canvasRef = useRef(null);
