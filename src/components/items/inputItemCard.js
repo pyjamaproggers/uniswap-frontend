@@ -118,58 +118,74 @@ export default function InputItemCard(props) {
             });
     };
 
+    const handleTouchStart = (event) => {
+        if (event.touches.length === 2) {
+            const touch1 = event.touches[0];
+            const touch2 = event.touches[1];
+
+            // Calculate the initial distance between two points
+            const initialDistance = Math.sqrt(
+                Math.pow(touch2.pageX - touch1.pageX, 2) +
+                Math.pow(touch2.pageY - touch1.pageY, 2)
+            );
+
+            setStartScale({ scale: scale, distance: initialDistance });
+        }
+    };
+
     const handleTouchMove = (event) => {
         if (event.touches.length === 2) {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
-            const distance = Math.sqrt(
-                (touch2.pageX - touch1.pageX) ** 2 + (touch2.pageY - touch1.pageY) ** 2
+            const newDistance = Math.sqrt(
+                Math.pow(touch2.pageX - touch1.pageX, 2) +
+                Math.pow(touch2.pageY - touch1.pageY, 2)
             );
 
-            if (!initialDistance) {
-                setInitialDistance(distance);
-            } else {
-                const scaleChange = distance / initialDistance;
-                const newScale = Math.max(1, scale * scaleChange); // Ensure minimum scale is 1
+            if (startScale.distance) {
+                const distanceRatio = newDistance / startScale.distance;
+                const newScale = Math.max(1, Math.min(5, startScale.scale * distanceRatio)); // Set a maximum scale limit
                 setScale(newScale);
-                setInitialDistance(distance);  // Update the initial distance for the next move event
             }
-            event.preventDefault();
+
+            event.preventDefault(); // Prevent the default action to ensure smooth zooming
         }
     };
 
-    const handleTouchEnd = () => {
-        if (scale !== 1) {
-            cropAndSaveImage();
-        }
-        setInitialDistance(null); // Reset initial distance for the next touch
+    const handleTouchEnd = (event) => {
+        // Reset the start scale when the touch ends
+        setStartScale({ scale: scale, distance: null });
+        cropAndSaveImage(); // Trigger cropping and saving the image
     };
 
     const cropAndSaveImage = () => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
         const image = imageRef.current;
-        const container = containerRef.current;
+        const rect = containerRef.current.getBoundingClientRect();
 
-        // Calculate crop dimensions
-        const sx = (image.width - container.offsetWidth / scale) / 2;
-        const sy = (image.height - container.offsetHeight / scale) / 2;
-        const sWidth = container.offsetWidth / scale;
-        const sHeight = container.offsetHeight / scale;
+        // Set canvas dimensions to the crop area
+        canvas.width = rect.width;
+        canvas.height = rect.height;
 
-        canvas.width = container.offsetWidth;
-        canvas.height = container.offsetHeight;
+        // Calculate the portion of the image to draw onto the canvas
+        const startX = (image.width * scale - rect.width) / 2 / scale;
+        const startY = (image.height * scale - rect.height) / 2 / scale;
+        const width = rect.width / scale;
+        const height = rect.height / scale;
 
-        // Draw cropped image
-        context.drawImage(image, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+        // Draw the image segment on the canvas
+        context.drawImage(image, startX, startY, width, height, 0, 0, rect.width, rect.height);
 
+        // Convert the canvas to a blob and then to a File object
         canvas.toBlob(blob => {
-            const newFile = new File([blob], 'cropped-image.jpg', { type: 'image/jpeg' });
-            props.setImageFile(newFile);
-            props.setPreviewUrl(URL.createObjectURL(newFile));
+            const newFile = new File([blob], 'cropped-image.jpeg', { type: 'image/jpeg' });
+            setImageFile(newFile);  // Assuming setImageFile is a state setter for storing the file
+            setPreviewUrl(URL.createObjectURL(newFile));  // Update the preview URL to show the cropped image
         }, 'image/jpeg');
     };
+
 
     return (
         <Grid css={{
@@ -289,9 +305,12 @@ export default function InputItemCard(props) {
 
                 </Row>
 
-                <div ref={containerRef} style={{ position: 'relative', width: '97.5vw', height: '400px', overflow: 'hidden' }}
+                <div ref={containerRef}
+                    style={{ position: 'relative', width: '97.5vw', height: '400px', overflow: 'hidden' }}
+                    onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}>
+
 
                     {/* {previewUrl === null ?
                         <Image src={type === 'createSale' ? Grey : item.itemPicture} width={'330px'} height={'300px'} css={{
@@ -308,7 +327,7 @@ export default function InputItemCard(props) {
                     } */}
                     <img ref={imageRef} src={props.previewUrl || Grey} alt="Preview" style={{
                         width: `${100 * scale}%`,
-                        height: 'auto',
+                        height: '400px',
                         transform: `translate(-50%, -50%) scale(${scale})`,
                         transformOrigin: 'center center'
                     }} />
@@ -563,6 +582,6 @@ export default function InputItemCard(props) {
             </Snackbar>
 
 
-        </Grid>
+        </Grid >
     )
 }
