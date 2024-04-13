@@ -242,7 +242,7 @@ export default function CreateSalePage() {
             }}>
                 <div style={{
                     position: 'absolute',
-                    top: '98px',
+                    top: '24px',
                     left: '15px'
                 }}
                     onClick={() => navigate(-1)}>

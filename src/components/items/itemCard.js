@@ -49,6 +49,7 @@ export default function ItemCard(props) {
     // let shareItemViaWhatsApp = props.shareItemViaWhatsApp
 
     const handleFavouriteButtonClick = async (favouriteItems, item) => {
+        console.log('invoking')
         const itemIDToUpdate = item._id;
 
         try {
@@ -281,7 +282,12 @@ export default function ItemCard(props) {
                             // },
                             objectFit: 'cover',
                             borderRadius: '4px'
-                        }} />
+                        }} 
+                        // onDoubleClick={()=>{
+                        //     console.log('invoking func')
+                        //     handleFavouriteButtonClick(favouriteItems, item)
+                        // }}
+                        />
                     <Collapse css={{
                         width: '100%',
                         maxWidth: '390px',

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setUserItems } from '../../slices/userItemsSlice';
 import { useNavigate } from 'react-router-dom';
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
-import { Col, Grid, Input, Text, Row, Badge } from "@nextui-org/react";
+import { Col, Grid, Input, Text, Row, Badge, Avatar, useTheme, Button } from "@nextui-org/react";
 import ItemCard from "../../components/items/itemCard";
 import Skeleton from '@mui/material/Skeleton';
 import { IoSearchSharp } from "react-icons/io5";
@@ -16,6 +16,8 @@ import Alert from '@mui/material/Alert';
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import PullToRefresh from 'react-simple-pull-to-refresh';
+import ColorThief from 'colorthief';
+import { FaChevronLeft } from "react-icons/fa";
 
 export default function UserItemsPage() {
 
@@ -38,6 +40,8 @@ export default function UserItemsPage() {
     const ITEMS_PER_PAGE = 10;
     const [lastItemIndex, setLastItemIndex] = useState(0);
     const [visibleItems, setVisibleItems] = useState([]);
+    const [bgColor, setBgColor] = useState('')
+    const [topImageLoading, setTopImageLoading] = useState(true)
 
     const loadMoreItems = () => {
 
@@ -188,11 +192,10 @@ export default function UserItemsPage() {
         result.forEach(item => {
             final.push(item)
         })
-        setFilteredItems(result); 
-        setVisibleItems(result.slice(0, ITEMS_PER_PAGE)); 
-        setLastItemIndex(ITEMS_PER_PAGE); 
+        setFilteredItems(result);
+        setVisibleItems(result.slice(0, ITEMS_PER_PAGE));
+        setLastItemIndex(ITEMS_PER_PAGE);
     }
-
 
     const fetchAllItems = async (userEmail) => {
         setFetchingAllItems(true);
@@ -210,6 +213,8 @@ export default function UserItemsPage() {
 
             dispatch(setUserItems(tempUserItems));
             setFilteredItems(tempUserItems);
+            setVisibleItems(tempUserItems.slice(0, ITEMS_PER_PAGE));
+            setLastItemIndex(ITEMS_PER_PAGE);
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);
         } finally {
@@ -240,21 +245,94 @@ export default function UserItemsPage() {
         window.location.pathname = '/useritems'
     }
 
+    useEffect(() => {
+        // Generate avatar URL
+        let username = localStorage.getItem('userName')
+        // let username = 'ravina'
+        const avatarApiUrl = `https://api.multiavatar.com/${username}.png?apikey=Bvjs0QyHcCxZNe`;
+        // setAvatarUrl(avatarApiUrl);
+
+        // // Load image and extract color
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // This is needed to avoid CORS issues when loading images
+        img.src = avatarApiUrl;
+        img.onload = () => {
+            const colorThief = new ColorThief();
+            const [r, g, b] = colorThief.getColor(img);
+            const dominantColor = `rgb(${r}, ${g}, ${b})`;
+            setBgColor(dominantColor);
+        };
+    }, []);
+
+    const theme = useTheme()
+
     return (
-        <PullToRefresh onRefresh={fetchAllItems}
+        <PullToRefresh onRefresh={() => fetchAllItems(localStorage.getItem('userEmail'))}
             pullingContent={''}
             maxPullDownDistance={80}
             pullDownThreshold={60}
             aria-label='pulltorefresh'
         >
+
+            {/* <div style={{
+                position: 'absolute',
+                top: '24px',
+                left: '15px',
+                zIndex: 100
+            }}
+                onClick={() => navigate(-1)}>
+                <FaChevronLeft size={16} color={theme.type === 'light' ? "#0c0c0c" : "#f0f0f0"}/>
+            </div> */}
+
+            <>
+                {bgColor.length > 0 &&
+                    <Col css={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        borderColor: '#0c0c0c',
+                        marginBottom: '40px'
+                    }}>
+                        <img
+                            width={'100%'}
+                            height={60}
+                            style={{
+                                background: `linear-gradient(to bottom, ${bgColor}, ${theme.theme.colors.background.value})`,
+                                // backgroundColor: bgColor,
+                                filter: 'blur(40px)'
+                            }}
+                        />
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '20px',
+                            }}
+                        >
+                            <img
+                                // src={`https://api.multiavatar.com/${'ravina'}.png?apikey=Bvjs0QyHcCxZNe`}
+                                src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
+                                style={{
+                                    width: 60,
+                                    height: 60,
+                                    borderRadius: 40,
+                                }}
+                                onLoad={() => {
+                                    setTopImageLoading(false)
+                                }}
+                            />
+                        </div>
+                    </Col>
+                }
+            </>
+
             <Grid.Container>
-                {/* {console.log('FavouriteItems: ', favouriteItems)} */}
-                <Grid.Container css={{
-                    padding: '4px 4px',
-                    jc: 'center',
-                    marginBottom: '100px'
-                }}>
-                    <Text css={{
+                {!topImageLoading &&
+                    <Grid.Container css={{
+                        padding: '4px 4px',
+                        jc: 'center',
+                        marginBottom: '100px'
+                    }}>
+                        {/* <Text css={{
                         fontWeight: '$medium',
                         '@xsMin': {
                             fontSize: '$3xl',
@@ -267,176 +345,201 @@ export default function UserItemsPage() {
                         width: 'max-content'
                     }}>
                         {localStorage.getItem('userName').split(" ")[0]}'s Sale Items
-                    </Text>
-                    <Row css={{
-                        '@xsMin': {
-                            padding: '0% 2% 1% 2%'
-                        },
-                        '@xsMax': {
-                            padding: '0% 4% 1% 4%'
-                        },
-                        alignItems: 'center',
-                        gap: 10,
-                        jc: 'center'
-                    }}>
-                        <Input clearable placeholder="Corset / Cargos / Necklace" width="280px" css={{ margin: '0px 0px 8px 0px', fontSize: '16px' }}
-                            initialValue=""
-                            labelLeft={<IoSearchSharp size={'20px'} color={""} />}
-                            animated={false}
-                            onChange={(e) => {
-                                setFiltersApplied(prev => ({
-                                    ...prev,
-                                    searched: e.target.value
-                                }))
-                            }}
-                            className="items-search-input"
-                            aria-label="input-search"
-                        />
-                    </Row>
-
-                    <Grid.Container css={{
-                        '@xsMin': {
-                            padding: '0% 2% 1% 2%'
-                        },
-                        '@xsMax': {
-                            padding: '0% 0% 1% 0%'
-                        },
-                        alignItems: 'center',
-                        jc: 'center'
-                    }}>
+                    </Text> */}
                         <Row css={{
+                            '@xsMin': {
+                                padding: '0% 2% 1% 2%'
+                            },
+                            '@xsMax': {
+                                padding: '0% 4% 1% 4%'
+                            },
                             alignItems: 'center',
-                            gap: 4,
-                            jc: 'center',
+                            gap: 10,
+                            jc: 'center'
                         }}>
-                            <IoIosArrowBack color="#7f7f7f" size={16} />
-                            <div className="horizontal-scroller">
-                                {priceFilters.map((priceFilter) => (
-                                    <Grid key={priceFilter.key} css={{
-                                        margin: '4px 2px',
-                                        '&:hover': {
-                                            cursor: 'pointer'
-                                        }
-                                    }}>
-                                        <Badge
-                                            variant="flat"
-                                            size={'md'}
-                                            color={priceFilter.chosen ? "primary" : "default"}
-                                            onClick={() => {
-                                                // Toggle the "chosen" property for the clicked filter
-                                                const updatedPriceFilters = priceFilters.map(filter => {
-                                                    if (filter.key === priceFilter.key) {
-                                                        return { ...filter, chosen: !filter.chosen };
-                                                    }
-                                                    return filter;
-                                                });
-                                                setPriceFilters(updatedPriceFilters);
-
-                                                // Update the filtersApplied state
-                                                setFiltersApplied(prevState => {
-                                                    const isFilterApplied = prevState.price.includes(priceFilter.key);
-                                                    const newPriceFilters = isFilterApplied
-                                                        ? prevState.price.filter(k => k !== priceFilter.key) // Remove filter
-                                                        : [...prevState.price, priceFilter.key]; // Add filter
-
-                                                    return {
-                                                        ...prevState,
-                                                        price: newPriceFilters,
-                                                    };
-                                                });
-                                            }}
-                                        >
-                                            {priceFilter.value}
-                                        </Badge>
-                                    </Grid>
-                                ))}
-                            </div>
-                            <IoIosArrowForward color="#7f7f7f" size={16} />
-                        </Row>
-                    </Grid.Container>
-
-                    <Grid.Container css={{
-                        '@xsMin': {
-                            padding: '0% 2% 2% 2%'
-                        },
-                        '@xsMax': {
-                            padding: '0% 2% 5% 2%'
-                        },
-                        alignItems: 'center',
-                        jc: 'center'
-                    }}>
-                        <Row css={{
-                            alignItems: 'center',
-                            gap: 4,
-                            jc: 'center',
-                        }}>
-                            <IoIosArrowBack color="#7f7f7f" size={16} />
-                            <div className="horizontal-scroller">
-                                {categoryFilters.map((categoryFilter) => (
-                                    <Grid key={categoryFilter.key} css={{
-                                        margin: '4px 2px',
-                                        '&:hover': {
-                                            cursor: 'pointer'
-                                        }
-                                    }}>
-                                        <Badge
-                                            variant="flat"
-                                            size="md"
-                                            color={categoryFilter.chosen ? categoryFilter.color : ""} // Use the filter's color if chosen
-                                            onClick={() => {
-                                                // Toggle the "chosen" property for the clicked filter
-                                                const updatedCategoryFilters = categoryFilters.map(filter => {
-                                                    if (filter.key === categoryFilter.key) {
-                                                        return { ...filter, chosen: !filter.chosen };
-                                                    }
-                                                    return filter;
-                                                });
-                                                setCategoryFilters(updatedCategoryFilters);
-
-                                                // Assuming you have a similar state management for category as you have for price
-                                                // Update a hypothetical filtersApplied state for categories
-                                                setFiltersApplied(prevState => {
-                                                    const isFilterApplied = prevState.category.includes(categoryFilter.key);
-                                                    const newCategoryFilters = isFilterApplied
-                                                        ? prevState.category.filter(k => k !== categoryFilter.key) // Remove filter
-                                                        : [...prevState.category, categoryFilter.key]; // Add filter
-
-                                                    return {
-                                                        ...prevState,
-                                                        category: newCategoryFilters,
-                                                    };
-                                                });
-                                            }}
-                                        >
-                                            {categoryFilter.value}
-                                        </Badge>
-                                    </Grid>
-                                ))}
-                            </div>
-                            <IoIosArrowForward color="#7f7f7f" size={16} />
+                            <Input clearable placeholder="Corset / Cargos / Necklace" width="280px" css={{ margin: '0px 0px 8px 0px', fontSize: '16px' }}
+                                initialValue=""
+                                labelLeft={<IoSearchSharp size={'20px'} color={""} />}
+                                animated={false}
+                                onChange={(e) => {
+                                    setFiltersApplied(prev => ({
+                                        ...prev,
+                                        searched: e.target.value
+                                    }))
+                                }}
+                                className="items-search-input"
+                                aria-label="input-search"
+                            />
                         </Row>
 
+                        <Grid.Container css={{
+                            '@xsMin': {
+                                padding: '0% 2% 1% 2%'
+                            },
+                            '@xsMax': {
+                                padding: '0% 0% 1% 0%'
+                            },
+                            alignItems: 'center',
+                            jc: 'center'
+                        }}>
+                            <Row css={{
+                                alignItems: 'center',
+                                gap: 4,
+                                jc: 'center',
+                            }}>
+                                <IoIosArrowBack color="#7f7f7f" size={16} />
+                                <div className="horizontal-scroller">
+                                    {priceFilters.map((priceFilter) => (
+                                        <Grid key={priceFilter.key} css={{
+                                            margin: '4px 2px',
+                                            '&:hover': {
+                                                cursor: 'pointer'
+                                            }
+                                        }}>
+                                            <Badge
+                                                variant="flat"
+                                                size={'md'}
+                                                color={priceFilter.chosen ? "primary" : "default"}
+                                                onClick={() => {
+                                                    // Toggle the "chosen" property for the clicked filter
+                                                    const updatedPriceFilters = priceFilters.map(filter => {
+                                                        if (filter.key === priceFilter.key) {
+                                                            return { ...filter, chosen: !filter.chosen };
+                                                        }
+                                                        return filter;
+                                                    });
+                                                    setPriceFilters(updatedPriceFilters);
+
+                                                    // Update the filtersApplied state
+                                                    setFiltersApplied(prevState => {
+                                                        const isFilterApplied = prevState.price.includes(priceFilter.key);
+                                                        const newPriceFilters = isFilterApplied
+                                                            ? prevState.price.filter(k => k !== priceFilter.key) // Remove filter
+                                                            : [...prevState.price, priceFilter.key]; // Add filter
+
+                                                        return {
+                                                            ...prevState,
+                                                            price: newPriceFilters,
+                                                        };
+                                                    });
+                                                }}
+                                            >
+                                                {priceFilter.value}
+                                            </Badge>
+                                        </Grid>
+                                    ))}
+                                </div>
+                                <IoIosArrowForward color="#7f7f7f" size={16} />
+                            </Row>
+                        </Grid.Container>
+
+                        <Grid.Container css={{
+                            '@xsMin': {
+                                padding: '0% 2% 2% 2%'
+                            },
+                            '@xsMax': {
+                                padding: '0% 2% 5% 2%'
+                            },
+                            alignItems: 'center',
+                            jc: 'center'
+                        }}>
+                            <Row css={{
+                                alignItems: 'center',
+                                gap: 4,
+                                jc: 'center',
+                            }}>
+                                <IoIosArrowBack color="#7f7f7f" size={16} />
+                                <div className="horizontal-scroller">
+                                    {categoryFilters.map((categoryFilter) => (
+                                        <Grid key={categoryFilter.key} css={{
+                                            margin: '4px 2px',
+                                            '&:hover': {
+                                                cursor: 'pointer'
+                                            }
+                                        }}>
+                                            <Badge
+                                                variant="flat"
+                                                size="md"
+                                                color={categoryFilter.chosen ? categoryFilter.color : ""} // Use the filter's color if chosen
+                                                onClick={() => {
+                                                    // Toggle the "chosen" property for the clicked filter
+                                                    const updatedCategoryFilters = categoryFilters.map(filter => {
+                                                        if (filter.key === categoryFilter.key) {
+                                                            return { ...filter, chosen: !filter.chosen };
+                                                        }
+                                                        return filter;
+                                                    });
+                                                    setCategoryFilters(updatedCategoryFilters);
+
+                                                    // Assuming you have a similar state management for category as you have for price
+                                                    // Update a hypothetical filtersApplied state for categories
+                                                    setFiltersApplied(prevState => {
+                                                        const isFilterApplied = prevState.category.includes(categoryFilter.key);
+                                                        const newCategoryFilters = isFilterApplied
+                                                            ? prevState.category.filter(k => k !== categoryFilter.key) // Remove filter
+                                                            : [...prevState.category, categoryFilter.key]; // Add filter
+
+                                                        return {
+                                                            ...prevState,
+                                                            category: newCategoryFilters,
+                                                        };
+                                                    });
+                                                }}
+                                            >
+                                                {categoryFilter.value}
+                                            </Badge>
+                                        </Grid>
+                                    ))}
+                                </div>
+                                <IoIosArrowForward color="#7f7f7f" size={16} />
+                            </Row>
+
+                        </Grid.Container>
+
+                        {!fetchingAllItems && !backdropLoaderOpen && filteredItems && visibleItems &&
+                            <>
+                                {
+                                    visibleItems.map((item, index) => (
+                                        <div key={item._id} id={item._id}>
+                                            <ItemCard
+                                                item={item}
+                                                type={"user"}
+                                                handleLiveToggle={handleLiveToggle}
+                                                onItemDeleted={onItemDeleted}
+                                            />
+                                        </div>
+                                    ))
+                                }
+                            </>
+                        }
+
+                        {visibleItems.length === 0 && !fetchingAllItems && !backdropLoaderOpen &&
+                            <Grid.Container css={{
+                                jc: 'center',
+                            }}>
+                                <Text css={{
+                                    width: '100vw',
+                                    fontSize: '$base',
+                                    fontWeight: '$medium',
+                                    textAlign: 'center',
+                                    // lineHeight: '1',
+                                    marginTop: '132px',
+                                    paddingBottom: '8px'
+                                }}>
+                                    No items up uploaded...
+                                </Text>
+
+                                <Button auto flat color={'primary'} onClick={() => {
+                                    window.location.pathname = '/createsale'
+                                }}>
+                                    Create A Sale →
+                                </Button>
+
+                            </Grid.Container>
+                        }
+
                     </Grid.Container>
-
-                    {!fetchingAllItems && !backdropLoaderOpen && filteredItems && visibleItems &&
-                        <>
-                            {
-                                visibleItems.map((item, index) => (
-                                    <div key={item._id} id={item._id}>
-                                        <ItemCard
-                                            item={item}
-                                            type={"user"}
-                                            handleLiveToggle={handleLiveToggle}
-                                            onItemDeleted={onItemDeleted}
-                                        />
-                                    </div>
-                                ))
-                            }
-                        </>
-                    }
-
-
-                </Grid.Container>
+                }
 
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -486,6 +589,7 @@ export default function UserItemsPage() {
                 </Snackbar>
 
             </Grid.Container>
+
 
         </PullToRefresh>
     )

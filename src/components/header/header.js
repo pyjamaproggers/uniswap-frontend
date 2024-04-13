@@ -41,6 +41,9 @@ import T4 from '../../assets/Tutorial/Outlet.png'
 import T5 from '../../assets/Tutorial/Notifications.jpeg'
 import { IoFastFood } from "react-icons/io5";
 import { MdOutgoingMail } from "react-icons/md";
+import { BsArrowBarLeft, BsBell } from "react-icons/bs";
+import Drawer from '@mui/material/Drawer';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 
 
 export default function Header(props) {
@@ -65,6 +68,8 @@ export default function Header(props) {
     const isLightMode = props.isLightMode
     const setIsLightMode = props.setIsLightMode
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const iOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const [userDrawer, setUserDrawer] = useState(false)
 
     const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
@@ -76,10 +81,10 @@ export default function Header(props) {
     const navigationItems = [
         // { path: '/', icon: GoHomeFill },
         { path: '/saleitems', icon: MdStorefront },
-        { path: '/useritems', icon: FaShop },
+        { path: '/favourites', icon: IoMdHeart },
         { path: '/createsale', icon: FaPlus },
-        // { path: '/favourites', icon: IoMdHeart },
         { path: '/outlets', icon: IoFastFood },
+        { path: '/useritems', icon: Avatar }
     ];
 
     const collapseItemsLoggedOut = [
@@ -435,27 +440,28 @@ export default function Header(props) {
 
     return (
         <>
-            <Navbar isBordered variant="static">
+            {(window.location.pathname === '/' || window.location.pathname === '/unauthorized') &&
+                <Navbar isBordered variant="static">
 
-                <Navbar.Toggle showIn={'xs'} css={{ width: '44px' }} />
+                    <Navbar.Toggle showIn={'xs'} css={{ width: '44px' }} />
 
-                <Navbar.Brand
-                    onClick={() => {
-                        navigate('/')
-                    }}
-                    css={{
-                        '&:hover': {
-                            cursor: 'pointer'
-                        },
-                        justifyContent: 'center'
-                    }}>
-                    <Image
-                        css={{
-                            height: '60px',
-                            width: '60px',
+                    <Navbar.Brand
+                        onClick={() => {
+                            navigate('/')
                         }}
-                        src={Icon} />
-                    {/* <Text b color="inherit"
+                        css={{
+                            '&:hover': {
+                                cursor: 'pointer'
+                            },
+                            justifyContent: 'center'
+                        }}>
+                        <Image
+                            css={{
+                                height: '60px',
+                                width: '60px',
+                            }}
+                            src={Icon} />
+                        {/* <Text b color="inherit"
                         hideIn={'xs'}
                         css={{
                             padding: '0px 8px',
@@ -466,150 +472,150 @@ export default function Header(props) {
                         }}>
                         UniSwap™
                     </Text> */}
-                </Navbar.Brand>
+                    </Navbar.Brand>
 
-                {Object.keys(localStorage).length >= 2 &&
-                    <Navbar.Content
-                        enableCursorHighlight
-                        activeColor="error"
-                        hideIn="xs"
-                        variant="underline"
-                    >
-                        <Navbar.Link href="/saleitems" >Sale Items</Navbar.Link>
-                        <Dropdown isBordered>
-                            <Navbar.Item>
-                                <Dropdown.Button
-                                    auto
-                                    light
-                                    css={{
-                                        px: 0,
-                                        dflex: "center",
-                                        svg: { pe: "none" },
-                                    }}
-                                    iconRight={icons.chevron}
-                                    ripple={false}
-                                >
-                                    Category
-                                </Dropdown.Button>
-                            </Navbar.Item>
-                            <Dropdown.Menu
-                                aria-label="Items Category"
-                                selectionMode="single"
-                                // selectedKeys={selected}
-                                onSelectionChange={(selection) => {
-                                    console.log(selection)
-                                    navigate('/saleitems', { state: { category: `${selection.currentKey}` } });
-                                }}
-                                css={{
-                                    $$dropdownMenuWidth: "340px",
-                                    $$dropdownItemHeight: "70px",
-                                    "& .nextui-dropdown-item": {
-                                        py: "$4",
-                                        // dropdown item left icon
-                                        svg: {
-                                            color: "$secondary",
-                                            mr: "$4",
-                                        },
-                                        // dropdown item title
-                                        "& .nextui-dropdown-item-content": {
-                                            w: "100%",
-                                            fontWeight: "$semibold",
-                                        },
-                                    },
-                                }}
-                            >
-                                {categories.map((category, index) => (
-                                    <Dropdown.Item
-                                        key={category.key}
-                                        showFullDescription
-                                        description={category.description}
-                                        icon={category.icon}
-                                    // onClick={()=>{
-                                    //     navigate('/saleitems', {state: {
-                                    //         category: `${category.key}`
-                                    //     }})
-                                    // }}
-                                    >
-                                        <Navbar.Link css={{
-                                            fontWeight: '$semibold'
+                    {Object.keys(localStorage).length >= 2 &&
+                        <Navbar.Content
+                            enableCursorHighlight
+                            activeColor="error"
+                            hideIn="xs"
+                            variant="underline"
+                        >
+                            <Navbar.Link href="/saleitems" >Sale Items</Navbar.Link>
+                            <Dropdown isBordered>
+                                <Navbar.Item>
+                                    <Dropdown.Button
+                                        auto
+                                        light
+                                        css={{
+                                            px: 0,
+                                            dflex: "center",
+                                            svg: { pe: "none" },
                                         }}
+                                        iconRight={icons.chevron}
+                                        ripple={false}
+                                    >
+                                        Category
+                                    </Dropdown.Button>
+                                </Navbar.Item>
+                                <Dropdown.Menu
+                                    aria-label="Items Category"
+                                    selectionMode="single"
+                                    // selectedKeys={selected}
+                                    onSelectionChange={(selection) => {
+                                        console.log(selection)
+                                        navigate('/saleitems', { state: { category: `${selection.currentKey}` } });
+                                    }}
+                                    css={{
+                                        $$dropdownMenuWidth: "340px",
+                                        $$dropdownItemHeight: "70px",
+                                        "& .nextui-dropdown-item": {
+                                            py: "$4",
+                                            // dropdown item left icon
+                                            svg: {
+                                                color: "$secondary",
+                                                mr: "$4",
+                                            },
+                                            // dropdown item title
+                                            "& .nextui-dropdown-item-content": {
+                                                w: "100%",
+                                                fontWeight: "$semibold",
+                                            },
+                                        },
+                                    }}
+                                >
+                                    {categories.map((category, index) => (
+                                        <Dropdown.Item
+                                            key={category.key}
+                                            showFullDescription
+                                            description={category.description}
+                                            icon={category.icon}
+                                        // onClick={()=>{
+                                        //     navigate('/saleitems', {state: {
+                                        //         category: `${category.key}`
+                                        //     }})
+                                        // }}
                                         >
-                                            {category.value}
-                                        </Navbar.Link>
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <Navbar.Link href="/about">About</Navbar.Link>
-                        <Navbar.Link href="/outlets">Outlets</Navbar.Link>
-                    </Navbar.Content>
-                }
-
-                <Navbar.Content
-                    css={{
-                        "@xs": {
-                            // w: "12%",
-                            jc: "flex-end",
-                        },
-                    }}
-                >
-                    {loginLoader && Object.keys(localStorage).length <= 2 &&
-                        <Skeleton variant="circular" width={40} height={40} />
+                                            <Navbar.Link css={{
+                                                fontWeight: '$semibold'
+                                            }}
+                                            >
+                                                {category.value}
+                                            </Navbar.Link>
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <Navbar.Link href="/about">About</Navbar.Link>
+                            <Navbar.Link href="/outlets">Outlets</Navbar.Link>
+                        </Navbar.Content>
                     }
-                    {Object.keys(localStorage).length <= 2 ?
-                        <div className="GoogleButton" id='GoogleButton'></div>
-                        :
-                        <Dropdown placement="bottom-right">
-                            <Navbar.Item>
-                                <Dropdown.Trigger>
-                                    <Avatar
-                                        bordered
-                                        as="button"
-                                        color=""
-                                        size="md"
-                                        src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
-                                    // src={localStorage.getItem('userPicture')}
-                                    />
-                                </Dropdown.Trigger>
-                            </Navbar.Item>
-                            <Dropdown.Menu
-                                aria-label="User menu actions"
-                                color="error"
-                                onAction={(actionKey) => {
-                                    if (actionKey === 'logout') {
-                                        handleLogout()
-                                    }
-                                    else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale' || actionKey === 'outlets') {
-                                        navigate(actionKey)
-                                    }
-                                    else if (actionKey === 'phoneAuth') {
-                                        setShowNumberUpdateModal(true)
-                                    }
-                                    else if (actionKey === 'enablenotif') {
-                                        requestNotificationPermission()
-                                    }
-                                    else if (actionKey === 'contactDev') {
-                                        window.open('mailto:pyjamaprogrammers@gmail.com?subject="UniSwap Issue/Bug/Suggestion"')
-                                    }
-                                    else if (actionKey === 'toggleMode') {
-                                        setIsLightMode(!isLightMode)
-                                    }
-                                    else {
-                                        console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
-                                    }
-                                }}
-                            >
-                                <Dropdown.Item key="profile" css={{ height: "$22", }}>
-                                    <Text b color="$gray600" css={{ d: "flex", fontSize: '$xs' }}>
-                                        Signed in as
-                                    </Text>
-                                    <Text b color="inherit" css={{ d: "flex", fontSize: '$base' }}>
-                                        {localStorage.getItem('userName')}
-                                    </Text>
-                                    <Text b color="inherit" css={{ d: "flex", fontSize: '$sm' }}>
-                                        {localStorage.getItem('contactNumber')}
-                                    </Text>
-                                    {/* <Text b color="inherit" 
+
+                    <Navbar.Content
+                        css={{
+                            "@xs": {
+                                // w: "12%",
+                                jc: "flex-end",
+                            },
+                        }}
+                    >
+                        {loginLoader && Object.keys(localStorage).length <= 2 &&
+                            <Skeleton variant="circular" width={40} height={40} />
+                        }
+                        {Object.keys(localStorage).length <= 2 ?
+                            <div className="GoogleButton" id='GoogleButton'></div>
+                            :
+                            <Dropdown placement="bottom-right">
+                                <Navbar.Item>
+                                    <Dropdown.Trigger>
+                                        <Avatar
+                                            bordered
+                                            as="button"
+                                            color=""
+                                            size="md"
+                                            src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
+                                        // src={localStorage.getItem('userPicture')}
+                                        />
+                                    </Dropdown.Trigger>
+                                </Navbar.Item>
+                                <Dropdown.Menu
+                                    aria-label="User menu actions"
+                                    color="error"
+                                    onAction={(actionKey) => {
+                                        if (actionKey === 'logout') {
+                                            handleLogout()
+                                        }
+                                        else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale' || actionKey === 'outlets') {
+                                            navigate(actionKey)
+                                        }
+                                        else if (actionKey === 'phoneAuth') {
+                                            setShowNumberUpdateModal(true)
+                                        }
+                                        else if (actionKey === 'enablenotif') {
+                                            requestNotificationPermission()
+                                        }
+                                        else if (actionKey === 'contactDev') {
+                                            window.open('mailto:pyjamaprogrammers@gmail.com?subject="UniSwap Issue/Bug/Suggestion"')
+                                        }
+                                        else if (actionKey === 'toggleMode') {
+                                            setIsLightMode(!isLightMode)
+                                        }
+                                        else {
+                                            console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
+                                        }
+                                    }}
+                                >
+                                    <Dropdown.Item key="profile" css={{ height: "$22", }}>
+                                        <Text b color="$gray600" css={{ d: "flex", fontSize: '$xs' }}>
+                                            Signed in as
+                                        </Text>
+                                        <Text b color="inherit" css={{ d: "flex", fontSize: '$base' }}>
+                                            {localStorage.getItem('userName')}
+                                        </Text>
+                                        <Text b color="inherit" css={{ d: "flex", fontSize: '$sm' }}>
+                                            {localStorage.getItem('contactNumber')}
+                                        </Text>
+                                        {/* <Text b color="inherit" 
                                     css={{ 
                                         d: "flex", 
                                         fontSize: '$sm',
@@ -620,89 +626,58 @@ export default function Header(props) {
                                     >
                                         {localStorage.getItem('userEmail')}
                                     </Text> */}
-                                </Dropdown.Item>
-                                {/* <Dropdown.Item key="createsale" withDivider color=""
+                                    </Dropdown.Item>
+                                    {/* <Dropdown.Item key="createsale" withDivider color=""
                                     icon={<FaPlus size={16} />}>
                                     Create Sale
                                 </Dropdown.Item> */}
-                                {/* <Dropdown.Item key="outlets" withDivider color=""
+                                    {/* <Dropdown.Item key="outlets" withDivider color=""
                                     icon={<IoFastFood size={16} />}>
                                     Outlets
                                 </Dropdown.Item> */}
-                                {/* <Dropdown.Item key="useritems" color=""
+                                    {/* <Dropdown.Item key="useritems" color=""
                                     icon={<FaBagShopping size={16} />}>
                                     My Sale Items
                                 </Dropdown.Item> */}
-                                <Dropdown.Item key="favourites" color=""
-                                    icon={<IoMdHeart size={16} />}>
-                                    Favourites
-                                </Dropdown.Item>
-                                <Dropdown.Item key="phoneAuth" color=""
-                                    icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
-                                    Update Phone
-                                </Dropdown.Item>
-                                <Dropdown.Item key="contactDev" color=""
-                                    icon={<MdOutgoingMail size={16} />}>
-                                    Contact Developers
-                                </Dropdown.Item>
-                                {!hasFCMToken &&
-                                    <Dropdown.Item key="enablenotif" color=""
-                                        icon={<GoBellFill size={16} />}
-                                    >
-                                        Enable Notifications
+                                    {/* <Dropdown.Item key="favourites" color=""
+                                        icon={<IoMdHeart size={16} />}>
+                                        Favourites
+                                    </Dropdown.Item> */}
+                                    <Dropdown.Item key="phoneAuth" color=""
+                                        icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
+                                        Update Phone
                                     </Dropdown.Item>
-                                }
-                                <Dropdown.Item key="toggleMode" color=""
-                                    icon={<MdOutlinePhoneIphone size={16} />}>
-                                    Go {isLightMode ? 'Dark' : 'Light'}
-                                </Dropdown.Item>
-                                <Dropdown.Item key="logout" withDivider color="error"
-                                    icon={<IoLogOut size={16} />}>
-                                    Log Out
-                                </Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    }
-                </Navbar.Content>
+                                    <Dropdown.Item key="contactDev" color=""
+                                        icon={<MdOutgoingMail size={16} />}>
+                                        Contact Developers
+                                    </Dropdown.Item>
+                                    {!hasFCMToken &&
+                                        <Dropdown.Item key="enablenotif" color=""
+                                            icon={<GoBellFill size={16} />}
+                                        >
+                                            Enable Notifications
+                                        </Dropdown.Item>
+                                    }
+                                    <Dropdown.Item key="toggleMode" color=""
+                                        icon={<MdOutlinePhoneIphone size={16} />}>
+                                        Go {isLightMode ? 'Dark' : 'Light'}
+                                    </Dropdown.Item>
+                                    <Dropdown.Item key="logout" withDivider color="error"
+                                        icon={<IoLogOut size={16} />}>
+                                        Log Out
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        }
+                    </Navbar.Content>
 
-                {Object.keys(localStorage).length <= 2 ?
-                    <Navbar.Collapse>
-                        {collapseItemsLoggedOut.map((item, index) => (
-                            <Navbar.CollapseItem
-                                key={item.key}
-                                activeColor=""
-                            >
-                                <Link
-                                    color="inherit"
-                                    css={{
-                                        minWidth: "100%",
-                                    }}
-                                    href={item.key}
+                    {Object.keys(localStorage).length <= 2 ?
+                        <Navbar.Collapse>
+                            {collapseItemsLoggedOut.map((item, index) => (
+                                <Navbar.CollapseItem
+                                    key={item.key}
+                                    activeColor=""
                                 >
-                                    {item.value}
-                                </Link>
-                            </Navbar.CollapseItem>
-                        ))}
-                    </Navbar.Collapse>
-                    :
-                    <Navbar.Collapse>
-                        {collapseItemsLoggedIn.map((item, index) => (
-                            <Navbar.CollapseItem
-                                key={item.key}
-                                activeColor=""
-                                css={{
-                                    color: index === collapseItemsLoggedIn.length - 1 ? "$error" : "",
-                                }}
-                            >
-                                {item.key === 'logout' ?
-                                    <Col>
-                                        <Link href="" onClick={handleLogout} css={{
-                                            color: '$error'
-                                        }}>
-                                            {item.value}
-                                        </Link>
-                                    </Col>
-                                    :
                                     <Link
                                         color="inherit"
                                         css={{
@@ -712,12 +687,250 @@ export default function Header(props) {
                                     >
                                         {item.value}
                                     </Link>
-                                }
-                            </Navbar.CollapseItem>
-                        ))}
-                    </Navbar.Collapse>
-                }
-            </Navbar>
+                                </Navbar.CollapseItem>
+                            ))}
+                        </Navbar.Collapse>
+                        :
+                        <Navbar.Collapse>
+                            {collapseItemsLoggedIn.map((item, index) => (
+                                <Navbar.CollapseItem
+                                    key={item.key}
+                                    activeColor=""
+                                    css={{
+                                        color: index === collapseItemsLoggedIn.length - 1 ? "$error" : "",
+                                    }}
+                                >
+                                    {item.key === 'logout' ?
+                                        <Col>
+                                            <Link href="" onClick={handleLogout} css={{
+                                                color: '$error'
+                                            }}>
+                                                {item.value}
+                                            </Link>
+                                        </Col>
+                                        :
+                                        <Link
+                                            color="inherit"
+                                            css={{
+                                                minWidth: "100%",
+                                            }}
+                                            href={item.key}
+                                        >
+                                            {item.value}
+                                        </Link>
+                                    }
+                                </Navbar.CollapseItem>
+                            ))}
+                        </Navbar.Collapse>
+                    }
+                </Navbar>
+            }
+
+            {(window.location.pathname === '/useritems' ) &&
+                <div style={{
+                    position: 'absolute',
+                    top: '24px',
+                    right: '17.5px',
+                    zIndex: 100,
+                    transform: 'rotate(90deg)'
+                }}
+                    onClick={() => {
+                        setUserDrawer(true)
+                    }}
+                >
+                    <BsArrowBarLeft
+                        size={24}
+                        color={theme.type === 'light' ? "#0c0c0c" : "#f0f0f0"}
+                    />
+                </div>
+            }
+
+            <SwipeableDrawer
+                disableBackdropTransition={!iOS} disableDiscovery={iOS}
+                open={userDrawer}
+                onClose={() => setUserDrawer(false)}
+                anchor="bottom"
+            >
+                <Grid.Container css={{
+                    padding: '4px 12px 48px 12px',
+                    backgroundColor: theme.type === 'light' ? '#f0f0f0' : '#000000',
+                }}>
+                    <Grid css={{
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                    }}>
+                        <Row
+                            style={{
+                                width: '40px',
+                                height: '6px',
+                                backgroundColor: 'rgba(128,128,128, 0.5)',
+                                margin: '8px 0px 8px',
+                                justifyContent: 'center',
+                                justifySelf: 'center',
+                                borderRadius: '8px'
+                            }}
+                        >
+                            { }
+                        </Row>
+                    </Grid>
+
+                    <Grid css={{
+                        width: '100%',
+                        backgroundColor: theme.theme.colors.background.value,
+                        borderRadius: '8px',
+                        padding: '8px 12px',
+                        margin: '8px 0px 4px'
+                    }}>
+                        <Text b color="$gray600" css={{ d: "flex", fontSize: '$xs' }}>
+                            Signed in as
+                        </Text>
+                        <Text b css={{ d: "flex", fontSize: '$base' }}>
+                            {localStorage.getItem('userName')}
+                        </Text>
+                        <Text b css={{ d: "flex", fontSize: '$sm' }}>
+                            {localStorage.getItem('contactNumber')}
+                        </Text>
+                    </Grid>
+
+                    <Grid css={{
+                        width: '100%',
+                        backgroundColor: theme.theme.colors.background.value,
+                        borderRadius: '8px',
+                        padding: '6px 12px',
+                        margin: '4px 0px'
+                    }}
+                    >
+                        {/* <Row css={{
+                            alignItems: 'center',
+                            gap: 8,
+                            width: '100%',
+                            padding: '6px 0px',
+                            borderStyle: 'solid',
+                            borderWidth: '0px 0px 1px 0px',
+                            borderColor: '$gray400'
+                        }}
+                            onClick={() => {
+
+                            }}>
+                            <IoMdHeart size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
+                            <Text css={{
+                                fontSize: '$md',
+                                fontWeight: '$medium'
+                            }}>
+                                Favourites
+                            </Text>
+                        </Row> */}
+
+                        <Row css={{
+                            alignItems: 'center',
+                            gap: 8,
+                            width: '100%',
+                            padding: '6px 0px',
+                            borderStyle: 'solid',
+                            borderWidth: '0px 0px 1px 0px',
+                            borderColor: '$gray400'
+                        }}
+                            onClick={() => {
+
+                            }}>
+                            <FaPhone size={12} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} style={{ marginRight: '4px' }} />
+                            <Text css={{
+                                fontSize: '$md',
+                                fontWeight: '$medium'
+                            }}>
+                                Update Phone
+                            </Text>
+                        </Row>
+
+                        <Row css={{
+                            alignItems: 'center',
+                            gap: 8,
+                            width: '100%',
+                            padding: '6px 0px',
+                            borderStyle: 'solid',
+                            borderWidth: '0px 0px 1px 0px',
+                            borderColor: '$gray400'
+                        }}
+                            onClick={() => {
+
+                            }}>
+                            <MdOutgoingMail size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
+                            <Text css={{
+                                fontSize: '$md',
+                                fontWeight: '$medium'
+                            }}>
+                                Contact Developers
+                            </Text>
+                        </Row>
+
+                        {!hasFCMToken &&
+                            <Row css={{
+                                alignItems: 'center',
+                                gap: 8,
+                                width: '100%',
+                                padding: '6px 0px',
+                                borderStyle: 'solid',
+                                borderWidth: '0px 0px 1px 0px',
+                                borderColor: '$gray600'
+                            }}
+                                onClick={() => {
+
+                                }}>
+                                <GoBellFill size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
+                                <Text css={{
+                                    fontSize: '$md',
+                                    fontWeight: '$medium'
+                                }}>
+                                    Enable Notifications
+                                </Text>
+                            </Row>
+                        }
+
+                        <Row css={{
+                            alignItems: 'center',
+                            gap: 8,
+                            width: '100%',
+                            padding: '6px 0px',
+                            borderStyle: 'solid',
+                            borderWidth: '0px 0px 1px 0px',
+                            borderColor: '$gray400'
+                        }}
+                            onClick={() => {
+                                setIsLightMode(!isLightMode)
+                            }}>
+                            <MdOutlinePhoneIphone size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
+                            <Text css={{
+                                fontSize: '$md',
+                                fontWeight: '$medium'
+                            }}>
+                                Go {isLightMode ? 'Dark' : 'Light'}
+                            </Text>
+                        </Row>
+
+                        <Row css={{
+                            alignItems: 'center',
+                            gap: 8,
+                            width: '100%',
+                            margin: '6px 0px'
+                        }}
+                            onClick={() => {
+                                handleLogout()
+                            }}>
+                            <IoLogOut size={16} color={"#F31260"} />
+                            <Text css={{
+                                fontSize: '$md',
+                                fontWeight: '$medium',
+                                color: '$error'
+                            }}>
+                                Logout
+                            </Text>
+                        </Row>
+
+                    </Grid>
+
+                </Grid.Container>
+            </SwipeableDrawer>
 
             <Modal
                 open={showAshokaOnlyModal}
@@ -1143,10 +1356,10 @@ export default function Header(props) {
                 </Grid.Container>
             </Modal>
 
-            {!(window.location.pathname === '/unauthorised' 
-            || Object.keys(localStorage).length <= 4 
-            || window.location.pathname === '/createsale' 
-            || window.location.pathname === '/editsale' 
+            {!(window.location.pathname === '/unauthorised'
+                || Object.keys(localStorage).length <= 4
+                || window.location.pathname === '/createsale'
+                || window.location.pathname === '/editsale'
             ) ?
                 <Grid.Container css={{
                     '@xsMin': {
@@ -1170,127 +1383,49 @@ export default function Header(props) {
                             <Row css={{
                                 maxW: '330px',
                                 justifyContent: 'space-between',
-                                paddingTop: '10px',
+                                paddingTop: '8px',
                                 paddingLeft: '8px',
                                 paddingRight: '8px',
-                                paddingBottom: isIOS ? '52px' : '16px',
+                                paddingBottom: isIOS ? '48px' : '12px',
                                 alignItems: 'center'
                             }}>
                                 {navigationItems.map(navItem => {
                                     const IconComponent = navItem.icon;
                                     const isSelected = location.pathname === navItem.path;
-
-                                    return (
-                                        <>
-                                            {theme.type === 'light' ?
-                                                <IconComponent
-                                                    key={navItem.path}
-                                                    size={28}
-                                                    color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
-                                                    // onClick={() => window.location.pathname = navItem.path}
-                                                    onClick={() => navigate(navItem.path)}
-                                                />
-                                                :
-                                                <IconComponent
-                                                    key={navItem.path}
-                                                    size={28}
-                                                    color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
-                                                    // onClick={() => window.location.pathname = navItem.path}
-                                                    onClick={() => navigate(navItem.path)}
-                                                />
-                                            }
-                                        </>
-                                    );
-                                })}
-                                <Dropdown placement="top-right">
-                                    <Dropdown.Trigger>
-                                        <Avatar
-                                            // as="button"
-                                            color=""
-                                            size="sm"
+                                    if(navItem.path!=='/useritems'){
+                                        return (
+                                            <>
+                                                {theme.type === 'light' ?
+                                                    <IconComponent
+                                                        key={navItem.path}
+                                                        size={24}
+                                                        color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
+                                                        // onClick={() => window.location.pathname = navItem.path}
+                                                        onClick={() => navigate(navItem.path)}
+                                                    />
+                                                    :
+                                                    <IconComponent
+                                                        key={navItem.path}
+                                                        size={24}
+                                                        color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
+                                                        // onClick={() => window.location.pathname = navItem.path}
+                                                        onClick={() => navigate(navItem.path)}
+                                                    />
+                                                }
+                                            </>
+                                        );
+                                    }
+                                    else{
+                                        return (
+                                            <IconComponent 
                                             src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
-                                        // src={localStorage.getItem('userPicture')}
-                                        />
-                                    </Dropdown.Trigger>
-                                    <Dropdown.Menu
-                                        aria-label="User menu actions"
-                                        color="error"
-                                        onAction={(actionKey) => {
-                                            if (actionKey === 'logout') {
-                                                handleLogout()
-                                            }
-                                            else if (actionKey === 'useritems' || actionKey === 'favourites' || actionKey == 'createsale' || actionKey == 'outlets') {
-                                                navigate(actionKey)
-                                            }
-                                            else if (actionKey === 'phoneAuth') {
-                                                setShowNumberUpdateModal(true)
-                                            }
-                                            else if (actionKey === 'enablenotif') {
-                                                requestNotificationPermission()
-                                            }
-                                            else if (actionKey === 'contactDev') {
-                                                window.open('mailto:pyjamaprogrammers@gmail.com?subject="UniSwap Issue/Bug/Suggestion"')
-                                            }
-                                            else if (actionKey === 'toggleMode') {
-                                                setIsLightMode(!isLightMode)
-                                            }
-                                            else {
-                                                console.log(`Yes ${localStorage.getItem('userName')}, you are signed in. `)
-                                            }
-                                        }}
-                                    >
-                                        <Dropdown.Item key="profile" css={{ height: "$22", }}>
-                                            <Text b color="$gray600" css={{ d: "flex", fontSize: '$xs' }}>
-                                                Signed in as
-                                            </Text>
-                                            <Text b color="inherit" css={{ d: "flex", fontSize: '$base' }}>
-                                                {localStorage.getItem('userName')}
-                                            </Text>
-                                            <Text b color="inherit" css={{ d: "flex", fontSize: '$sm' }}>
-                                                {localStorage.getItem('contactNumber')}
-                                            </Text>
-                                        </Dropdown.Item>
-                                        {/* <Dropdown.Item withDivider key="outlets" color=""
-                                            icon={<IoFastFood size={16} />}>
-                                            Outlets
-                                        </Dropdown.Item> */}
-                                        {/* <Dropdown.Item key="createsale" withDivider color=""
-                                            icon={<FaPlus size={16} />}>
-                                            Create Sale
-                                        </Dropdown.Item> */}
-                                        {/* <Dropdown.Item key="useritems" color=""
-                                            icon={<FaBagShopping size={16} />}>
-                                            My Sale Items
-                                        </Dropdown.Item> */}
-                                        <Dropdown.Item key="favourites" withDivider color=""
-                                            icon={<IoMdHeart size={16} />}>
-                                            Favourites
-                                        </Dropdown.Item>
-                                        <Dropdown.Item key="phoneAuth" color=""
-                                            icon={<FaPhone size={12} style={{ margin: '2px' }} />}>
-                                            Update Phone
-                                        </Dropdown.Item>
-                                        <Dropdown.Item key="contactDev" color=""
-                                            icon={<MdOutgoingMail size={16}/>}>
-                                            Contact Developers
-                                        </Dropdown.Item>
-                                        {!hasFCMToken &&
-                                            <Dropdown.Item key="enablenotif" color=""
-                                                icon={<GoBellFill size={16} />}
-                                            >
-                                                Enable Notifications
-                                            </Dropdown.Item>
-                                        }
-                                        <Dropdown.Item key="toggleMode" color=""
-                                            icon={<MdOutlinePhoneIphone size={16} />}>
-                                            Go {isLightMode ? 'Dark' : 'Light'}
-                                        </Dropdown.Item>
-                                        <Dropdown.Item key="logout" withDivider color="error"
-                                            icon={<IoLogOut size={16} />}>
-                                            Log Out
-                                        </Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
+                                            color={''}
+                                            size={'sm'}
+                                            onClick={() => navigate(navItem.path)}
+                                            />
+                                        )
+                                    }
+                                })}
                             </Row>
                         </BottomNavigation>
                     </Paper>

@@ -4,7 +4,7 @@ import { addFavouriteItem, removeFavouriteItem, setFavouriteItems } from '../../
 import { setSaleItems } from '../../slices/saleItemsSlice';
 import { useNavigate } from 'react-router-dom';
 import ErrorAuthPage from "../ErrorAuthPage/ErrorAuthPage";
-import { Col, Grid, Input, Text, Row, Badge } from "@nextui-org/react";
+import { Col, Grid, Input, Text, Row, Badge, useTheme, Button } from "@nextui-org/react";
 import ItemCard from "../../components/items/itemCard";
 import Skeleton from '@mui/material/Skeleton';
 import { IoSearchSharp } from "react-icons/io5";
@@ -17,6 +17,8 @@ import Alert from '@mui/material/Alert';
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosArrowForward } from "react-icons/io";
 import PullToRefresh from 'react-simple-pull-to-refresh';
+import ColorThief from 'colorthief';
+import { FaHeart } from "react-icons/fa6";
 
 export default function FavouritesItemsPage() {
 
@@ -41,6 +43,8 @@ export default function FavouritesItemsPage() {
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
     const [fetchingAllItems, setFetchingAllItems] = useState(true)
     const [render, setRender] = useState(false)
+    const [bgColor, setBgColor] = useState('')
+    const [topImageLoading, setTopImageLoading] = useState(true)
 
     const [priceFilters, setPriceFilters] = useState([
         { key: '1', value: '₹0-₹100', chosen: false },
@@ -61,8 +65,7 @@ export default function FavouritesItemsPage() {
     ]);
 
     useEffect(() => {
-        if(localStorage.getItem('favouriteItems')==null)
-        {
+        if (localStorage.getItem('favouriteItems') == null) {
             dispatch(setFavouriteItems(JSON.parse(localStorage.getItem('favouriteItems'))))
         }
         verifyUserSession()
@@ -174,11 +177,10 @@ export default function FavouritesItemsPage() {
         result.forEach(item => {
             final.push(item)
         })
-        setFilteredItems(result); 
-        setVisibleItems(result.slice(0, ITEMS_PER_PAGE)); 
-        setLastItemIndex(ITEMS_PER_PAGE); 
+        setFilteredItems(result);
+        setVisibleItems(result.slice(0, ITEMS_PER_PAGE));
+        setLastItemIndex(ITEMS_PER_PAGE);
     }
-
 
     const fetchAllItems = async () => {
         setFetchingAllItems(true);
@@ -193,10 +195,11 @@ export default function FavouritesItemsPage() {
 
             items.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
 
+            items = items.filter(x => favouriteItems.includes(x._id))
 
             dispatch(setSaleItems(items));
             setFilteredItems(items);
-            setVisibleItems(items.slice(0, ITEMS_PER_PAGE)); 
+            setVisibleItems(items.slice(0, ITEMS_PER_PAGE));
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);
         } finally {
@@ -207,18 +210,18 @@ export default function FavouritesItemsPage() {
     const handleFavouriteItemToggle = (favouriteItemsFromCard, itemIDToUpdate) => {
         const isCurrentlyFavourite = favouriteItems.includes(itemIDToUpdate);
         let updatedFavouriteItems = [];
-    
+
         if (isCurrentlyFavourite) {
             updatedFavouriteItems = favouriteItems.filter(itemID => itemID !== itemIDToUpdate);
-            dispatch(removeFavouriteItem({id: itemIDToUpdate})); // Dispatching the action to remove
+            dispatch(removeFavouriteItem({ id: itemIDToUpdate })); // Dispatching the action to remove
         } else {
             updatedFavouriteItems = [...favouriteItems, itemIDToUpdate];
-            dispatch(addFavouriteItem({id: itemIDToUpdate})); // Dispatching the action to add
+            dispatch(addFavouriteItem({ id: itemIDToUpdate })); // Dispatching the action to add
         }
-    
+
         // Update local storage
         localStorage.setItem('favouriteItems', JSON.stringify(updatedFavouriteItems));
-    
+
         setRender(prev => !prev); // Trigger re-render if necessary
     };
 
@@ -240,7 +243,28 @@ export default function FavouritesItemsPage() {
 
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastItemIndex, filteredItems]);
-    
+
+    useEffect(() => {
+        // Generate avatar URL
+        let username = localStorage.getItem('userName')
+        // let username = 'ravina'
+        const avatarApiUrl = `https://api.multiavatar.com/${username}.png?apikey=Bvjs0QyHcCxZNe`;
+        // setAvatarUrl(avatarApiUrl);
+
+        // // Load image and extract color
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // This is needed to avoid CORS issues when loading images
+        img.src = avatarApiUrl;
+        img.onload = () => {
+            const colorThief = new ColorThief();
+            const [r, g, b] = colorThief.getColor(img);
+            const dominantColor = `rgb(${r}, ${g}, ${b})`;
+            setBgColor(dominantColor);
+        };
+    }, []);
+
+    const theme = useTheme()
+
 
     return (
         <PullToRefresh onRefresh={fetchAllItems}
@@ -249,14 +273,52 @@ export default function FavouritesItemsPage() {
             pullDownThreshold={60}
             aria-label='pulltorefresh'
         >
+
+            <>
+                {bgColor.length > 0 &&
+                    <Col css={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        borderColor: '#0c0c0c',
+                        marginBottom: '40px'
+                    }}>
+                        <img
+                            width={'100%'}
+                            height={60}
+                            style={{
+                                background: `linear-gradient(to bottom, #F31260, ${theme.theme.colors.background.value})`,
+                                // backgroundColor: bgColor,
+                                filter: 'blur(40px)'
+                            }}
+                        />
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '20px',
+                                backgroundColor: theme.type === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(20,20,20,0.75)',
+                                borderRadius: '40px',
+                                height: 'max-content',
+                            }}
+                        >
+                            <FaHeart size={28} color="#F31260"
+                                style={{
+                                    margin: '16px 16px 8px 16px'
+                                }}
+                            />
+                        </div>
+                    </Col>
+                }
+            </>
+
             <Grid.Container>
-                {/* {console.log('FavouriteItems: ', favouriteItems)} */}
-                <Grid.Container css={{
-                    padding: '4px 4px',
-                    jc: 'center',
-                    marginBottom: '100px'
-                }}>
-                    <Text css={{
+                {
+                    <Grid.Container css={{
+                        padding: '4px 4px',
+                        jc: 'center',
+                        marginBottom: '100px'
+                    }}>
+                        {/* <Text css={{
                         fontWeight: '$medium',
                         '@xsMin': {
                             fontSize: '$3xl',
@@ -269,177 +331,203 @@ export default function FavouritesItemsPage() {
                         width: 'max-content'
                     }}>
                         {localStorage.getItem('userName').split(" ")[0]}'s Favourites
-                    </Text>
-                    <Row css={{
-                        '@xsMin': {
-                            padding: '0% 2% 1% 2%'
-                        },
-                        '@xsMax': {
-                            padding: '0% 4% 1% 4%'
-                        },
-                        alignItems: 'center',
-                        gap: 10,
-                        jc: 'center'
-                    }}>
-                        <Input clearable placeholder="Corset / Cargos / Necklace" width="280px" css={{ margin: '0px 0px 8px 0px', fontSize: '16px' }}
-                            initialValue=""
-                            labelLeft={<IoSearchSharp size={'20px'} color={""} />}
-                            animated={false}
-                            onChange={(e) => {
-                                setFiltersApplied(prev => ({
-                                    ...prev,
-                                    searched: e.target.value
-                                }))
-                            }}
-                            className="items-search-input"
-                            aria-label="input-search"
-                        />
-                    </Row>
-
-                    <Grid.Container css={{
-                        '@xsMin': {
-                            padding: '0% 2% 1% 2%'
-                        },
-                        '@xsMax': {
-                            padding: '0% 0% 1% 0%'
-                        },
-                        alignItems: 'center',
-                        jc: 'center'
-                    }}>
+                    </Text> */}
                         <Row css={{
+                            '@xsMin': {
+                                padding: '0% 2% 1% 2%'
+                            },
+                            '@xsMax': {
+                                padding: '0% 4% 1% 4%'
+                            },
                             alignItems: 'center',
-                            gap: 4,
-                            jc: 'center',
+                            gap: 10,
+                            jc: 'center'
                         }}>
-                            <IoIosArrowBack color="#7f7f7f" size={16} />
-                            <div className="horizontal-scroller">
-                                {priceFilters.map((priceFilter) => (
-                                    <Grid key={priceFilter.key} css={{
-                                        margin: '4px 2px',
-                                        '&:hover': {
-                                            cursor: 'pointer'
-                                        }
-                                    }}>
-                                        <Badge
-                                            variant="flat"
-                                            size={'md'}
-                                            color={priceFilter.chosen ? "primary" : "default"}
-                                            onClick={() => {
-                                                // Toggle the "chosen" property for the clicked filter
-                                                const updatedPriceFilters = priceFilters.map(filter => {
-                                                    if (filter.key === priceFilter.key) {
-                                                        return { ...filter, chosen: !filter.chosen };
-                                                    }
-                                                    return filter;
-                                                });
-                                                setPriceFilters(updatedPriceFilters);
-
-                                                // Update the filtersApplied state
-                                                setFiltersApplied(prevState => {
-                                                    const isFilterApplied = prevState.price.includes(priceFilter.key);
-                                                    const newPriceFilters = isFilterApplied
-                                                        ? prevState.price.filter(k => k !== priceFilter.key) // Remove filter
-                                                        : [...prevState.price, priceFilter.key]; // Add filter
-
-                                                    return {
-                                                        ...prevState,
-                                                        price: newPriceFilters,
-                                                    };
-                                                });
-                                            }}
-                                        >
-                                            {priceFilter.value}
-                                        </Badge>
-                                    </Grid>
-                                ))}
-                            </div>
-                            <IoIosArrowForward color="#7f7f7f" size={16} />
-                        </Row>
-                    </Grid.Container>
-
-                    <Grid.Container css={{
-                        '@xsMin': {
-                            padding: '0% 2% 2% 2%'
-                        },
-                        '@xsMax': {
-                            padding: '0% 2% 5% 2%'
-                        },
-                        alignItems: 'center',
-                        jc: 'center'
-                    }}>
-                        <Row css={{
-                            alignItems: 'center',
-                            gap: 4,
-                            jc: 'center',
-                        }}>
-                            <IoIosArrowBack color="#7f7f7f" size={16} />
-                            <div className="horizontal-scroller">
-                                {categoryFilters.map((categoryFilter) => (
-                                    <Grid key={categoryFilter.key} css={{
-                                        margin: '4px 2px',
-                                        '&:hover': {
-                                            cursor: 'pointer'
-                                        }
-                                    }}>
-                                        <Badge
-                                            variant="flat"
-                                            size="md"
-                                            color={categoryFilter.chosen ? categoryFilter.color : ""} // Use the filter's color if chosen
-                                            onClick={() => {
-                                                // Toggle the "chosen" property for the clicked filter
-                                                const updatedCategoryFilters = categoryFilters.map(filter => {
-                                                    if (filter.key === categoryFilter.key) {
-                                                        return { ...filter, chosen: !filter.chosen };
-                                                    }
-                                                    return filter;
-                                                });
-                                                setCategoryFilters(updatedCategoryFilters);
-
-                                                // Assuming you have a similar state management for category as you have for price
-                                                // Update a hypothetical filtersApplied state for categories
-                                                setFiltersApplied(prevState => {
-                                                    const isFilterApplied = prevState.category.includes(categoryFilter.key);
-                                                    const newCategoryFilters = isFilterApplied
-                                                        ? prevState.category.filter(k => k !== categoryFilter.key) // Remove filter
-                                                        : [...prevState.category, categoryFilter.key]; // Add filter
-
-                                                    return {
-                                                        ...prevState,
-                                                        category: newCategoryFilters,
-                                                    };
-                                                });
-                                            }}
-                                        >
-                                            {categoryFilter.value}
-                                        </Badge>
-                                    </Grid>
-                                ))}
-                            </div>
-                            <IoIosArrowForward color="#7f7f7f" size={16} />
+                            <Input clearable placeholder="Corset / Cargos / Necklace" width="280px" css={{ margin: '0px 0px 8px 0px', fontSize: '16px' }}
+                                initialValue=""
+                                labelLeft={<IoSearchSharp size={'20px'} color={""} />}
+                                animated={false}
+                                onChange={(e) => {
+                                    setFiltersApplied(prev => ({
+                                        ...prev,
+                                        searched: e.target.value
+                                    }))
+                                }}
+                                className="items-search-input"
+                                aria-label="input-search"
+                            />
                         </Row>
 
+                        <Grid.Container css={{
+                            '@xsMin': {
+                                padding: '0% 2% 1% 2%'
+                            },
+                            '@xsMax': {
+                                padding: '0% 0% 1% 0%'
+                            },
+                            alignItems: 'center',
+                            jc: 'center'
+                        }}>
+                            <Row css={{
+                                alignItems: 'center',
+                                gap: 4,
+                                jc: 'center',
+                            }}>
+                                <IoIosArrowBack color="#7f7f7f" size={16} />
+                                <div className="horizontal-scroller">
+                                    {priceFilters.map((priceFilter) => (
+                                        <Grid key={priceFilter.key} css={{
+                                            margin: '4px 2px',
+                                            '&:hover': {
+                                                cursor: 'pointer'
+                                            }
+                                        }}>
+                                            <Badge
+                                                variant="flat"
+                                                size={'md'}
+                                                color={priceFilter.chosen ? "primary" : "default"}
+                                                onClick={() => {
+                                                    // Toggle the "chosen" property for the clicked filter
+                                                    const updatedPriceFilters = priceFilters.map(filter => {
+                                                        if (filter.key === priceFilter.key) {
+                                                            return { ...filter, chosen: !filter.chosen };
+                                                        }
+                                                        return filter;
+                                                    });
+                                                    setPriceFilters(updatedPriceFilters);
+
+                                                    // Update the filtersApplied state
+                                                    setFiltersApplied(prevState => {
+                                                        const isFilterApplied = prevState.price.includes(priceFilter.key);
+                                                        const newPriceFilters = isFilterApplied
+                                                            ? prevState.price.filter(k => k !== priceFilter.key) // Remove filter
+                                                            : [...prevState.price, priceFilter.key]; // Add filter
+
+                                                        return {
+                                                            ...prevState,
+                                                            price: newPriceFilters,
+                                                        };
+                                                    });
+                                                }}
+                                            >
+                                                {priceFilter.value}
+                                            </Badge>
+                                        </Grid>
+                                    ))}
+                                </div>
+                                <IoIosArrowForward color="#7f7f7f" size={16} />
+                            </Row>
+                        </Grid.Container>
+
+                        <Grid.Container css={{
+                            '@xsMin': {
+                                padding: '0% 2% 2% 2%'
+                            },
+                            '@xsMax': {
+                                padding: '0% 2% 5% 2%'
+                            },
+                            alignItems: 'center',
+                            jc: 'center'
+                        }}>
+                            <Row css={{
+                                alignItems: 'center',
+                                gap: 4,
+                                jc: 'center',
+                            }}>
+                                <IoIosArrowBack color="#7f7f7f" size={16} />
+                                <div className="horizontal-scroller">
+                                    {categoryFilters.map((categoryFilter) => (
+                                        <Grid key={categoryFilter.key} css={{
+                                            margin: '4px 2px',
+                                            '&:hover': {
+                                                cursor: 'pointer'
+                                            }
+                                        }}>
+                                            <Badge
+                                                variant="flat"
+                                                size="md"
+                                                color={categoryFilter.chosen ? categoryFilter.color : ""} // Use the filter's color if chosen
+                                                onClick={() => {
+                                                    // Toggle the "chosen" property for the clicked filter
+                                                    const updatedCategoryFilters = categoryFilters.map(filter => {
+                                                        if (filter.key === categoryFilter.key) {
+                                                            return { ...filter, chosen: !filter.chosen };
+                                                        }
+                                                        return filter;
+                                                    });
+                                                    setCategoryFilters(updatedCategoryFilters);
+
+                                                    // Assuming you have a similar state management for category as you have for price
+                                                    // Update a hypothetical filtersApplied state for categories
+                                                    setFiltersApplied(prevState => {
+                                                        const isFilterApplied = prevState.category.includes(categoryFilter.key);
+                                                        const newCategoryFilters = isFilterApplied
+                                                            ? prevState.category.filter(k => k !== categoryFilter.key) // Remove filter
+                                                            : [...prevState.category, categoryFilter.key]; // Add filter
+
+                                                        return {
+                                                            ...prevState,
+                                                            category: newCategoryFilters,
+                                                        };
+                                                    });
+                                                }}
+                                            >
+                                                {categoryFilter.value}
+                                            </Badge>
+                                        </Grid>
+                                    ))}
+                                </div>
+                                <IoIosArrowForward color="#7f7f7f" size={16} />
+                            </Row>
+
+                        </Grid.Container>
+
+                        {!fetchingAllItems && !backdropLoaderOpen && filteredItems && visibleItems &&
+                            <>
+                                {
+                                    visibleItems.map((item, index) => (
+                                        <div key={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
+                                            id={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
+                                        >
+                                            <ItemCard
+                                                item={item}
+                                                type={"favourites"}
+                                                favouriteItems={favouriteItems}
+                                                handleFavouriteItemToggle={handleFavouriteItemToggle}
+                                            />
+                                        </div>
+                                    ))
+                                }
+                            </>
+                        }
+
+                        {visibleItems.length === 0 && !fetchingAllItems && !backdropLoaderOpen &&
+                            <Grid.Container css={{
+                                jc: 'center',
+                            }}>
+                                <Text css={{
+                                    width: '100vw',
+                                    fontSize: '$base',
+                                    fontWeight: '$medium',
+                                    textAlign: 'center',
+                                    // lineHeight: '1',
+                                    marginTop: '132px',
+                                    paddingBottom: '8px'
+                                }}>
+                                    No favourites yet...
+                                </Text>
+
+                                <Button auto flat color={'error'} onClick={() => {
+                                    window.location.pathname = '/saleitems'
+                                }}>
+                                    Items On Sale →
+                                </Button>
+
+                            </Grid.Container>
+                        }
+
                     </Grid.Container>
-
-                    {!fetchingAllItems && !backdropLoaderOpen && filteredItems && visibleItems &&
-                        <>
-                            {
-                                visibleItems.map((item, index) => (
-                                    <div key={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
-                                    id={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
-                                    >
-                                        <ItemCard
-                                            item={item}
-                                            type={"favourites"}
-                                            favouriteItems={favouriteItems}
-                                            handleFavouriteItemToggle={handleFavouriteItemToggle}
-                                        />
-                                    </div>
-                                ))
-                            }
-                        </>
-                    }
-
-                </Grid.Container>
+                }
 
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
