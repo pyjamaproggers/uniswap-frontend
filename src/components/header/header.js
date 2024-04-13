@@ -80,7 +80,7 @@ export default function Header(props) {
 
     const navigationItems = [
         // { path: '/', icon: GoHomeFill },
-        { path: '/saleitems', icon: MdStorefront },
+        { path: '/saleitems', icon: FaShop },
         { path: '/favourites', icon: IoMdHeart },
         { path: '/createsale', icon: FaPlus },
         { path: '/outlets', icon: IoFastFood },
@@ -358,8 +358,6 @@ export default function Header(props) {
         fetchUserData();
     }, []);
 
-
-
     function handleLogout() {
         fetch(`${backend}/api/auth/logout`, {
             method: 'POST',
@@ -388,20 +386,6 @@ export default function Header(props) {
                 // Optionally handle the error, maybe show a notification to the user
             });
     }
-
-    // useEffect(() => {
-    //     fetch(`${backend}/api/auth/profile`, {
-    //         credentials: 'include',
-    //     })
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             if (data.isAuthenticated) {
-    //                 // Update UI to reflect authenticated state
-    //             } else {
-    //                 // User is not authenticated
-    //             }
-    //         });
-    // }, []);
 
     useEffect(() => {
         setLoginLoader(true)
@@ -726,7 +710,7 @@ export default function Header(props) {
                 </Navbar>
             }
 
-            {(window.location.pathname === '/useritems' ) &&
+            {(window.location.pathname === '/useritems') &&
                 <div style={{
                     position: 'absolute',
                     top: '24px',
@@ -750,6 +734,9 @@ export default function Header(props) {
                 open={userDrawer}
                 onClose={() => setUserDrawer(false)}
                 anchor="bottom"
+                style={{
+                    borderRadius: '24px 0px 0px 24px'
+                }}
             >
                 <Grid.Container css={{
                     padding: '4px 12px 48px 12px',
@@ -826,10 +813,6 @@ export default function Header(props) {
                             alignItems: 'center',
                             gap: 8,
                             width: '100%',
-                            padding: '6px 0px',
-                            borderStyle: 'solid',
-                            borderWidth: '0px 0px 1px 0px',
-                            borderColor: '$gray400'
                         }}
                             onClick={() => {
 
@@ -837,7 +820,12 @@ export default function Header(props) {
                             <FaPhone size={12} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} style={{ marginRight: '4px' }} />
                             <Text css={{
                                 fontSize: '$md',
-                                fontWeight: '$medium'
+                                fontWeight: '$medium',
+                                width: '100%',
+                                padding: '6px 0px',
+                                borderStyle: 'solid',
+                                borderWidth: '0px 0px 1px 0px',
+                                borderColor: '$gray300'
                             }}>
                                 Update Phone
                             </Text>
@@ -847,10 +835,6 @@ export default function Header(props) {
                             alignItems: 'center',
                             gap: 8,
                             width: '100%',
-                            padding: '6px 0px',
-                            borderStyle: 'solid',
-                            borderWidth: '0px 0px 1px 0px',
-                            borderColor: '$gray400'
                         }}
                             onClick={() => {
 
@@ -858,7 +842,12 @@ export default function Header(props) {
                             <MdOutgoingMail size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
                             <Text css={{
                                 fontSize: '$md',
-                                fontWeight: '$medium'
+                                fontWeight: '$medium',
+                                width: '100%',
+                                padding: '6px 0px',
+                                borderStyle: 'solid',
+                                borderWidth: '0px 0px 1px 0px',
+                                borderColor: '$gray300'
                             }}>
                                 Contact Developers
                             </Text>
@@ -869,10 +858,6 @@ export default function Header(props) {
                                 alignItems: 'center',
                                 gap: 8,
                                 width: '100%',
-                                padding: '6px 0px',
-                                borderStyle: 'solid',
-                                borderWidth: '0px 0px 1px 0px',
-                                borderColor: '$gray600'
                             }}
                                 onClick={() => {
 
@@ -880,7 +865,12 @@ export default function Header(props) {
                                 <GoBellFill size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
                                 <Text css={{
                                     fontSize: '$md',
-                                    fontWeight: '$medium'
+                                    fontWeight: '$medium',
+                                    width: '100%',
+                                    padding: '6px 0px',
+                                    borderStyle: 'solid',
+                                    borderWidth: '0px 0px 1px 0px',
+                                    borderColor: '$gray300'
                                 }}>
                                     Enable Notifications
                                 </Text>
@@ -891,10 +881,6 @@ export default function Header(props) {
                             alignItems: 'center',
                             gap: 8,
                             width: '100%',
-                            padding: '6px 0px',
-                            borderStyle: 'solid',
-                            borderWidth: '0px 0px 1px 0px',
-                            borderColor: '$gray400'
                         }}
                             onClick={() => {
                                 setIsLightMode(!isLightMode)
@@ -902,7 +888,12 @@ export default function Header(props) {
                             <MdOutlinePhoneIphone size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
                             <Text css={{
                                 fontSize: '$md',
-                                fontWeight: '$medium'
+                                fontWeight: '$medium',
+                                width: '100%',
+                                padding: '6px 0px',
+                                borderStyle: 'solid',
+                                borderWidth: '0px 0px 1px 0px',
+                                borderColor: '$gray300'
                             }}>
                                 Go {isLightMode ? 'Dark' : 'Light'}
                             </Text>
@@ -1392,36 +1383,84 @@ export default function Header(props) {
                                 {navigationItems.map(navItem => {
                                     const IconComponent = navItem.icon;
                                     const isSelected = location.pathname === navItem.path;
-                                    if(navItem.path!=='/useritems'){
-                                        return (
-                                            <>
-                                                {theme.type === 'light' ?
-                                                    <IconComponent
-                                                        key={navItem.path}
-                                                        size={24}
-                                                        color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
-                                                        // onClick={() => window.location.pathname = navItem.path}
-                                                        onClick={() => navigate(navItem.path)}
-                                                    />
-                                                    :
-                                                    <IconComponent
-                                                        key={navItem.path}
-                                                        size={24}
-                                                        color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
-                                                        // onClick={() => window.location.pathname = navItem.path}
-                                                        onClick={() => navigate(navItem.path)}
-                                                    />
-                                                }
-                                            </>
-                                        );
+                                    if (navItem.path !== '/useritems') {
+                                        if (navItem.path === '/saleitems') {
+                                            return (
+                                                <>
+                                                    {theme.type === 'light' ?
+                                                        <IconComponent
+                                                            key={navItem.path}
+                                                            size={28}
+                                                            color={isSelected ? '#7828C8' : 'rgb(40,40,40)'}
+                                                            // onClick={() => window.location.pathname = navItem.path}
+                                                            onClick={() => navigate(navItem.path)}
+                                                        />
+                                                        :
+                                                        <IconComponent
+                                                            key={navItem.path}
+                                                            size={28}
+                                                            color={isSelected ? '#7828C8' : 'rgb(220,220,220)'}
+                                                            // onClick={() => window.location.pathname = navItem.path}
+                                                            onClick={() => navigate(navItem.path)}
+                                                        />
+                                                    }
+                                                </>
+                                            );
+                                        }
+                                        if (navItem.path === '/favourites' || navItem.path === '/createsale') {
+                                            return (
+                                                <>
+                                                    {theme.type === 'light' ?
+                                                        <IconComponent
+                                                            key={navItem.path}
+                                                            size={28}
+                                                            color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
+                                                            // onClick={() => window.location.pathname = navItem.path}
+                                                            onClick={() => navigate(navItem.path)}
+                                                        />
+                                                        :
+                                                        <IconComponent
+                                                            key={navItem.path}
+                                                            size={28}
+                                                            color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
+                                                            // onClick={() => window.location.pathname = navItem.path}
+                                                            onClick={() => navigate(navItem.path)}
+                                                        />
+                                                    }
+                                                </>
+                                            );
+                                        }
+                                        if (navItem.path === '/outlets') {
+                                            return (
+                                                <>
+                                                    {theme.type === 'light' ?
+                                                        <IconComponent
+                                                            key={navItem.path}
+                                                            size={28}
+                                                            color={isSelected ? '#0072F5' : 'rgb(40,40,40)'}
+                                                            // onClick={() => window.location.pathname = navItem.path}
+                                                            onClick={() => navigate(navItem.path)}
+                                                        />
+                                                        :
+                                                        <IconComponent
+                                                            key={navItem.path}
+                                                            size={28}
+                                                            color={isSelected ? '#0072F5' : 'rgb(220,220,220)'}
+                                                            // onClick={() => window.location.pathname = navItem.path}
+                                                            onClick={() => navigate(navItem.path)}
+                                                        />
+                                                    }
+                                                </>
+                                            );
+                                        }
                                     }
-                                    else{
+                                    else {
                                         return (
-                                            <IconComponent 
-                                            src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
-                                            color={''}
-                                            size={'sm'}
-                                            onClick={() => navigate(navItem.path)}
+                                            <IconComponent
+                                                src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
+                                                color={''}
+                                                size={'sm'}
+                                                onClick={() => navigate(navItem.path)}
                                             />
                                         )
                                     }

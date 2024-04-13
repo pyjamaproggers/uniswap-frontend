@@ -156,74 +156,14 @@ export default function OutletsPage() {
             location: 'Between AC02 & AC03',
             website: ''
         },
-        // {
-        //     name: 'Fuel Zone',
-        //     timing: '12pm To 3am',
-        //     picture: FuelZone,
-        //     phone: '+918104213125',
-        //     menu: [FZ1, FZ2],
-        //     location: 'Mess Ground Floor (Near Lawns)',
-        //     website: ''
-        // },
-        // {
-        //     name: 'Dosai',
-        //     timing: '12pm To 11pm',
-        //     picture: Dosai,
-        //     phone: '+918104213125',
-        //     menu: [Do1, Do2, Do3, Do4, Do5, Do6, Do7, Do8],
-        //     location: 'Food Street (Next To Frisbee Field)',
-        //     website: ''
-        // },
-        // {
-        //     name: 'Amul',
-        //     timing: '12pm To 11pm',
-        //     picture: Amul,
-        //     phone: '+918104213125',
-        //     menu: [Grey, Grey, Grey, Grey],
-        //     location: 'Mess (AC01 Entry)',
-        //     website: ''
-        // },
-        // {
-        //     name: 'LocoMoko',
-        //     timing: '12pm To 11pm',
-        //     picture: LocoMoko,
-        //     phone: '+918104213125',
-        //     menu: [Grey, Grey, Grey, Grey],
-        //     location: 'Mess Ground Floor',
-        //     website: ''
-        // },
     ]
 
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
     const navigate = useNavigate();
-
-    // const verifyUserSession = () => {
-    //     fetch(`${backend}/api/auth/verify`, {
-    //         method: 'GET',
-    //         credentials: 'include', // Necessary to include the cookie in the request
-    //     })
-    //     .then(response => {
-    //         if (response.ok) {
-    //             return response.json();
-    //         } else {
-    //             throw new Error('Session expired or user not logged in');
-    //         }
-    //     })
-    //     .then(data => {
-    //         console.log('User session verified:', data);
-    //         // Optionally update the UI or state based on the response
-    //     })
-    //     .catch(error => {
-    //         console.error('Error verifying user session:', error);
-    //         // Redirect to login page or show an error page
-    //         navigate('/'); // Adjust the path as necessary
-    //     });
-    // };
-
-    // useEffect(() => {
-    //     verifyUserSession();
-    // }, []);
+    const [loadedImages, setLoadedImages] = useState(0);
+    const [totalImages, setTotalImages] = useState(0);
+    const [isPageLoaded, setIsPageLoaded] = useState(false);
 
     const [isGalleryOpen, setIsGalleryOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -272,7 +212,6 @@ export default function OutletsPage() {
         return { hours, minutes };
     }
 
-    // Function to check if the current time is within the opening hours range
     const isCurrentlyOpen = (timing) => {
         // Extract the opening and closing times from the timing string
         const [openingTime, closingTime] = timing.split(' To ').map(parseTime);
@@ -320,6 +259,23 @@ export default function OutletsPage() {
         };
     }, []);
 
+    useEffect(() => {
+        // Calculate total number of images
+        let imageCount = outlets.reduce((acc, outlet) => acc + outlet.menu.length + 1, 0); // +1 for each outlet picture
+        setTotalImages(imageCount);
+    }, [outlets]);
+
+    const handleImageLoad = () => {
+        setLoadedImages((prev) => prev + 1);
+    };
+
+    useEffect(() => {
+        // Check if all images are loaded
+        if (loadedImages === totalImages) {
+            setIsPageLoaded(true);
+        }
+    }, [loadedImages, totalImages]);
+
     const theme = useTheme()
 
     return (
@@ -329,106 +285,111 @@ export default function OutletsPage() {
             alignItems: 'center',
             marginBottom: '100px'
         }}>
-
-            <>
-                {bgColor.length > 0 &&
-                    <Col css={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        borderColor: '#0c0c0c',
-                        marginBottom: '0px'
-                    }}>
-                        <img
-                            width={'100%'}
-                            height={60}
-                            style={{
-                                background: `linear-gradient(to bottom, #0072F5, ${theme.theme.colors.background.value})`,
-                                // backgroundColor: bgColor,
-                                filter: 'blur(40px)'
-                            }}
-                        />
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '20px',
-                                backgroundColor: theme.type === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(20,20,20,0.75)',
-                                borderRadius: '80px',
-                                height: 'max-content',
-                            }}
-                        >
-                            <IoFastFood size={28} color="#0072F5"
-                                style={{
-                                    margin: '14px 16px 12px 16px'
-                                }}
-                            />
-                        </div>
-                    </Col>
-                }
-            </>
-
-            {/* <Text css={{
-                '@xsMin': {
-                    fontSize: '$2xl',
-                    margin: '24px 0px 48px 0px'
-                },
-                '@xsMax': {
-                    fontSize: '$xl',
-                    margin: '24px 0px 24px 0px'
-                },
-                fontWeight: '$semibold',
-                width: '100vw',
-                textAlign: 'center'
-            }}>
-                Food Outlets
-            </Text> */}
-            <Grid.Container css={{
-                jc: 'center',
-                marginTop: '72px'
-            }}>
-                {outlets.map((outlet, index) => {
-                    const isOpen = isCurrentlyOpen(outlet.timing);
-                    return (
-                        <Grid key={index} css={{
-                            maxWidth: '400px',
-                            width: '97.5vw',
-                            margin: '0px 0px'
-                        }}>
+            {isPageLoaded &&
+                <>
+                    <>
+                        {bgColor.length > 0 &&
                             <Col css={{
-                                width: '100%',
-                                padding: '0px 0px 64px 0px'
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                borderColor: '#0c0c0c',
+                                marginBottom: '0px'
                             }}>
-                                <Row css={{
-                                    jc: 'space-between',
-                                    alignItems: 'center'
+                                <img
+                                    width={'100%'}
+                                    height={60}
+                                    style={{
+                                        background: `linear-gradient(to bottom, #0072F5, ${theme.theme.colors.background.value})`,
+                                        // backgroundColor: bgColor,
+                                        filter: 'blur(40px)'
+                                    }}
+                                />
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        top: '32px',
+                                        backgroundColor: theme.type === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(20,20,20,0.75)',
+                                        borderRadius: '80px',
+                                        height: 'max-content',
+                                    }}
+                                >
+                                    <IoFastFood size={20} color="#0072F5"
+                                        style={{
+                                            margin: '10px 12px 8px 12px'
+                                        }}
+                                    />
+                                </div>
+                            </Col>
+                        }
+                    </>
+
+                    <Grid.Container css={{
+                        jc: 'center',
+                        marginTop: '72px'
+                    }}>
+                        {outlets.map((outlet, index) => {
+                            const isOpen = isCurrentlyOpen(outlet.timing);
+                            return (
+                                <Grid key={index} css={{
+                                    maxWidth: '400px',
+                                    width: '97.5vw',
+                                    margin: '0px 0px'
                                 }}>
-                                    <Row css={{
-                                        jc: 'flex-start',
-                                        alignItems: 'center'
+                                    <Col css={{
+                                        width: '100%',
+                                        padding: '0px 0px 64px 0px'
                                     }}>
-                                        <NextUIImage
-                                            css={{
-                                                width: '80px',
-                                                height: '60px',
-                                                objectFit: 'cover',
-                                                borderRadius: '4px'
-                                            }}
-                                            // width={'80px'}
-                                            // height={'80px'}
-                                            src={outlet.picture} />
-                                        <Col css={{
-                                            padding: '0px 12px',
+                                        <Row css={{
+                                            jc: 'space-between',
+                                            alignItems: 'center'
                                         }}>
-                                            {outlet.website.length > 0 ?
-                                                <Row css={{
-                                                    maxW: '110px',
-                                                    alignItems: 'center'
+                                            <Row css={{
+                                                jc: 'flex-start',
+                                                alignItems: 'center'
+                                            }}>
+                                                <NextUIImage
+                                                    css={{
+                                                        width: '80px',
+                                                        height: '60px',
+                                                        objectFit: 'cover',
+                                                        borderRadius: '4px'
+                                                    }}
+                                                    // width={'80px'}
+                                                    // height={'80px'}
+                                                    src={outlet.picture} />
+                                                <Col css={{
+                                                    padding: '0px 12px',
                                                 }}>
-                                                    <Link
-                                                        href={outlet.website}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        css={{
+                                                    {outlet.website.length > 0 ?
+                                                        <Row css={{
+                                                            maxW: '110px',
+                                                            alignItems: 'center'
+                                                        }}>
+                                                            <Link
+                                                                href={outlet.website}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                css={{
+                                                                    '@xsMin': {
+                                                                        fontSize: '$lg'
+                                                                    },
+                                                                    '@xsMax': {
+                                                                        fontSize: '$base'
+                                                                    },
+                                                                    fontWeight: '$semibold',
+                                                                    whiteSpace: 'nowrap',
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    maxW: '100px'
+                                                                }}
+                                                            >
+                                                                {outlet.name}
+                                                            </Link>
+                                                            <MdArrowOutward color="#0072F5" size={20} />
+                                                        </Row>
+                                                        :
+                                                        <Text css={{
                                                             '@xsMin': {
                                                                 fontSize: '$lg'
                                                             },
@@ -439,93 +400,84 @@ export default function OutletsPage() {
                                                             whiteSpace: 'nowrap',
                                                             overflow: 'hidden',
                                                             textOverflow: 'ellipsis',
-                                                            maxW: '100px'
-                                                        }}
-                                                    >
-                                                        {outlet.name}
-                                                    </Link>
-                                                    <MdArrowOutward color="#0072F5" size={20} />
-                                                </Row>
-                                                :
-                                                <Text css={{
-                                                    '@xsMin': {
-                                                        fontSize: '$lg'
-                                                    },
-                                                    '@xsMax': {
-                                                        fontSize: '$base'
-                                                    },
-                                                    fontWeight: '$semibold',
-                                                    whiteSpace: 'nowrap',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    maxW: '150px'
-                                                }}>
-                                                    {outlet.name}
-                                                </Text>
-                                            }
-                                            <Text css={{
-                                                '@xsMin': {
-                                                    fontSize: '$lg'
-                                                },
-                                                '@xsMax': {
-                                                    fontSize: '$md'
-                                                },
-                                                fontWeight: '$semibold',
-                                                color: '$gray600'
+                                                            maxW: '150px'
+                                                        }}>
+                                                            {outlet.name}
+                                                        </Text>
+                                                    }
+                                                    <Text css={{
+                                                        '@xsMin': {
+                                                            fontSize: '$lg'
+                                                        },
+                                                        '@xsMax': {
+                                                            fontSize: '$md'
+                                                        },
+                                                        fontWeight: '$semibold',
+                                                        color: '$gray600'
+                                                    }}>
+                                                        {outlet.timing}
+                                                    </Text>
+                                                </Col>
+
+                                            </Row>
+                                            <Row css={{
+                                                width: 'max-content',
+                                                alignItems: 'flex-end',
+                                                display: 'flex',
+                                                flexDirection: 'column'
                                             }}>
-                                                {outlet.timing}
-                                            </Text>
-                                        </Col>
+                                                {/* Check based on current time if outlet is open or not comparing to outlet.timing */}
+                                                <Badge variant={'flat'} color={(isOpen || outlet.name === 'Subway') ? 'success' : 'error'}>
+                                                    {(isOpen || outlet.name === 'Subway') ? 'Open' : 'Closed'}
+                                                </Badge>
+                                                <Badge variant={'flat'} color={'primary'}>
+                                                    {outlet.phone}
+                                                </Badge>
+                                            </Row>
 
-                                    </Row>
-                                    <Row css={{
-                                        width: 'max-content',
-                                        alignItems: 'flex-end',
-                                        display: 'flex',
-                                        flexDirection: 'column'
-                                    }}>
-                                        {/* Check based on current time if outlet is open or not comparing to outlet.timing */}
-                                        <Badge variant={'flat'} color={(isOpen || outlet.name === 'Subway') ? 'success' : 'error'}>
-                                            {(isOpen || outlet.name === 'Subway') ? 'Open' : 'Closed'}
-                                        </Badge>
-                                        <Badge variant={'flat'} color={'primary'}>
-                                            {outlet.phone}
-                                        </Badge>
-                                    </Row>
+                                        </Row>
+                                        <div className="gallery-thumbnail" onClick={() => openGallery(outlet.menu, 0)}>
+                                            <img
+                                                key={index}
+                                                src={outlet.menu[0]}
+                                                alt=""
+                                                onLoad={() => {
+                                                    handleImageLoad()
+                                                }}
+                                            />
+                                        </div>
+                                        <Text css={{
+                                            '@xsMin': {
+                                                fontSize: '$lg'
+                                            },
+                                            '@xsMax': {
+                                                fontSize: '$base'
+                                            },
+                                            fontWeight: '$semibold',
+                                            marginLeft: '4px',
+                                            color: '$gray600'
+                                        }}>
+                                            {outlet.location}
+                                        </Text>
+                                    </Col>
+                                </Grid>
+                            )
+                        }
+                        )}
+                    </Grid.Container>
 
-                                </Row>
-                                <div className="gallery-thumbnail" onClick={() => openGallery(outlet.menu, 0)}>
-                                    <img src={outlet.menu[0]} alt="" />
-                                </div>
-                                <Text css={{
-                                    '@xsMin': {
-                                        fontSize: '$lg'
-                                    },
-                                    '@xsMax': {
-                                        fontSize: '$base'
-                                    },
-                                    fontWeight: '$semibold',
-                                    marginLeft: '4px',
-                                    color: '$gray600'
-                                }}>
-                                    {outlet.location}
-                                </Text>
-                            </Col>
-                        </Grid>
-                    )
-                }
-                )}
-            </Grid.Container>
+                    {/* Gallery Modal */}
+                    {isGalleryOpen && (
+                        <div className="gallery-modal">
+                            <FontAwesomeIcon icon={faCircleXmark} onClick={closeGallery} className="close-icon" />
+                            <FontAwesomeIcon icon={faCircleChevronLeft} onClick={goToPreviousImage} className="prev-icon" />
+                            <img src={currentMenuImages[currentImageIndex]} alt="" className="gallery-image" />
+                            <FontAwesomeIcon icon={faCircleChevronRight} onClick={goToNextImage} className="next-icon" />
+                        </div>
+                    )}
 
-            {/* Gallery Modal */}
-            {isGalleryOpen && (
-                <div className="gallery-modal">
-                    <FontAwesomeIcon icon={faCircleXmark} onClick={closeGallery} className="close-icon" />
-                    <FontAwesomeIcon icon={faCircleChevronLeft} onClick={goToPreviousImage} className="prev-icon" />
-                    <img src={currentMenuImages[currentImageIndex]} alt="" className="gallery-image" />
-                    <FontAwesomeIcon icon={faCircleChevronRight} onClick={goToNextImage} className="next-icon" />
-                </div>
-            )}
+                </>
+            }
 
         </Grid.Container>
     )

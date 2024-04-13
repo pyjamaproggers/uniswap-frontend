@@ -526,11 +526,11 @@ export default function UserItemsPage() {
                                     marginTop: '132px',
                                     paddingBottom: '8px'
                                 }}>
-                                    No items up uploaded...
+                                    No items uploaded...
                                 </Text>
 
                                 <Button auto flat color={'primary'} onClick={() => {
-                                    window.location.pathname = '/createsale'
+                                    navigate('/createsale')
                                 }}>
                                     Create A Sale →
                                 </Button>

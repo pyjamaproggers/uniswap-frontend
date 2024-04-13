@@ -1,16 +1,19 @@
-.nextui-c-STltJ{
-    padding: 0px
+.nextui-c-STltJ {
+  padding: 0px;
 }
 
-.haAclf{
-    background-color: #0c0c0c !important;
+.haAclf {
+  background-color: #0c0c0c !important;
 }
 
-iframe{
-    color-scheme: dark;
+iframe {
+  color-scheme: dark;
 }
 
 #GoogleButton {
-    background: none !important; /* Remove the background */
-  }
-  
+  background: none !important; /* Remove the background */
+}
+
+.css-9emuhu-MuiPaper-root-MuiDrawer-paper{
+    border-radius: 16px !important;
+}

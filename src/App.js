@@ -49,7 +49,7 @@ function App() {
                 white: isLightMode ? '#fff' : '#f0f0f0',
                 black: isLightMode ? '#000' : '#0c0c0c',
                 background: isLightMode ? '#fff' : '#0c0c0c',
-                text: isLightMode ? '#000' : '#f0f0f0'
+                text: isLightMode ? '#000' : '#f0f0f0',
             }
         }
     });
@@ -79,7 +79,7 @@ function App() {
         };
     }, []);
 
-    const isPWA = (window.matchMedia('(display-mode: standalone)').matches)
+    const isPWA = !(window.matchMedia('(display-mode: standalone)').matches)
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isAndroid = /Android/i.test(navigator.userAgent);
 

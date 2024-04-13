@@ -32,7 +32,7 @@ export default function ItemCard(props) {
     const URL = 'https://wa.me'
     // let number = item.contactNumber.replace(/[^\w\s]/gi, '').replace(/ /g, '')
     let number = item.contactNumber
-    let message = `Hi ${firstName}, this is regarding the ${item.itemName} you put on the UniSwap™ priced at ${item.itemPrice},`
+    let message = `Hi ${firstName}, I saw you put ${item.itemName} on UniSwap™ for ${item.itemPrice}`
     let url = `${URL}/${number}?text=${encodeURI(message)}`;
     let favouriteItems = props.favouriteItems
     let handleFavouriteItemToggle = props.handleFavouriteItemToggle

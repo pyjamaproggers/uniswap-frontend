@@ -194,7 +194,6 @@ export default function FavouritesItemsPage() {
             let items = await response.json();
 
             items.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-
             items = items.filter(x => favouriteItems.includes(x._id))
 
             dispatch(setSaleItems(items));
@@ -273,7 +272,6 @@ export default function FavouritesItemsPage() {
             pullDownThreshold={60}
             aria-label='pulltorefresh'
         >
-
             <>
                 {bgColor.length > 0 &&
                     <Col css={{
@@ -295,15 +293,15 @@ export default function FavouritesItemsPage() {
                         <div
                             style={{
                                 position: 'absolute',
-                                top: '20px',
+                                top: '28px',
                                 backgroundColor: theme.type === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(20,20,20,0.75)',
                                 borderRadius: '40px',
                                 height: 'max-content',
                             }}
                         >
-                            <FaHeart size={28} color="#F31260"
+                            <FaHeart size={20} color="#F31260"
                                 style={{
-                                    margin: '16px 16px 8px 16px'
+                                    margin: '12px 12px 6px 12px'
                                 }}
                             />
                         </div>
@@ -518,7 +516,7 @@ export default function FavouritesItemsPage() {
                                 </Text>
 
                                 <Button auto flat color={'error'} onClick={() => {
-                                    window.location.pathname = '/saleitems'
+                                    navigate('/saleitems')
                                 }}>
                                     Items On Sale →
                                 </Button>

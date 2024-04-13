@@ -41,7 +41,6 @@ export default function SaleItemsPage() {
     });
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
-    const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
     const [fetchingAllItems, setFetchingAllItems] = useState(true)
     const [render, setRender] = useState(false)
     const ITEMS_PER_PAGE = 10;
@@ -79,14 +78,14 @@ export default function SaleItemsPage() {
 
     useEffect(() => {
 
-        checkFcmToken()
-
         if (localStorage.getItem('favouriteItems') == null) {
             dispatch(setFavouriteItems(JSON.parse(localStorage.getItem('favouriteItems'))))
         }
 
         verifyUserSession()
-        fetchAllItems()
+        window.setTimeout(() => {
+            fetchAllItems()
+        }, [2000])
 
         const categoryKeyFromNavbar = location.state?.category;
         if (categoryKeyFromNavbar) {
@@ -147,57 +146,61 @@ export default function SaleItemsPage() {
     function filterItems() {
         // setBackdropLoaderOpen(true)
         // console.log("filtering")
-        let result = saleItems;
+        setFetchingAllItems(true)
+        window.setTimeout(() => {
+            let result = saleItems;
 
-        const getPriceRange = (rangeStr) => {
-            const match = rangeStr.match(/₹(\d+)-₹(\d+)/) || rangeStr.match(/₹(\d+)\+/);
-            if (match) {
-                return match[1] ? { min: parseInt(match[1], 10), max: match[2] ? parseInt(match[2], 10) : Infinity } : null;
+            const getPriceRange = (rangeStr) => {
+                const match = rangeStr.match(/₹(\d+)-₹(\d+)/) || rangeStr.match(/₹(\d+)\+/);
+                if (match) {
+                    return match[1] ? { min: parseInt(match[1], 10), max: match[2] ? parseInt(match[2], 10) : Infinity } : null;
+                }
+                return null;
+            };
+
+            const isPriceWithinRange = (itemPrice, rangeStr) => {
+                const range = getPriceRange(rangeStr);
+                if (!range) return false;
+                return itemPrice >= range.min && itemPrice <= range.max;
+            };
+
+            // Filter by price
+            if (filtersApplied.price.length > 0) {
+                const activePriceRanges = filtersApplied.price.map(key =>
+                    priceFilters.find(filter => filter.key === key).value
+                );
+
+                result = result.filter(item =>
+                    activePriceRanges.some(rangeStr => isPriceWithinRange(item.itemPrice, rangeStr))
+                );
             }
-            return null;
-        };
 
-        const isPriceWithinRange = (itemPrice, rangeStr) => {
-            const range = getPriceRange(rangeStr);
-            if (!range) return false;
-            return itemPrice >= range.min && itemPrice <= range.max;
-        };
+            // Filter by category
+            if (filtersApplied.category.length > 0) {
+                result = result.filter(item =>
+                    filtersApplied.category.includes(item.itemCategory)
+                );
+            }
 
-        // Filter by price
-        if (filtersApplied.price.length > 0) {
-            const activePriceRanges = filtersApplied.price.map(key =>
-                priceFilters.find(filter => filter.key === key).value
-            );
+            // Filter by searched text
+            if (filtersApplied.searched.trim() !== '') {
+                const searchTerms = filtersApplied.searched.toLowerCase().trim().split(/\s+/);
+                result = result.filter(item => {
+                    const itemText = `${item.userName} ${item.userEmail} ${item.itemName} ${item.itemDescription} ${item.contactNumber}`.toLowerCase();
+                    // Check for matches of all search terms in the combined text
+                    return searchTerms.every(term => itemText.includes(term));
+                });
+            }
 
-            result = result.filter(item =>
-                activePriceRanges.some(rangeStr => isPriceWithinRange(item.itemPrice, rangeStr))
-            );
-        }
-
-        // Filter by category
-        if (filtersApplied.category.length > 0) {
-            result = result.filter(item =>
-                filtersApplied.category.includes(item.itemCategory)
-            );
-        }
-
-        // Filter by searched text
-        if (filtersApplied.searched.trim() !== '') {
-            const searchTerms = filtersApplied.searched.toLowerCase().trim().split(/\s+/);
-            result = result.filter(item => {
-                const itemText = `${item.userName} ${item.userEmail} ${item.itemName} ${item.itemDescription} ${item.contactNumber}`.toLowerCase();
-                // Check for matches of all search terms in the combined text
-                return searchTerms.every(term => itemText.includes(term));
-            });
-        }
-
-        var final = []
-        result.forEach(item => {
-            final.push(item)
-        })
-        setFilteredItems(result);
-        setVisibleItems(result.slice(0, ITEMS_PER_PAGE));
-        setLastItemIndex(ITEMS_PER_PAGE);
+            var final = []
+            result.forEach(item => {
+                final.push(item)
+            })
+            setFilteredItems(result);
+            setVisibleItems(result.slice(0, ITEMS_PER_PAGE));
+            setLastItemIndex(ITEMS_PER_PAGE);
+            setFetchingAllItems(false)
+        }, [500])
     }
 
     const fetchAllItems = async () => {
@@ -373,7 +376,7 @@ export default function SaleItemsPage() {
                             style={{
                                 background: `linear-gradient(to bottom, #7828C8, ${theme.theme.colors.background.value})`,
                                 // backgroundColor: bgColor,
-                                filter: 'blur(50px)'
+                                filter: 'blur(40px)'
                             }}
                         />
                         <div
@@ -574,7 +577,7 @@ export default function SaleItemsPage() {
 
                         </Grid.Container>
 
-                        {!fetchingAllItems && !backdropLoaderOpen && visibleItems && favouriteItems &&
+                        {!fetchingAllItems && visibleItems && favouriteItems &&
                             <>
                                 {
                                     visibleItems.map((item, index) => (
@@ -593,16 +596,162 @@ export default function SaleItemsPage() {
                             </>
                         }
 
+                        {(fetchingAllItems) &&
+                            <>
+                                <Col css={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    width: '330px',
+                                    margin: '24px 24px'
+                                }}>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        padding: '4px 4px 12px 4px',
+                                        jc: 'space-between'
+                                    }}>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content',
+                                            gap: 10
+                                        }}>
+                                            <Skeleton animation="wave" variant="circular" width={40} height={40}
+                                                sx={{
+                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                }}
+                                            />
+                                            <Col css={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                jc: 'center',
+                                                gap: 4,
+                                                width: 'max-content'
+                                            }}>
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5}
+                                                    sx={{
+                                                        bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                    }}
+                                                />
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5}
+                                                    sx={{
+                                                        bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                    }}
+                                                />
+                                            </Col>
+                                        </Row>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={60} height={20}
+                                                sx={{
+                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                }}
+                                            />
+                                        </Row>
+                                    </Row>
+                                    <Skeleton animation="wave" variant="rounded" width={330} height={300}
+                                        sx={{
+                                            bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                        }}
+                                    />
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        paddingTop: '12px',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={120} height={10}
+                                            sx={{
+                                                bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                            }}
+                                        />
+                                        <Skeleton animation="wave" variant="rounded" width={80} height={20}
+                                            sx={{
+                                                bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                            }}
+                                        />
+                                    </Row>
+                                </Col>
+
+                                <Col css={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    width: '330px',
+                                    margin: '24px 24px'
+                                }}>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        padding: '4px 4px 12px 4px',
+                                        jc: 'space-between'
+                                    }}>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content',
+                                            gap: 10
+                                        }}>
+                                            <Skeleton animation="wave" variant="circular" width={40} height={40}
+                                                sx={{
+                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                }}
+                                            />
+                                            <Col css={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                jc: 'center',
+                                                gap: 4,
+                                                width: 'max-content'
+                                            }}>
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} 
+                                                sx={{
+                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                }}
+                                                />
+                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} 
+                                                sx={{
+                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                }}
+                                                />
+                                            </Col>
+                                        </Row>
+                                        <Row css={{
+                                            alignItems: 'center',
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={60} height={20} 
+                                            sx={{
+                                                bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                            }}
+                                            />
+                                        </Row>
+                                    </Row>
+                                    <Skeleton animation="wave" variant="rounded" width={330} height={300} 
+                                    sx={{
+                                        bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                    }}
+                                    />
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        paddingTop: '12px',
+                                        gap: 10
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={120} height={10} 
+                                        sx={{
+                                            bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                        }}
+                                        />
+                                        <Skeleton animation="wave" variant="rounded" width={80} height={20} 
+                                        sx={{
+                                            bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                        }}
+                                        />
+                                    </Row>
+                                </Col>
+
+                            </>
+                        }
+
 
                     </Grid.Container>
                 }
-
-                <Backdrop
-                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                    open={backdropLoaderOpen}
-                >
-                    <CircularProgress color="inherit" />
-                </Backdrop>
 
                 <Snackbar
                     anchorOrigin={{
