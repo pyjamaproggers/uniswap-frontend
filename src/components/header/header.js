@@ -80,11 +80,11 @@ export default function Header(props) {
 
     const navigationItems = [
         // { path: '/', icon: GoHomeFill },
-        { path: '/saleitems', icon: FaShop },
-        { path: '/favourites', icon: IoMdHeart },
-        { path: '/createsale', icon: FaPlus },
-        { path: '/outlets', icon: IoFastFood },
-        { path: '/useritems', icon: Avatar }
+        { path: '/saleitems', icon: FaShop, value: 'Live' },
+        { path: '/favourites', icon: IoMdHeart, value: 'Favourites' },
+        { path: '/createsale', icon: FaPlus, value: '' },
+        { path: '/outlets', icon: IoFastFood, value: 'Outlets' },
+        { path: '/useritems', icon: Avatar, value: '' }
     ];
 
     const collapseItemsLoggedOut = [
@@ -307,7 +307,7 @@ export default function Header(props) {
             .then(data => {
                 setHasFCMToken(true)
                 setRender((prev) => !prev);
-                if(userEnabled){
+                if (userEnabled) {
                     setSuccessSnackbarMessage('Notifications token updated. You should be getting them now.')
                     setShowSuccessSnackbar(true)
                 }
@@ -858,27 +858,27 @@ export default function Header(props) {
                         </Row>
 
                         {/* {!hasFCMToken && */}
-                            <Row css={{
-                                alignItems: 'center',
-                                gap: 8,
+                        <Row css={{
+                            alignItems: 'center',
+                            gap: 8,
+                            width: '100%',
+                        }}
+                            onClick={() => {
+                                requestNotificationPermission(true)
+                            }}>
+                            <GoBellFill size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
+                            <Text css={{
+                                fontSize: '$md',
+                                fontWeight: '$medium',
                                 width: '100%',
-                            }}
-                                onClick={() => {
-                                    requestNotificationPermission(true)
-                                }}>
-                                <GoBellFill size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
-                                <Text css={{
-                                    fontSize: '$md',
-                                    fontWeight: '$medium',
-                                    width: '100%',
-                                    padding: '6px 0px',
-                                    borderStyle: 'solid',
-                                    borderWidth: '0px 0px 1px 0px',
-                                    borderColor: '$gray300'
-                                }}>
-                                    Enable Notifications
-                                </Text>
-                            </Row>
+                                padding: '6px 0px',
+                                borderStyle: 'solid',
+                                borderWidth: '0px 0px 1px 0px',
+                                borderColor: '$gray300'
+                            }}>
+                                Enable Notifications
+                            </Text>
+                        </Row>
                         {/* } */}
 
                         <Row css={{
@@ -1415,13 +1415,27 @@ export default function Header(props) {
                                             return (
                                                 <>
                                                     {theme.type === 'light' ?
-                                                        <IconComponent
-                                                            key={navItem.path}
-                                                            size={28}
-                                                            color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
-                                                            // onClick={() => window.location.pathname = navItem.path}
-                                                            onClick={() => navigate(navItem.path)}
-                                                        />
+                                                        <Col css={{
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            alignItems: 'center',
+                                                            gap: 0,
+                                                            width: 'max-content'
+                                                        }}>
+                                                            <IconComponent
+                                                                key={navItem.path}
+                                                                size={28}
+                                                                color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
+                                                                // onClick={() => window.location.pathname = navItem.path}
+                                                                onClick={() => navigate(navItem.path)}
+                                                            />
+                                                            <Text css={{
+                                                                fontSize: '12px',
+                                                                fontWeight: '$medium'
+                                                            }}>
+                                                                {navItem.value}
+                                                            </Text>
+                                                        </Col>
                                                         :
                                                         <IconComponent
                                                             key={navItem.path}
@@ -1484,21 +1498,6 @@ export default function Header(props) {
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
-
-            {/* <Snackbar
-                open={showFcmTokenWarning}
-                autoHideDuration={6000}
-                onClose={() => setShowFcmTokenWarning(false)}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert
-                    onClose={() => setShowFcmTokenWarning(false)}
-                    severity="warning"
-                    sx={{ width: '100%' }}
-                >
-                    Seems like you don't have notifications enabled. Press on your avatar and click on 'Enable Notifications' to turn them on.
-                </Alert>
-            </Snackbar> */}
 
             <Snackbar
                 anchorOrigin={{

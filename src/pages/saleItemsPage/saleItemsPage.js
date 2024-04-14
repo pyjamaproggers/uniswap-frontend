@@ -24,6 +24,7 @@ import HomeBG from '../../assets/HomeImage.jpg'
 import ColorThief from 'colorthief';
 import Icon from '../../assets/UniSwap2.PNG'
 import { FaChevronLeft } from "react-icons/fa";
+import FlatList from 'flatlist-react'
 
 export default function SaleItemsPage() {
 
@@ -198,8 +199,8 @@ export default function SaleItemsPage() {
             result.forEach(item => {
                 final.push(item)
             })
-            setFilteredItems(result);
-            setVisibleItems(result.slice(0, ITEMS_PER_PAGE));
+            setFilteredItems(final);
+            setVisibleItems(final.slice(0, ITEMS_PER_PAGE));
             setLastItemIndex(ITEMS_PER_PAGE);
             setFetchingAllItems(false)
         }, [500])
@@ -343,6 +344,21 @@ export default function SaleItemsPage() {
         };
     }, []);
 
+    const renderItem = (item, index) => {
+        return (
+            <div key={item._id}
+                id={item._id}
+            >
+                <ItemCard
+                    item={item}
+                    type={"sale"}
+                    favouriteItems={favouriteItems}
+                    handleFavouriteItemToggle={handleFavouriteItemToggle}
+                />
+            </div>
+        )
+    }
+
     const theme = useTheme()
 
     return (
@@ -399,12 +415,12 @@ export default function SaleItemsPage() {
 
             <Grid.Container className="saleitems">
                 {/* {!topImageLoading && */}
-                    <Grid.Container css={{
-                        padding: '4px 4px',
-                        jc: 'center',
-                        marginBottom: '100px'
-                    }}>
-                        {/* <Text css={{
+                <Grid.Container css={{
+                    padding: '4px 4px',
+                    jc: 'center',
+                    marginBottom: '100px'
+                }}>
+                    {/* <Text css={{
                         fontWeight: '$medium',
                         '@xsMin': {
                             fontSize: '$3xl',
@@ -418,330 +434,319 @@ export default function SaleItemsPage() {
                     }}>
                         Items For Sale
                     </Text> */}
+                    <Row css={{
+                        '@xsMin': {
+                            padding: '0% 2% 1% 2%'
+                        },
+                        '@xsMax': {
+                            padding: '0% 4% 1% 4%'
+                        },
+                        alignItems: 'center',
+                        gap: 10,
+                        jc: 'center'
+                    }}>
+                        <Input clearable placeholder="Corset / Cargos / Necklace" width="280px" css={{ margin: '0px 0px 8px 0px', fontSize: '16px' }}
+                            initialValue=""
+                            labelLeft={<IoSearchSharp size={'20px'} color={""} />}
+                            animated={false}
+                            onChange={(e) => {
+                                setFiltersApplied(prev => ({
+                                    ...prev,
+                                    searched: e.target.value
+                                }))
+                            }}
+                            className="items-search-input"
+                            aria-label="input-search"
+                        />
+                    </Row>
+
+                    <Grid.Container css={{
+                        '@xsMin': {
+                            padding: '0% 2% 1% 2%'
+                        },
+                        '@xsMax': {
+                            padding: '0% 0% 1% 0%'
+                        },
+                        alignItems: 'center',
+                        jc: 'center'
+                    }}>
                         <Row css={{
-                            '@xsMin': {
-                                padding: '0% 2% 1% 2%'
-                            },
-                            '@xsMax': {
-                                padding: '0% 4% 1% 4%'
-                            },
                             alignItems: 'center',
-                            gap: 10,
-                            jc: 'center'
+                            gap: 4,
+                            jc: 'center',
                         }}>
-                            <Input clearable placeholder="Corset / Cargos / Necklace" width="280px" css={{ margin: '0px 0px 8px 0px', fontSize: '16px' }}
-                                initialValue=""
-                                labelLeft={<IoSearchSharp size={'20px'} color={""} />}
-                                animated={false}
-                                onChange={(e) => {
-                                    setFiltersApplied(prev => ({
-                                        ...prev,
-                                        searched: e.target.value
-                                    }))
-                                }}
-                                className="items-search-input"
-                                aria-label="input-search"
-                            />
+                            <IoIosArrowBack color="#7f7f7f" size={16} />
+                            <div className="horizontal-scroller">
+                                {priceFilters.map((priceFilter) => (
+                                    <Grid key={priceFilter.key} css={{
+                                        margin: '4px 2px',
+                                        '&:hover': {
+                                            cursor: 'pointer'
+                                        }
+                                    }}>
+                                        <Badge
+                                            variant="flat"
+                                            size={'md'}
+                                            color={priceFilter.chosen ? "primary" : "default"}
+                                            onClick={() => {
+                                                // Toggle the "chosen" property for the clicked filter
+                                                const updatedPriceFilters = priceFilters.map(filter => {
+                                                    if (filter.key === priceFilter.key) {
+                                                        return { ...filter, chosen: !filter.chosen };
+                                                    }
+                                                    return filter;
+                                                });
+                                                setPriceFilters(updatedPriceFilters);
+
+                                                // Update the filtersApplied state
+                                                setFiltersApplied(prevState => {
+                                                    const isFilterApplied = prevState.price.includes(priceFilter.key);
+                                                    const newPriceFilters = isFilterApplied
+                                                        ? prevState.price.filter(k => k !== priceFilter.key) // Remove filter
+                                                        : [...prevState.price, priceFilter.key]; // Add filter
+
+                                                    return {
+                                                        ...prevState,
+                                                        price: newPriceFilters,
+                                                    };
+                                                });
+                                            }}
+                                        >
+                                            {priceFilter.value}
+                                        </Badge>
+                                    </Grid>
+                                ))}
+                            </div>
+                            <IoIosArrowForward color="#7f7f7f" size={16} />
+                        </Row>
+                    </Grid.Container>
+
+                    <Grid.Container css={{
+                        '@xsMin': {
+                            padding: '0% 2% 2% 2%'
+                        },
+                        '@xsMax': {
+                            padding: '0% 2% 5% 2%'
+                        },
+                        alignItems: 'center',
+                        jc: 'center'
+                    }}>
+                        <Row css={{
+                            alignItems: 'center',
+                            gap: 4,
+                            jc: 'center',
+                        }}>
+                            <IoIosArrowBack color="#7f7f7f" size={16} />
+                            <div className="horizontal-scroller">
+                                {categoryFilters.map((categoryFilter) => (
+                                    <Grid key={categoryFilter.key} css={{
+                                        margin: '4px 2px',
+                                        '&:hover': {
+                                            cursor: 'pointer'
+                                        }
+                                    }}>
+                                        <Badge
+                                            variant="flat"
+                                            size="md"
+                                            color={categoryFilter.chosen ? categoryFilter.color : ""} // Use the filter's color if chosen
+                                            onClick={() => {
+                                                // Toggle the "chosen" property for the clicked filter
+                                                const updatedCategoryFilters = categoryFilters.map(filter => {
+                                                    if (filter.key === categoryFilter.key) {
+                                                        return { ...filter, chosen: !filter.chosen };
+                                                    }
+                                                    return filter;
+                                                });
+                                                setCategoryFilters(updatedCategoryFilters);
+
+                                                // Assuming you have a similar state management for category as you have for price
+                                                // Update a hypothetical filtersApplied state for categories
+                                                setFiltersApplied(prevState => {
+                                                    const isFilterApplied = prevState.category.includes(categoryFilter.key);
+                                                    const newCategoryFilters = isFilterApplied
+                                                        ? prevState.category.filter(k => k !== categoryFilter.key) // Remove filter
+                                                        : [...prevState.category, categoryFilter.key]; // Add filter
+
+                                                    return {
+                                                        ...prevState,
+                                                        category: newCategoryFilters,
+                                                    };
+                                                });
+                                            }}
+                                        >
+                                            {categoryFilter.value}
+                                        </Badge>
+                                    </Grid>
+                                ))}
+                            </div>
+                            <IoIosArrowForward color="#7f7f7f" size={16} />
                         </Row>
 
-                        <Grid.Container css={{
-                            '@xsMin': {
-                                padding: '0% 2% 1% 2%'
-                            },
-                            '@xsMax': {
-                                padding: '0% 0% 1% 0%'
-                            },
-                            alignItems: 'center',
-                            jc: 'center'
-                        }}>
-                            <Row css={{
-                                alignItems: 'center',
-                                gap: 4,
-                                jc: 'center',
+                    </Grid.Container>
+
+                    {!fetchingAllItems && filteredItems && favouriteItems &&
+                        <FlatList
+                            list={filteredItems}
+                            renderItem={renderItem}
+                            renderOnScroll={true}
+                        />
+                    }
+
+                    {(fetchingAllItems && filteredItems.length === 0) &&
+                        <>
+                            <Col css={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                width: '330px',
+                                margin: '24px 24px'
                             }}>
-                                <IoIosArrowBack color="#7f7f7f" size={16} />
-                                <div className="horizontal-scroller">
-                                    {priceFilters.map((priceFilter) => (
-                                        <Grid key={priceFilter.key} css={{
-                                            margin: '4px 2px',
-                                            '&:hover': {
-                                                cursor: 'pointer'
-                                            }
-                                        }}>
-                                            <Badge
-                                                variant="flat"
-                                                size={'md'}
-                                                color={priceFilter.chosen ? "primary" : "default"}
-                                                onClick={() => {
-                                                    // Toggle the "chosen" property for the clicked filter
-                                                    const updatedPriceFilters = priceFilters.map(filter => {
-                                                        if (filter.key === priceFilter.key) {
-                                                            return { ...filter, chosen: !filter.chosen };
-                                                        }
-                                                        return filter;
-                                                    });
-                                                    setPriceFilters(updatedPriceFilters);
-
-                                                    // Update the filtersApplied state
-                                                    setFiltersApplied(prevState => {
-                                                        const isFilterApplied = prevState.price.includes(priceFilter.key);
-                                                        const newPriceFilters = isFilterApplied
-                                                            ? prevState.price.filter(k => k !== priceFilter.key) // Remove filter
-                                                            : [...prevState.price, priceFilter.key]; // Add filter
-
-                                                        return {
-                                                            ...prevState,
-                                                            price: newPriceFilters,
-                                                        };
-                                                    });
-                                                }}
-                                            >
-                                                {priceFilter.value}
-                                            </Badge>
-                                        </Grid>
-                                    ))}
-                                </div>
-                                <IoIosArrowForward color="#7f7f7f" size={16} />
-                            </Row>
-                        </Grid.Container>
-
-                        <Grid.Container css={{
-                            '@xsMin': {
-                                padding: '0% 2% 2% 2%'
-                            },
-                            '@xsMax': {
-                                padding: '0% 2% 5% 2%'
-                            },
-                            alignItems: 'center',
-                            jc: 'center'
-                        }}>
-                            <Row css={{
-                                alignItems: 'center',
-                                gap: 4,
-                                jc: 'center',
-                            }}>
-                                <IoIosArrowBack color="#7f7f7f" size={16} />
-                                <div className="horizontal-scroller">
-                                    {categoryFilters.map((categoryFilter) => (
-                                        <Grid key={categoryFilter.key} css={{
-                                            margin: '4px 0px',
-                                            '&:hover': {
-                                                cursor: 'pointer'
-                                            }
-                                        }}>
-                                            <Badge
-                                                variant="flat"
-                                                size="md"
-                                                color={categoryFilter.chosen ? categoryFilter.color : ""} // Use the filter's color if chosen
-                                                onClick={() => {
-                                                    // Toggle the "chosen" property for the clicked filter
-                                                    const updatedCategoryFilters = categoryFilters.map(filter => {
-                                                        if (filter.key === categoryFilter.key) {
-                                                            return { ...filter, chosen: !filter.chosen };
-                                                        }
-                                                        return filter;
-                                                    });
-                                                    setCategoryFilters(updatedCategoryFilters);
-
-                                                    // Assuming you have a similar state management for category as you have for price
-                                                    // Update a hypothetical filtersApplied state for categories
-                                                    setFiltersApplied(prevState => {
-                                                        const isFilterApplied = prevState.category.includes(categoryFilter.key);
-                                                        const newCategoryFilters = isFilterApplied
-                                                            ? prevState.category.filter(k => k !== categoryFilter.key) // Remove filter
-                                                            : [...prevState.category, categoryFilter.key]; // Add filter
-
-                                                        return {
-                                                            ...prevState,
-                                                            category: newCategoryFilters,
-                                                        };
-                                                    });
-                                                }}
-                                            >
-                                                {categoryFilter.value}
-                                            </Badge>
-                                        </Grid>
-                                    ))}
-                                </div>
-                                <IoIosArrowForward color="#7f7f7f" size={16} />
-                            </Row>
-
-                        </Grid.Container>
-
-                        {!fetchingAllItems && visibleItems && favouriteItems &&
-                            <>
-                                {
-                                    visibleItems.map((item, index) => (
-                                        <div key={item._id}
-                                            id={item._id}
-                                        >
-                                            <ItemCard
-                                                item={item}
-                                                type={"sale"}
-                                                favouriteItems={favouriteItems}
-                                                handleFavouriteItemToggle={handleFavouriteItemToggle}
-                                            />
-                                        </div>
-                                    ))
-                                }
-                            </>
-                        }
-
-                        {(fetchingAllItems && visibleItems.length===0) &&
-                            <>
-                                <Col css={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    width: '330px',
-                                    margin: '24px 24px'
+                                <Row css={{
+                                    alignItems: 'center',
+                                    padding: '4px 4px 12px 4px',
+                                    jc: 'space-between'
                                 }}>
                                     <Row css={{
                                         alignItems: 'center',
-                                        padding: '4px 4px 12px 4px',
-                                        jc: 'space-between'
-                                    }}>
-                                        <Row css={{
-                                            alignItems: 'center',
-                                            width: 'max-content',
-                                            gap: 10
-                                        }}>
-                                            <Skeleton animation="wave" variant="circular" width={40} height={40}
-                                                sx={{
-                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                                }}
-                                            />
-                                            <Col css={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                jc: 'center',
-                                                gap: 4,
-                                                width: 'max-content'
-                                            }}>
-                                                <Skeleton animation="wave" variant="rounded" width={80} height={5}
-                                                    sx={{
-                                                        bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                                    }}
-                                                />
-                                                <Skeleton animation="wave" variant="rounded" width={80} height={5}
-                                                    sx={{
-                                                        bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                                    }}
-                                                />
-                                            </Col>
-                                        </Row>
-                                        <Row css={{
-                                            alignItems: 'center',
-                                            width: 'max-content'
-                                        }}>
-                                            <Skeleton animation="wave" variant="rounded" width={60} height={20}
-                                                sx={{
-                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                                }}
-                                            />
-                                        </Row>
-                                    </Row>
-                                    <Skeleton animation="wave" variant="rounded" width={330} height={300}
-                                        sx={{
-                                            bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                        }}
-                                    />
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        paddingTop: '12px',
+                                        width: 'max-content',
                                         gap: 10
                                     }}>
-                                        <Skeleton animation="wave" variant="rounded" width={120} height={10}
+                                        <Skeleton animation="wave" variant="circular" width={40} height={40}
                                             sx={{
                                                 bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
                                             }}
                                         />
-                                        <Skeleton animation="wave" variant="rounded" width={80} height={20}
-                                            sx={{
-                                                bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                            }}
-                                        />
-                                    </Row>
-                                </Col>
-
-                                <Col css={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    width: '330px',
-                                    margin: '24px 24px'
-                                }}>
-                                    <Row css={{
-                                        alignItems: 'center',
-                                        padding: '4px 4px 12px 4px',
-                                        jc: 'space-between'
-                                    }}>
-                                        <Row css={{
-                                            alignItems: 'center',
-                                            width: 'max-content',
-                                            gap: 10
-                                        }}>
-                                            <Skeleton animation="wave" variant="circular" width={40} height={40}
-                                                sx={{
-                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                                }}
-                                            />
-                                            <Col css={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                jc: 'center',
-                                                gap: 4,
-                                                width: 'max-content'
-                                            }}>
-                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} 
-                                                sx={{
-                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                                }}
-                                                />
-                                                <Skeleton animation="wave" variant="rounded" width={80} height={5} 
-                                                sx={{
-                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                                }}
-                                                />
-                                            </Col>
-                                        </Row>
-                                        <Row css={{
-                                            alignItems: 'center',
+                                        <Col css={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            jc: 'center',
+                                            gap: 4,
                                             width: 'max-content'
                                         }}>
-                                            <Skeleton animation="wave" variant="rounded" width={60} height={20} 
+                                            <Skeleton animation="wave" variant="rounded" width={80} height={5}
+                                                sx={{
+                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                }}
+                                            />
+                                            <Skeleton animation="wave" variant="rounded" width={80} height={5}
+                                                sx={{
+                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                }}
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        width: 'max-content'
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={60} height={20}
                                             sx={{
                                                 bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
                                             }}
-                                            />
-                                        </Row>
+                                        />
                                     </Row>
-                                    <Skeleton animation="wave" variant="rounded" width={330} height={300} 
+                                </Row>
+                                <Skeleton animation="wave" variant="rounded" width={330} height={300}
                                     sx={{
                                         bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
                                     }}
+                                />
+                                <Row css={{
+                                    alignItems: 'center',
+                                    paddingTop: '12px',
+                                    gap: 10
+                                }}>
+                                    <Skeleton animation="wave" variant="rounded" width={120} height={10}
+                                        sx={{
+                                            bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                        }}
                                     />
+                                    <Skeleton animation="wave" variant="rounded" width={80} height={20}
+                                        sx={{
+                                            bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                        }}
+                                    />
+                                </Row>
+                            </Col>
+
+                            <Col css={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                width: '330px',
+                                margin: '24px 24px'
+                            }}>
+                                <Row css={{
+                                    alignItems: 'center',
+                                    padding: '4px 4px 12px 4px',
+                                    jc: 'space-between'
+                                }}>
                                     <Row css={{
                                         alignItems: 'center',
-                                        paddingTop: '12px',
+                                        width: 'max-content',
                                         gap: 10
                                     }}>
-                                        <Skeleton animation="wave" variant="rounded" width={120} height={10} 
-                                        sx={{
-                                            bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                        }}
+                                        <Skeleton animation="wave" variant="circular" width={40} height={40}
+                                            sx={{
+                                                bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                            }}
                                         />
-                                        <Skeleton animation="wave" variant="rounded" width={80} height={20} 
-                                        sx={{
-                                            bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
-                                        }}
+                                        <Col css={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            jc: 'center',
+                                            gap: 4,
+                                            width: 'max-content'
+                                        }}>
+                                            <Skeleton animation="wave" variant="rounded" width={80} height={5}
+                                                sx={{
+                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                }}
+                                            />
+                                            <Skeleton animation="wave" variant="rounded" width={80} height={5}
+                                                sx={{
+                                                    bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                                }}
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <Row css={{
+                                        alignItems: 'center',
+                                        width: 'max-content'
+                                    }}>
+                                        <Skeleton animation="wave" variant="rounded" width={60} height={20}
+                                            sx={{
+                                                bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                            }}
                                         />
                                     </Row>
-                                </Col>
+                                </Row>
+                                <Skeleton animation="wave" variant="rounded" width={330} height={300}
+                                    sx={{
+                                        bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                    }}
+                                />
+                                <Row css={{
+                                    alignItems: 'center',
+                                    paddingTop: '12px',
+                                    gap: 10
+                                }}>
+                                    <Skeleton animation="wave" variant="rounded" width={120} height={10}
+                                        sx={{
+                                            bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                        }}
+                                    />
+                                    <Skeleton animation="wave" variant="rounded" width={80} height={20}
+                                        sx={{
+                                            bgcolor: theme.type === 'light' ? '#9BA1A6' : '#313538'
+                                        }}
+                                    />
+                                </Row>
+                            </Col>
 
-                            </>
-                        }
+                        </>
+                    }
 
 
-                    </Grid.Container>
+                </Grid.Container>
                 {/* } */}
 
                 <Snackbar

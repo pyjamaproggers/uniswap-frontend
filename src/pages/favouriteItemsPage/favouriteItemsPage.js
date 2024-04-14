@@ -19,6 +19,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import PullToRefresh from 'react-simple-pull-to-refresh';
 import ColorThief from 'colorthief';
 import { FaHeart } from "react-icons/fa6";
+import FlatList from 'flatlist-react';
 
 export default function FavouritesItemsPage() {
 
@@ -179,8 +180,8 @@ export default function FavouritesItemsPage() {
         result.forEach(item => {
             final.push(item)
         })
-        setFilteredItems(result);
-        setVisibleItems(result.slice(0, ITEMS_PER_PAGE));
+        setFilteredItems(final);
+        setVisibleItems(final.slice(0, ITEMS_PER_PAGE));
         setLastItemIndex(ITEMS_PER_PAGE);
     }
 
@@ -266,6 +267,18 @@ export default function FavouritesItemsPage() {
 
     const theme = useTheme()
 
+    const renderItem = (item, index) => {
+        return (
+            <div key={item._id} id={item._id}>
+                <ItemCard
+                    item={item}
+                    type={"favourites"}
+                    favouriteItems={favouriteItems}
+                    handleFavouriteItemToggle={handleFavouriteItemToggle}
+                />
+            </div>
+        )
+    }
 
     return (
         <PullToRefresh onRefresh={fetchAllItems}
@@ -482,26 +495,15 @@ export default function FavouritesItemsPage() {
 
                         </Grid.Container>
 
-                        {!fetchingAllItems && !backdropLoaderOpen && filteredItems && visibleItems &&
-                            <>
-                                {
-                                    visibleItems.map((item, index) => (
-                                        <div key={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
-                                            id={`${item._id}-${favouriteItems.includes(item._id) ? 'fav' : 'not-fav'}`}
-                                        >
-                                            <ItemCard
-                                                item={item}
-                                                type={"favourites"}
-                                                favouriteItems={favouriteItems}
-                                                handleFavouriteItemToggle={handleFavouriteItemToggle}
-                                            />
-                                        </div>
-                                    ))
-                                }
-                            </>
+                        {!fetchingAllItems && !backdropLoaderOpen && filteredItems &&
+                            <FlatList 
+                            list={filteredItems}
+                            renderItem={renderItem}
+                            renderOnScroll={true}
+                            />
                         }
 
-                        {visibleItems.length === 0 && !fetchingAllItems && !backdropLoaderOpen &&
+                        {filteredItems.length === 0 && !fetchingAllItems && !backdropLoaderOpen &&
                             <Grid.Container css={{
                                 jc: 'center',
                             }}>

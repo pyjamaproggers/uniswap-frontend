@@ -18,6 +18,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import PullToRefresh from 'react-simple-pull-to-refresh';
 import ColorThief from 'colorthief';
 import { FaChevronLeft } from "react-icons/fa";
+import FlatList from 'flatlist-react';
 
 export default function UserItemsPage() {
 
@@ -194,8 +195,8 @@ export default function UserItemsPage() {
         result.forEach(item => {
             final.push(item)
         })
-        setFilteredItems(result);
-        setVisibleItems(result.slice(0, ITEMS_PER_PAGE));
+        setFilteredItems(final);
+        setVisibleItems(final.slice(0, ITEMS_PER_PAGE));
         setLastItemIndex(ITEMS_PER_PAGE);
     }
 
@@ -267,6 +268,19 @@ export default function UserItemsPage() {
     }, []);
 
     const theme = useTheme()
+
+    const renderItem = (item, index) => {
+        return (
+            <div key={item._id} id={item._id}>
+                <ItemCard
+                    item={item}
+                    type={"user"}
+                    handleLiveToggle={handleLiveToggle}
+                    onItemDeleted={onItemDeleted}
+                />
+            </div>
+        )
+    }
 
     return (
         <PullToRefresh onRefresh={() => fetchAllItems(localStorage.getItem('userEmail'))}
@@ -498,24 +512,15 @@ export default function UserItemsPage() {
 
                         </Grid.Container>
 
-                        {!fetchingAllItems && !backdropLoaderOpen && filteredItems && visibleItems &&
-                            <>
-                                {
-                                    visibleItems.map((item, index) => (
-                                        <div key={item._id} id={item._id}>
-                                            <ItemCard
-                                                item={item}
-                                                type={"user"}
-                                                handleLiveToggle={handleLiveToggle}
-                                                onItemDeleted={onItemDeleted}
-                                            />
-                                        </div>
-                                    ))
-                                }
-                            </>
+                        {!fetchingAllItems && !backdropLoaderOpen && filteredItems &&
+                            <FlatList
+                                list={filteredItems}
+                                renderItem={renderItem}
+                                renderOnScroll={true}
+                            />
                         }
 
-                        {visibleItems.length === 0 && !fetchingAllItems && !backdropLoaderOpen &&
+                        {filteredItems.length === 0 && !fetchingAllItems && !backdropLoaderOpen &&
                             <Grid.Container css={{
                                 jc: 'center',
                             }}>
