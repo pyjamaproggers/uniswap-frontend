@@ -60,10 +60,12 @@ export default function InputItemCard(props) {
 
     const categoryColors = {
         apparel: 'error',
-        food: 'secondary',
         electronics: 'primary',
+        decor: 'success',
+        food: 'warning',
+        makeup: 'secondary',
         stationery: 'success',
-        Jewellery: 'warning',
+        jewellery: 'warning',
         lostandfound: 'neutral',
     };
 
