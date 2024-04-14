@@ -23,6 +23,8 @@ export default function ItemCard(props) {
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
+    const [showHeartAnimation, setShowHeartAnimation] = useState(false)
+    const [lastTap, setLastTap] = useState(0);
     const navigate = useNavigate()
     const backend = process.env.REACT_APP_BACKEND
     const [render, setRender] = useState(false)
@@ -41,7 +43,7 @@ export default function ItemCard(props) {
     const categoryColors = {
         apparel: 'error',
         food: 'secondary',
-        tickets: 'primary',
+        electronics: 'primary',
         stationery: 'success',
         jewellry: 'warning',
     };
@@ -49,8 +51,15 @@ export default function ItemCard(props) {
     // let shareItemViaWhatsApp = props.shareItemViaWhatsApp
 
     const handleFavouriteButtonClick = async (favouriteItems, item) => {
-        console.log('invoking')
+        // console.log('invoking')
         const itemIDToUpdate = item._id;
+
+        const isCurrentlyFavourite = favouriteItems.includes(itemIDToUpdate);
+        if(!isCurrentlyFavourite){
+            setShowHeartAnimation(true);
+            setTimeout(() => setShowHeartAnimation(false), 1000); // Animation lasts for 1 second
+        }
+
 
         try {
             const response = await fetch(`${backend}/api/user/favorites`, {
@@ -193,6 +202,19 @@ export default function ItemCard(props) {
         }
     };
 
+    const handleDoubleTap = () => {
+        const now = Date.now();
+        const DOUBLE_TAP_DELAY = 300; // milliseconds
+
+        if (lastTap && (now - lastTap) < DOUBLE_TAP_DELAY) {
+            // console.log('invoking func');
+            handleFavouriteButtonClick(favouriteItems, item);
+
+        } else {
+            setLastTap(now);
+        }
+    };
+
     if (item.live === 'n' && type === 'sale') {
         return null
     }
@@ -201,16 +223,16 @@ export default function ItemCard(props) {
     }
     else {
         return (
-            <Grid 
-            css={{
-                '@xsMax': {
-                    margin: '24px 6px'
-                },
-                '@xsMin': {
-                    margin: '24px 24px'
-                },
-                jc: 'center'
-            }}
+            <Grid
+                css={{
+                    '@xsMax': {
+                        margin: '24px 6px'
+                    },
+                    '@xsMin': {
+                        margin: '24px 24px'
+                    },
+                    jc: 'center'
+                }}
             >
 
                 <Backdrop
@@ -269,25 +291,44 @@ export default function ItemCard(props) {
                             ₹ {item.itemPrice}
                         </Badge>
                     </Row>
-                    <Image src={item.itemPicture}
-                        css={{
-                            height: '400px',
-                            width: '97.5vw',
-                            maxWidth: '400px',
-                            // '@xsMax': {
-                            //     width: '90vw'
-                            // },
-                            // '@xsMin': {
-                            //     width: '360px',
-                            // },
-                            objectFit: 'cover',
-                            borderRadius: '4px'
-                        }} 
-                        // onDoubleClick={()=>{
-                        //     console.log('invoking func')
-                        //     handleFavouriteButtonClick(favouriteItems, item)
-                        // }}
+                    <div
+                    style={{
+                        position: 'relative'
+                    }}
+                    >
+                        <img src={item.itemPicture}
+                            style={{
+                                height: '400px',
+                                width: '97.5vw',
+                                maxWidth: '400px',
+                                // '@xsMax': {
+                                //     width: '90vw'
+                                // },
+                                // '@xsMin': {
+                                //     width: '360px',
+                                // },
+                                objectFit: 'cover',
+                                borderRadius: '4px'
+                            }}
+                            // onDoubleClick={handleDoubleTap} // For desktop
+                            onTouchEnd={handleDoubleTap} // For mobile
                         />
+                        {showHeartAnimation && (
+                            <div className="heart-animation" style={{
+                                position: 'absolute',
+                                zIndex: 1200,
+                                top: '45%',
+                                left: '45%',
+                                animation: 'pulse 1s ease'
+                            }}>
+                                <IoMdHeart size={40} style={{
+                                    borderRadius: '12px',
+                                    color: '#F31260'
+                                }} className="item-icon"
+                                />
+                            </div>
+                        )}
+                    </div>
                     <Collapse css={{
                         width: '100%',
                         maxWidth: '390px',
@@ -388,25 +429,27 @@ export default function ItemCard(props) {
                                     }} className="item-icon" />
                                 </Button>
                                 {favouriteItems.includes(item._id) ?
-                                    <Button auto flat color={'error'} className="collapse-buttons">
+                                    <Button auto flat color={'error'} className="collapse-buttons"
+                                        onClick={() => {
+                                            handleFavouriteButtonClick(favouriteItems, item)
+                                        }}>
                                         <IoMdHeart size={20} style={{
                                             borderRadius: '12px',
                                             color: '#F31260'
                                         }} className="item-icon"
-                                            onClick={() => {
-                                                handleFavouriteButtonClick(favouriteItems, item)
-                                            }} />
+                                        />
                                     </Button>
                                     :
-                                    <Button auto flat color={'error'} className="collapse-buttons">
+                                    <Button auto flat color={'error'} className="collapse-buttons"
+                                        onClick={() => {
+                                            handleFavouriteButtonClick(favouriteItems, item)
+                                        }} >
                                         <IoMdHeart size={20} style={{
                                             borderRadius: '12px',
                                             color: '#fff',
-                                            opacity: theme.type==='light'?'1':'0.6'
+                                            opacity: theme.type === 'light' ? '1' : '0.6'
                                         }} className="item-icon"
-                                            onClick={() => {
-                                                handleFavouriteButtonClick(favouriteItems, item)
-                                            }} />
+                                        />
                                     </Button>
                                 }
                             </Row>

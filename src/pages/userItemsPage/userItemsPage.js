@@ -74,7 +74,7 @@ export default function UserItemsPage() {
     const [categoryFilters, setCategoryFilters] = useState([
         { key: 'apparel', value: 'Apparel', color: "error", chosen: false }, // Vibrant Pink
         { key: 'food', value: 'Food', color: "secondary", chosen: false }, // Orange
-        { key: 'tickets', value: 'Tickets', color: "primary", chosen: false }, // Indigo
+        { key: 'electronics', value: 'Electronics', color: "primary", chosen: false }, // Indigo
         { key: 'stationery', value: 'Stationery', color: "success", chosen: false }, // Green
         { key: 'jewellry', value: 'Jewellry', color: "warning", chosen: false }, // Yellow
         { key: 'lost&found', value: 'Lost & Found', color: "default", chosen: false }, // Grey

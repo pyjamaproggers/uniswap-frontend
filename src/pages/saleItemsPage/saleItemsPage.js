@@ -45,7 +45,7 @@ export default function SaleItemsPage() {
     const [render, setRender] = useState(false)
     const ITEMS_PER_PAGE = 10;
     const [lastItemIndex, setLastItemIndex] = useState(0);
-    const [visibleItems, setVisibleItems] = useState();
+    const [visibleItems, setVisibleItems] = useState([]);
     const [showFcmTokenWarning, setShowFcmTokenWarning] = useState(false)
     const [hasFCMToken, setHasFCMToken] = useState(false)
     const [bgColor, setBgColor] = useState('')
@@ -69,7 +69,7 @@ export default function SaleItemsPage() {
     const [categoryFilters, setCategoryFilters] = useState([
         { key: 'apparel', value: 'Apparel', color: "error", chosen: false }, // Vibrant Pink
         { key: 'food', value: 'Food', color: "secondary", chosen: false }, // Orange
-        { key: 'tickets', value: 'Tickets', color: "primary", chosen: false }, // Indigo
+        { key: 'electronics', value: 'Electronics', color: "primary", chosen: false }, // Indigo
         { key: 'stationery', value: 'Stationery', color: "success", chosen: false }, // Green
         { key: 'jewellry', value: 'Jewellry', color: "warning", chosen: false }, // Yellow
         { key: 'lost&found', value: 'Lost & Found', color: "default", chosen: false }, // Grey
@@ -117,7 +117,7 @@ export default function SaleItemsPage() {
 
     useEffect(() => {
         filterItems()
-    }, [filtersApplied, favouriteItems]);
+    }, [filtersApplied]);
 
     const verifyUserSession = () => {
         fetch(`${backend}/api/auth/verify`, {
@@ -407,7 +407,7 @@ export default function SaleItemsPage() {
             </>
 
             <Grid.Container className="saleitems">
-                {!topImageLoading &&
+                {/* {!topImageLoading && */}
                     <Grid.Container css={{
                         padding: '4px 4px',
                         jc: 'center',
@@ -596,7 +596,7 @@ export default function SaleItemsPage() {
                             </>
                         }
 
-                        {(fetchingAllItems) &&
+                        {(fetchingAllItems && visibleItems.length===0) &&
                             <>
                                 <Col css={{
                                     display: 'flex',
@@ -751,7 +751,7 @@ export default function SaleItemsPage() {
 
 
                     </Grid.Container>
-                }
+                {/* } */}
 
                 <Snackbar
                     anchorOrigin={{
