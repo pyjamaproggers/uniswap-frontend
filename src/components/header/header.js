@@ -815,7 +815,7 @@ export default function Header(props) {
                             width: '100%',
                         }}
                             onClick={() => {
-
+                                setShowNumberUpdateModal(true)
                             }}>
                             <FaPhone size={12} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} style={{ marginRight: '4px' }} />
                             <Text css={{
@@ -837,7 +837,7 @@ export default function Header(props) {
                             width: '100%',
                         }}
                             onClick={() => {
-
+                                window.open('mailto:pyjamaprogrammers@gmail.com?subject="UniSwap Issue/Bug/Suggestion"')
                             }}>
                             <MdOutgoingMail size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
                             <Text css={{
