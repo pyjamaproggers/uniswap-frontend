@@ -42,9 +42,11 @@ export default function ItemCard(props) {
     let onItemDeleted = props.onItemDeleted
     const categoryColors = {
         apparel: 'error',
-        food: 'secondary',
         electronics: 'primary',
-        stationery: 'success',
+        decor: 'success',
+        food: 'warning',
+        makeup: 'secondary',
+        stationery: 'primary',
         jewellery: 'warning',
     };
     const badgeColor = categoryColors[item.itemCategory] || 'default';

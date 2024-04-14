@@ -7,9 +7,14 @@ import { MdMiscellaneousServices } from "react-icons/md";
 import { GiJewelCrown } from "react-icons/gi";
 import { FaFilePen } from "react-icons/fa6";
 import { MdOutlineQuestionMark } from "react-icons/md";
+import { PiPottedPlantFill } from "react-icons/pi";
+import { GiLipstick } from "react-icons/gi";
+import { IoLaptop } from "react-icons/io5";
 import Grey from '../../assets/Grey.jpeg'
 import { IoLogoWhatsapp } from "react-icons/io";
 import { IoSendSharp } from "react-icons/io5";
+import { TbDeviceAirpods } from "react-icons/tb";
+import { MdCable } from "react-icons/md";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { ToastContainer, toast } from 'react-toastify';
@@ -71,12 +76,14 @@ export default function InputItemCard(props) {
 
     const categoryItems = [
         { key: 'apparel', value: 'Apparel', icon: <GiClothes size={24} color="#F31260" />, description: 'Tees, Shirts, Corsettes, Shorts, Cargos, Dresses, Footwear and more.' }, // Vibrant Pink
-        { key: 'food', value: 'Food', icon: <IoFastFoodSharp size={24} color="#7828C8" />, description: 'Fruits, Ramen, Masalas and more.' }, // Orange
-        { key: 'electronics', value: 'Electronics', icon: <IoTicket size={24} color="#0072F5" />, description: 'Concert, Show, Shuttle and more.' }, // Indigo
-        { key: 'stationery', value: 'Stationery', icon: <FaFilePen size={24} color="#17C964" />, description: 'Pens, Pencils, Erasers, Sharpeners, Notebooks, Highlighters and more.' }, // Green
+        { key: 'electronics', value: 'Electronics', icon: <MdCable size={24} color="#0072F5" />, description: 'Concert, Show, Shuttle and more.' }, // Indigo
+        { key: 'decor', value: 'Decor', icon: <PiPottedPlantFill size={24} color="#17C964" />, description: 'Plants, Balloons, Room Decor and more.' }, // Yellow
+        { key: 'food', value: 'Food', icon: <IoFastFoodSharp size={24} color="#F5A524" />, description: 'Fruits, Ramen, Masalas and more.' }, // Orange
+        { key: 'makeup', value: 'Makeup', icon: <GiLipstick size={24} color="#7828C8" />, description: 'Skincare, Bodycare, Lipstick, Mascara and more.' },
+        { key: 'stationery', value: 'Stationery', icon: <FaFilePen size={24} color="#0072F5" />, description: 'Pens, Pencils, Erasers, Sharpeners, Notebooks, Highlighters and more.' }, // Green
         { key: 'jewellery', value: 'Jewellery', icon: <GiJewelCrown size={24} color="#F5A524" />, description: 'Necklaces, Earrings, Nose Rings and more.' }, // Yellow
         { key: 'lostandfound', value: 'Lost & Found', icon: <MdOutlineQuestionMark size={24} color="#889096" />, description: 'Anything and everything lost around campus.' }, // Grey
-        { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color="#0c0c0c" />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
+        { key: 'miscellaneous', value: 'Miscellaneous', icon: <MdMiscellaneousServices size={24} color={theme.type==="light"?"#0c0c0c":"f0f0f0"} />, description: "Anything and everything that doesn't fall into the above categories" }, // Cyan
     ]
 
     const updateContactNumber = () => {
@@ -203,7 +210,7 @@ export default function InputItemCard(props) {
                             selectionMode="single"
                             css={{
                                 $$dropdownMenuWidth: "270px",
-                                $$dropdownItemHeight: "60px",
+                                $$dropdownItemHeight: "70px",
                                 "& .nextui-dropdown-item": {
                                     py: "$2",
                                     // dropdown item left icon
@@ -229,7 +236,7 @@ export default function InputItemCard(props) {
                                 <Dropdown.Item
                                     key={category.key}
                                     icon={category.icon}
-                                    showFullDescription={false}
+                                    showFullDescription={true}
                                     description={category.description}
                                 >
                                     <Text css={{
