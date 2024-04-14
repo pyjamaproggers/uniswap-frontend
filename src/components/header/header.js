@@ -279,13 +279,13 @@ export default function Header(props) {
 
     };
 
-    const requestNotificationPermission = () => {
+    const requestNotificationPermission = (userEnabled) => {
         Notification.requestPermission().then((permission) => {
             if (permission === "granted") {
                 getToken(messaging, { vapidKey: "BDiwlGg-uzE3Q5y94jyh_bSPo-b2v0A1thC9ePGnk7nt7E_3yuyGGf-Uqi4p6OSVG7tqdmhBU_T5CXOuoFJMACo" }).then((currentToken) => {
                     if (currentToken) {
                         console.log("FCM Token:", currentToken);
-                        sendTokenToServer(currentToken);
+                        sendTokenToServer(currentToken, userEnabled);
                     }
                 }).catch((err) => console.log("An error occurred while retrieving token. ", err));
             }
@@ -296,7 +296,7 @@ export default function Header(props) {
         });
     };
 
-    const sendTokenToServer = (currentToken) => {
+    const sendTokenToServer = (currentToken, userEnabled) => {
         fetch(`${backend}/api/user/token`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -307,6 +307,10 @@ export default function Header(props) {
             .then(data => {
                 setHasFCMToken(true)
                 setRender((prev) => !prev);
+                if(userEnabled){
+                    setSuccessSnackbarMessage('Notifications token updated. You should be getting them now.')
+                    setShowSuccessSnackbar(true)
+                }
                 // window.location.pathname = '/';
             })
             .catch((error) => console.error("Error sending FCM token to server:", error));
@@ -853,14 +857,14 @@ export default function Header(props) {
                             </Text>
                         </Row>
 
-                        {!hasFCMToken &&
+                        {/* {!hasFCMToken && */}
                             <Row css={{
                                 alignItems: 'center',
                                 gap: 8,
                                 width: '100%',
                             }}
                                 onClick={() => {
-
+                                    requestNotificationPermission(true)
                                 }}>
                                 <GoBellFill size={16} color={theme.type === 'light' ? '#0c0c0c' : '#ffffff'} />
                                 <Text css={{
@@ -875,7 +879,7 @@ export default function Header(props) {
                                     Enable Notifications
                                 </Text>
                             </Row>
-                        }
+                        {/* } */}
 
                         <Row css={{
                             alignItems: 'center',
