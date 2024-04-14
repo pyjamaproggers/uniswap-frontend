@@ -1415,27 +1415,13 @@ export default function Header(props) {
                                             return (
                                                 <>
                                                     {theme.type === 'light' ?
-                                                        <Col css={{
-                                                            display: 'flex',
-                                                            flexDirection: 'column',
-                                                            alignItems: 'center',
-                                                            gap: 0,
-                                                            width: 'max-content'
-                                                        }}>
-                                                            <IconComponent
-                                                                key={navItem.path}
-                                                                size={28}
-                                                                color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
-                                                                // onClick={() => window.location.pathname = navItem.path}
-                                                                onClick={() => navigate(navItem.path)}
-                                                            />
-                                                            <Text css={{
-                                                                fontSize: '12px',
-                                                                fontWeight: '$medium'
-                                                            }}>
-                                                                {navItem.value}
-                                                            </Text>
-                                                        </Col>
+                                                        <IconComponent
+                                                        key={navItem.path}
+                                                        size={28}
+                                                        color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
+                                                        // onClick={() => window.location.pathname = navItem.path}
+                                                        onClick={() => navigate(navItem.path)}
+                                                    />
                                                         :
                                                         <IconComponent
                                                             key={navItem.path}
