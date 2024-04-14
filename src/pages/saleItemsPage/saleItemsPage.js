@@ -584,16 +584,11 @@ export default function SaleItemsPage() {
 
                     </Grid.Container>
 
-                    {!fetchingAllItems && filteredItems && favouriteItems &&
+                    {!fetchingAllItems && filteredItems.length>0 && favouriteItems &&
                         <FlatList
                             list={filteredItems}
                             renderItem={renderItem}
                             renderOnScroll={true}
-                            renderWhenEmpty={
-                                <Text>
-                                    One second...
-                                </Text>
-                            }
                         />
                     }
 

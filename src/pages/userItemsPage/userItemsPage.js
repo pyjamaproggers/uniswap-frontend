@@ -512,7 +512,7 @@ export default function UserItemsPage() {
 
                         </Grid.Container>
 
-                        {!fetchingAllItems && !backdropLoaderOpen && filteredItems &&
+                        {!fetchingAllItems && !backdropLoaderOpen && filteredItems.length>0 &&
                             <FlatList
                                 list={filteredItems}
                                 renderItem={renderItem}

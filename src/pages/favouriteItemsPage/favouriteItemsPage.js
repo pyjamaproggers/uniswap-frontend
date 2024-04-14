@@ -495,16 +495,11 @@ export default function FavouritesItemsPage() {
 
                         </Grid.Container>
 
-                        {!fetchingAllItems && !backdropLoaderOpen && filteredItems &&
-                            <FlatList 
-                            list={filteredItems}
-                            renderItem={renderItem}
-                            renderOnScroll={true}
-                            renderWhenEmpty={
-                                <Text>
-                                    { }
-                                </Text>
-                            }
+                        {!fetchingAllItems && !backdropLoaderOpen && filteredItems.length>0 &&
+                            <FlatList
+                                list={filteredItems}
+                                renderItem={renderItem}
+                                renderOnScroll={true}
                             />
                         }
 
