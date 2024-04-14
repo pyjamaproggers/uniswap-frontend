@@ -519,7 +519,7 @@ export default function UserItemsPage() {
                                 renderOnScroll={true}
                                 renderWhenEmpty={
                                     <Text>
-                                        One second...
+                                        { }
                                     </Text>
                                 }
                             />

@@ -502,7 +502,7 @@ export default function FavouritesItemsPage() {
                             renderOnScroll={true}
                             renderWhenEmpty={
                                 <Text>
-                                    One second...
+                                    { }
                                 </Text>
                             }
                             />
