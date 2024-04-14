@@ -59,7 +59,7 @@ export default function FavouritesItemsPage() {
         { key: 'food', value: 'Food', color: "secondary", chosen: false }, // Orange
         { key: 'electronics', value: 'Electronics', color: "primary", chosen: false }, // Indigo
         { key: 'stationery', value: 'Stationery', color: "success", chosen: false }, // Green
-        { key: 'jewellry', value: 'Jewellry', color: "warning", chosen: false }, // Yellow
+        { key: 'jewellery', value: 'jewellery', color: "warning", chosen: false }, // Yellow
         { key: 'lost&found', value: 'Lost & Found', color: "default", chosen: false }, // Grey
         { key: 'miscellaneous', value: 'Miscellaneous', color: "default", chosen: false }, // Cyan
     ]);

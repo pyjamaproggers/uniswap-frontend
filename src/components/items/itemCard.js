@@ -45,7 +45,7 @@ export default function ItemCard(props) {
         food: 'secondary',
         electronics: 'primary',
         stationery: 'success',
-        jewellry: 'warning',
+        jewellery: 'warning',
     };
     const badgeColor = categoryColors[item.itemCategory] || 'default';
     // let shareItemViaWhatsApp = props.shareItemViaWhatsApp
