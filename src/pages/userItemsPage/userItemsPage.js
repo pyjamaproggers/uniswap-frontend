@@ -517,6 +517,11 @@ export default function UserItemsPage() {
                                 list={filteredItems}
                                 renderItem={renderItem}
                                 renderOnScroll={true}
+                                renderWhenEmpty={
+                                    <Text>
+                                        One second...
+                                    </Text>
+                                }
                             />
                         }
 

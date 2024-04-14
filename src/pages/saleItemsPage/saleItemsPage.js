@@ -589,6 +589,11 @@ export default function SaleItemsPage() {
                             list={filteredItems}
                             renderItem={renderItem}
                             renderOnScroll={true}
+                            renderWhenEmpty={
+                                <Text>
+                                    One second...
+                                </Text>
+                            }
                         />
                     }
 

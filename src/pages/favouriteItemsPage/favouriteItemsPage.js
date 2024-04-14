@@ -500,6 +500,11 @@ export default function FavouritesItemsPage() {
                             list={filteredItems}
                             renderItem={renderItem}
                             renderOnScroll={true}
+                            renderWhenEmpty={
+                                <Text>
+                                    One second...
+                                </Text>
+                            }
                             />
                         }
 
