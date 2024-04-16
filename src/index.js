@@ -7,6 +7,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Provider } from 'react-redux'; // Import Provider
 import { store } from './store'; // Import the Redux store you've configured
 import ReactGA from "react-ga4";
+import { ConfigProvider } from "antd";
 
 ReactGA.initialize(process.env.REACT_APP_measurementId);
 

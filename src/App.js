@@ -21,10 +21,12 @@ import UserItemsPage from './pages/userItemsPage/userItemsPage';
 import FavouritesItemsPage from './pages/favouriteItemsPage/favouriteItemsPage';
 import InstallPWA from './components/installPWA/installPWA';
 import {RemoveScrollBar} from 'react-remove-scroll-bar';
+import UserPage from './pages/userPage/userPage';
 
 function App() {
 
     const [isLightMode, setIsLightMode] = useState(getPrefersColorScheme());
+    const [bottomNavColor, setBottomNavColor] = useState('#0072F5')
 
     function getPrefersColorScheme() {
         return window.matchMedia('(prefers-color-scheme: light)').matches;
@@ -40,7 +42,6 @@ function App() {
         // Cleanup
         return () => mediaQuery.removeEventListener('change', handleChange);
     }, [isLightMode]);
-
     const theme = createTheme({
         type: isLightMode ? 'light' : 'dark', // Adjusted this line
         theme: {
@@ -93,12 +94,13 @@ function App() {
                             <NextUIProvider theme={theme}>
                             {/* <RemoveScrollBar /> */}
                                 <Router>
-                                    <Header setAppRender={setAppRender} setIsLightMode={setIsLightMode} isLightMode={isLightMode}/>
+                                    <Header setAppRender={setAppRender} setIsLightMode={setIsLightMode} isLightMode={isLightMode} bottomNavColor={bottomNavColor}/>
                                     <Routes>
                                         <Route exact path='/' element={<HomePage appRender={appRender} />} />
                                         {/* <Route exact path='/saleitems' element={<Itemspage type={'sale'} />} /> */}
                                         <Route exact path='/saleitems' element={<SaleItemsPage />} />
-                                        <Route exact path='/useritems' element={<UserItemsPage />} />
+                                        {/* <Route exact path='/useritems' element={<UserItemsPage />} /> */}
+                                        <Route exact path='/useritems' element={<UserPage />} />
                                         <Route exact path='/favourites' element={<FavouritesItemsPage />} />
                                         <Route exact path='/createsale' element={<CreateSalePage />} />
                                         <Route exact path='/editsale' element={<EditSalePage />} />

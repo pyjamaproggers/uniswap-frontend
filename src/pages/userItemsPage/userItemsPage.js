@@ -290,17 +290,7 @@ export default function UserItemsPage() {
             aria-label='pulltorefresh'
         >
 
-            {/* <div style={{
-                position: 'absolute',
-                top: '24px',
-                left: '15px',
-                zIndex: 100
-            }}
-                onClick={() => navigate(-1)}>
-                <FaChevronLeft size={16} color={theme.type === 'light' ? "#0c0c0c" : "#f0f0f0"}/>
-            </div> */}
-
-            <>
+            {/* <>
                 {bgColor.length > 0 &&
                     <Col css={{
                         display: 'flex',
@@ -339,10 +329,10 @@ export default function UserItemsPage() {
                         </div>
                     </Col>
                 }
-            </>
+            </> */}
 
             <Grid.Container>
-                {!topImageLoading &&
+                {/* {!topImageLoading && */}
                     <Grid.Container css={{
                         padding: '4px 4px',
                         jc: 'center',
@@ -541,7 +531,7 @@ export default function UserItemsPage() {
                                     No items uploaded...
                                 </Text>
 
-                                <Button auto flat color={'primary'} onClick={() => {
+                                <Button auto flat color={'secondary'} onClick={() => {
                                     navigate('/createsale')
                                 }}>
                                     Create A Sale →
@@ -551,7 +541,7 @@ export default function UserItemsPage() {
                         }
 
                     </Grid.Container>
-                }
+                {/* } */}
 
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}

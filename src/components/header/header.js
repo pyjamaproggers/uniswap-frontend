@@ -44,6 +44,8 @@ import { MdOutgoingMail } from "react-icons/md";
 import { BsArrowBarLeft, BsBell } from "react-icons/bs";
 import Drawer from '@mui/material/Drawer';
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import { MdEvent } from "react-icons/md";
+
 
 
 export default function Header(props) {
@@ -81,7 +83,8 @@ export default function Header(props) {
     const navigationItems = [
         // { path: '/', icon: GoHomeFill },
         { path: '/saleitems', icon: FaShop, value: 'Live' },
-        { path: '/favourites', icon: IoMdHeart, value: 'Favourites' },
+        // { path: '/favourites', icon: IoMdHeart, value: 'Favourites' },
+        { path: '/explore', icon: MdEvent, value: '' },
         { path: '/createsale', icon: FaPlus, value: '' },
         { path: '/outlets', icon: IoFastFood, value: 'Outlets' },
         { path: '/useritems', icon: Avatar, value: '' }
@@ -1411,7 +1414,7 @@ export default function Header(props) {
                                                 </>
                                             );
                                         }
-                                        if (navItem.path === '/favourites' || navItem.path === '/createsale') {
+                                        if (navItem.path === '/explore' || navItem.path === '/createsale') {
                                             return (
                                                 <>
                                                     {theme.type === 'light' ?
@@ -1441,7 +1444,7 @@ export default function Header(props) {
                                                         <IconComponent
                                                             key={navItem.path}
                                                             size={28}
-                                                            color={isSelected ? '#0072F5' : 'rgb(40,40,40)'}
+                                                            color={isSelected ? '#F5A524' : 'rgb(40,40,40)'}
                                                             // onClick={() => window.location.pathname = navItem.path}
                                                             onClick={() => navigate(navItem.path)}
                                                         />
@@ -1449,7 +1452,7 @@ export default function Header(props) {
                                                         <IconComponent
                                                             key={navItem.path}
                                                             size={28}
-                                                            color={isSelected ? '#0072F5' : 'rgb(220,220,220)'}
+                                                            color={isSelected ? '#F5A524' : 'rgb(220,220,220)'}
                                                             // onClick={() => window.location.pathname = navItem.path}
                                                             onClick={() => navigate(navItem.path)}
                                                         />

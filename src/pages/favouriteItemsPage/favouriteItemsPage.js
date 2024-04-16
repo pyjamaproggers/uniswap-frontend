@@ -287,7 +287,7 @@ export default function FavouritesItemsPage() {
             pullDownThreshold={60}
             aria-label='pulltorefresh'
         >
-            <>
+            {/* <>
                 {bgColor.length > 0 &&
                     <Col css={{
                         display: 'flex',
@@ -322,7 +322,7 @@ export default function FavouritesItemsPage() {
                         </div>
                     </Col>
                 }
-            </>
+            </> */}
 
             <Grid.Container>
                 {

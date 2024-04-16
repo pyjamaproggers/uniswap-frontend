@@ -151,7 +151,7 @@ export default function OutletsPage() {
             name: 'Nescafe',
             timing: '12pm To 2am',
             picture: Nescafe,
-            phone: '+91',
+            phone: '+919671697363',
             menu: [N1, N2, N3, N4, N5, N6],
             location: 'Between AC02 & AC03',
             website: ''
@@ -300,7 +300,7 @@ export default function OutletsPage() {
                                     width={'100%'}
                                     height={60}
                                     style={{
-                                        background: `linear-gradient(to bottom, #0072F5, ${theme.theme.colors.background.value})`,
+                                        background: `linear-gradient(to bottom, #F5A524, ${theme.theme.colors.background.value})`,
                                         // backgroundColor: bgColor,
                                         filter: 'blur(40px)'
                                     }}
@@ -314,7 +314,7 @@ export default function OutletsPage() {
                                         height: 'max-content',
                                     }}
                                 >
-                                    <IoFastFood size={20} color="#0072F5"
+                                    <IoFastFood size={20} color="#F5A524"
                                         style={{
                                             margin: '10px 12px 8px 12px'
                                         }}
