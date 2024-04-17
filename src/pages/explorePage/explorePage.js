@@ -7,7 +7,7 @@ import { Col, Grid, Input, Text, Row, Badge, Avatar, useTheme, Button } from "@n
 import ItemCard from "../../components/items/itemCard";
 import Skeleton from '@mui/material/Skeleton';
 import { IoSearchSharp } from "react-icons/io5";
-import './userPage.css'
+import './explorePage.css'
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useLocation } from 'react-router-dom';
@@ -29,22 +29,20 @@ import 'swiper/css/navigation'; // optional for navigation
 import Segmentation from "../../components/segmentation/segmentation";
 import ServicesPage from "../servicesPage/servicesPage";
 import EventsPage from "../eventsPage/eventsPage";
+import { MdEvent } from "react-icons/md";
 
 
-export default function UserPage() {
+export default function ExplorePage({ bottomNavColor, setBottomNavColor }) {
 
     const [bgColor, setBgColor] = useState('')
     const NextUITheme = useTheme()
     const [topImageLoading, setTopImageLoading] = useState(true)
     const [pageIndex, setPageIndex] = useState(0)
     const [pageValue, setPageValue] = useState([
-        'Up For Sale',
-        'Favourites',
         'Events',
-        'Services'
+        'Services',
     ])
     const swiperRef = useRef(null)
-    const [isScrolling, setIsScrolling] = useState(false);
     const theme = useTheme()
 
     function getBackgroundColor(value, theme) {
@@ -88,6 +86,7 @@ export default function UserPage() {
 
     useEffect(() => {
         swiperRef.current.slideTo(pageIndex)
+        setBottomNavColor(getTextColor(pageValue[pageIndex], theme))
     }, [pageIndex])
 
     // State to manage the width of the div
@@ -113,6 +112,7 @@ export default function UserPage() {
     return (
         <Grid.Container css={{
             jc: 'center',
+            backgroundColor: theme.theme.colors.background.value
         }}>
             <>
                 {bgColor.length > 0 &&
@@ -121,13 +121,13 @@ export default function UserPage() {
                         flexDirection: 'column',
                         alignItems: 'center',
                         borderColor: '#0c0c0c',
-                        marginBottom: '40px'
+                        paddingBottom: '40px',
                     }}>
                         <img
                             width={'100%'}
                             height={60}
                             style={{
-                                background: `linear-gradient(to bottom, ${bgColor}, ${NextUITheme.theme.colors.background.value})`,
+                                background: `linear-gradient(to bottom, ${bottomNavColor}, ${theme.theme.colors.background.value})`,
                                 // backgroundColor: bgColor,
                                 filter: 'blur(40px)'
                             }}
@@ -135,50 +135,17 @@ export default function UserPage() {
                         <div
                             style={{
                                 position: 'absolute',
-                                top: '20px',
+                                top: '28px',
+                                backgroundColor: theme.type === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(20,20,20,0.75)',
+                                borderRadius: '40px',
+                                height: 'max-content',
                             }}
                         >
-                            <Row css={{
-                                alignItems: 'center',
-                                jc: 'center',
-                                gap: 6,
-                            }}>
-                                <img
-                                    src={`https://api.multiavatar.com/${localStorage.getItem('userName')}.png?apikey=Bvjs0QyHcCxZNe`}
-                                    style={{
-                                        width: 60,
-                                        height: 60,
-                                        borderRadius: 40,
-                                    }}
-                                    onLoad={() => {
-                                        setTopImageLoading(false)
-                                    }}
-                                />
-                                <Col css={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    maxW: '260px',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
-                                }}>
-                                    <Text css={{
-                                        fontWeight: '$semibold',
-                                        fontSize: '$md',
-                                        lineHeight: '1.5'
-                                    }}>
-                                        {localStorage.getItem('userName')}
-                                    </Text>
-                                    <Text css={{
-                                        fontWeight: '$semibold',
-                                        fontSize: '$xs',
-                                        lineHeight: '1.5',
-                                        color: theme.type==='light' ? '#0c0c0c' : bgColor
-                                    }}>
-                                        {localStorage.getItem('userEmail').split('@')[0]}
-                                    </Text>
-                                </Col>
-                            </Row>
+                            <MdEvent size={20} color={bottomNavColor}
+                                style={{
+                                    margin: '12px 12px 6px 12px'
+                                }}
+                            />
                         </div>
                     </Col>
                 }
@@ -192,6 +159,7 @@ export default function UserPage() {
                     top: '0px',  // This should be the height of the image or however tall the sticky element is
                     zIndex: 1000,
                     transition: 'width 0.1s ease-in-out'
+                    // backgroundColor: theme.type === 'light' ? '#fff' : '#0c0c0c',
                 }}
             >
                 <Segmentation
@@ -211,10 +179,7 @@ export default function UserPage() {
                 onSwiper={(swiper) => {
                     swiperRef.current = swiper
                 }}
-                allowTouchMove={!isScrolling}
             >
-                <SwiperSlide><UserItemsPage setIsScrolling={setIsScrolling}/></SwiperSlide>
-                <SwiperSlide><FavouritesItemsPage /></SwiperSlide>
                 <SwiperSlide><EventsPage /></SwiperSlide>
                 <SwiperSlide><ServicesPage /></SwiperSlide>
             </Swiper>

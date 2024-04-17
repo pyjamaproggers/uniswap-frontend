@@ -107,7 +107,7 @@ export default function HomePage(props) {
                                     }}>
                                         Looking for Apparel? Food? Tickets? Jewellry? Stationery? We have it all here.
                                     </Text>
-                                    <Button auto flat color={'error'} onClick={() => {
+                                    <Button auto flat color={'secondary'} onClick={() => {
                                         window.location.pathname = '/saleitems'
                                     }}>
                                         Items On Sale →

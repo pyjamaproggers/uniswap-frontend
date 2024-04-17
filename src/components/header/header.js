@@ -72,6 +72,7 @@ export default function Header(props) {
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const iOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
     const [userDrawer, setUserDrawer] = useState(false)
+    const bottomNavColor = props.bottomNavColor
 
     const backend = process.env.REACT_APP_BACKEND
     // console.log(backend)
@@ -1414,22 +1415,51 @@ export default function Header(props) {
                                                 </>
                                             );
                                         }
-                                        if (navItem.path === '/explore' || navItem.path === '/createsale') {
+                                        if (navItem.path === '/explore') {
                                             return (
                                                 <>
                                                     {theme.type === 'light' ?
                                                         <IconComponent
-                                                        key={navItem.path}
-                                                        size={28}
-                                                        color={isSelected ? '#F31260' : 'rgb(40,40,40)'}
-                                                        // onClick={() => window.location.pathname = navItem.path}
-                                                        onClick={() => navigate(navItem.path)}
-                                                    />
+                                                            key={navItem.path}
+                                                            size={28}
+                                                            color={isSelected ? bottomNavColor : 'rgb(40,40,40)'}
+                                                            // onClick={() => window.location.pathname = navItem.path}
+                                                            onClick={() => navigate(navItem.path)}
+                                                            style={{
+                                                                marginTop: '2px'
+                                                            }}
+                                                        />
                                                         :
                                                         <IconComponent
                                                             key={navItem.path}
                                                             size={28}
-                                                            color={isSelected ? '#F31260' : 'rgb(220,220,220)'}
+                                                            color={isSelected ? bottomNavColor : 'rgb(220,220,220)'}
+                                                            // onClick={() => window.location.pathname = navItem.path}
+                                                            onClick={() => navigate(navItem.path)}
+                                                            style={{
+                                                                marginTop: '2px'
+                                                            }}
+                                                        />
+                                                    }
+                                                </>
+                                            );
+                                        }
+                                        if (navItem.path === '/createsale') {
+                                            return (
+                                                <>
+                                                    {theme.type === 'light' ?
+                                                        <IconComponent
+                                                            key={navItem.path}
+                                                            size={24}
+                                                            color={isSelected ? bottomNavColor : 'rgb(40,40,40)'}
+                                                            // onClick={() => window.location.pathname = navItem.path}
+                                                            onClick={() => navigate(navItem.path)}
+                                                        />
+                                                        :
+                                                        <IconComponent
+                                                            key={navItem.path}
+                                                            size={24}
+                                                            color={isSelected ? bottomNavColor : 'rgb(220,220,220)'}
                                                             // onClick={() => window.location.pathname = navItem.path}
                                                             onClick={() => navigate(navItem.path)}
                                                         />

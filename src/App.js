@@ -22,6 +22,7 @@ import FavouritesItemsPage from './pages/favouriteItemsPage/favouriteItemsPage';
 import InstallPWA from './components/installPWA/installPWA';
 import {RemoveScrollBar} from 'react-remove-scroll-bar';
 import UserPage from './pages/userPage/userPage';
+import ExplorePage from './pages/explorePage/explorePage';
 
 function App() {
 
@@ -101,7 +102,8 @@ function App() {
                                         <Route exact path='/saleitems' element={<SaleItemsPage />} />
                                         {/* <Route exact path='/useritems' element={<UserItemsPage />} /> */}
                                         <Route exact path='/useritems' element={<UserPage />} />
-                                        <Route exact path='/favourites' element={<FavouritesItemsPage />} />
+                                        {/* <Route exact path='/favourites' element={<FavouritesItemsPage />} /> */}
+                                        <Route exact path='/explore' element={<ExplorePage bottomNavColor={bottomNavColor} setBottomNavColor={setBottomNavColor}/>}/>
                                         <Route exact path='/createsale' element={<CreateSalePage />} />
                                         <Route exact path='/editsale' element={<EditSalePage />} />
                                         <Route exact path='/outlets' element={<OutletsPage />} />

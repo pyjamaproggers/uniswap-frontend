@@ -1,0 +1,21 @@
+.horizontal-scroller-events {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap; /* Prevents wrapping of child elements */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+    scrollbar-width: none; /* For Firefox */
+    width: 90vw;
+    max-width: 300px;
+    display: flex;
+    justify-content: center;
+    /* box-shadow: inset 0 4px 6px rgba(40, 40, 40, 1), inset 0 0px 4px rgba(40, 40, 40, 1);
+    border: 1px solid rgba(0, 0, 0, 0.1); Optional, for slight border */
+}
+
+.horizontal-scroller-events::-webkit-scrollbar {
+    display: none; /* For Webkit browsers */
+}
+
+.horizontal-scroller-events > * {
+    flex: 0 0 auto; /* Prevents flex items from growing or shrinking */
+}
