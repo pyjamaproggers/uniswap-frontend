@@ -292,7 +292,7 @@ export default function EventCard(props) {
                     maxW: '400px',
                     // padding: '4px 4px 4px 4px',
                     backgroundColor: theme.type === 'light' ? '#fdfdfd' : 'rgb(35,35,35)',
-                    borderRadius: '4px',
+                    borderRadius: '8px',
                     boxShadow: '0px 0px 2px rgba(150,150,150,0.75)'
                 }}
             >
@@ -456,7 +456,7 @@ export default function EventCard(props) {
                                     fontSize: '$sm',
                                     fontWeight: '$medium',
                                 }}>
-                                    Notify me 1 hour prior?
+                                    Notify me?
                                 </Text>
                                 {switchLoading ?
                                     <Loading

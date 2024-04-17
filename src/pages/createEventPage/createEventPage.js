@@ -9,7 +9,7 @@ import { MdMiscellaneousServices } from "react-icons/md";
 import { GiJewelCrown } from "react-icons/gi";
 import { FaFilePen } from "react-icons/fa6";
 import { MdOutlineQuestionMark } from "react-icons/md";
-import './createSalePage.css'
+import './createEventPage.css'
 import Grey from '../../assets/Grey.jpeg'
 import { IoLogoWhatsapp } from "react-icons/io";
 import { IoSendSharp } from "react-icons/io5";
@@ -25,8 +25,7 @@ import getCroppedImg from '../../components/items/cropImage'
 import Paper from '@mui/material/Paper';
 import BottomNavigation from '@mui/material/BottomNavigation';
 
-
-export default function CreateSalePage() {
+export default function CreateEventPage() {
 
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
@@ -254,7 +253,7 @@ export default function CreateSalePage() {
                     textAlign: 'center',
                     lineHeight: '1.3'
                 }}>
-                    Complete your item, upload your sale and people will directly contact you - it's that simple!
+                    Complete your event, upload to the public and reach your audience faster!
                 </Text>
 
                 <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createsale'} setCroppedAreaPixels={setCroppedAreaPixels} />
@@ -281,19 +280,20 @@ export default function CreateSalePage() {
                         }}>
                             <Button auto flat css={{
                                 marginTop: '8px',
-                                marginBottom: isIOS? '48px' : '8px',
+                                marginBottom: isIOS ? '48px' : '8px',
                                 height: 'max-content',
                                 padding: '6px 12px',
                                 width: '100%',
                                 marginLeft: '24px',
                                 marginRight: '24px'
                             }}
-                            color={'secondary'}
+                                color={'primary'}
                                 onClick={() => {
                                     if (checkForm()) {
                                         sendItem()
                                     }
                                 }}>
+
                                 <Row css={{
                                     alignItems: 'center',
                                     gap: 8
@@ -306,11 +306,11 @@ export default function CreateSalePage() {
                                             fontSize: '$md'
                                         },
                                         fontWeight: '$medium',
-                                        color: theme.type === 'light' ? '#7828C8' : '#B583E7'
+                                        color: theme.type === 'light' ? '#0072F5' : '#3694FF'
                                     }}>
                                         Upload
                                     </Text>
-                                    <IoSendSharp size={16} style={{  }} />
+                                    <IoSendSharp size={16} style={{}} />
                                 </Row>
                             </Button>
                         </BottomNavigation>
