@@ -173,7 +173,7 @@ export default function UserPage() {
                                         fontWeight: '$semibold',
                                         fontSize: '$xs',
                                         lineHeight: '1.5',
-                                        color: theme.type==='light' ? '#0c0c0c' : bgColor
+                                        color: theme.type === 'light' ? '#0c0c0c' : bgColor
                                     }}>
                                         {localStorage.getItem('userEmail').split('@')[0]}
                                     </Text>
@@ -198,6 +198,7 @@ export default function UserPage() {
                     pageValue={pageValue}
                     pageIndex={pageIndex}
                     setPageIndex={setPageIndex}
+                    isSticky={isSticky}
                     getBackgroundColor={getBackgroundColor}
                     getTextColor={getTextColor}
                 />
@@ -213,7 +214,7 @@ export default function UserPage() {
                 }}
                 allowTouchMove={!isScrolling}
             >
-                <SwiperSlide><UserItemsPage setIsScrolling={setIsScrolling}/></SwiperSlide>
+                <SwiperSlide><UserItemsPage setIsScrolling={setIsScrolling} /></SwiperSlide>
                 <SwiperSlide><FavouritesItemsPage /></SwiperSlide>
                 <SwiperSlide><EventsPage /></SwiperSlide>
                 <SwiperSlide><ServicesPage /></SwiperSlide>

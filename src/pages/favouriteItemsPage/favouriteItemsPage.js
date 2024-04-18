@@ -30,6 +30,7 @@ export default function FavouritesItemsPage() {
     const saleItems = useSelector(state => state.saleItems);
     const favouriteItems = useSelector(state => state.favouriteItems);
     const [filteredItems, setFilteredItems] = useState(saleItems);
+    const [favouriteItemsFull, setFavouriteItemsFull] = useState([])
     const [filtersApplied, setFiltersApplied] = useState({
         price: [],
         category: [],
@@ -132,7 +133,8 @@ export default function FavouritesItemsPage() {
 
     function filterItems() {
         // console.log("filtering")
-        let result = saleItems.filter(item => favouriteItems.includes(item._id));
+        // let result = saleItems.filter(item => favouriteItems.includes(item._id));
+        let result = favouriteItemsFull
 
         const getPriceRange = (rangeStr) => {
             const match = rangeStr.match(/₹(\d+)-₹(\d+)/) || rangeStr.match(/₹(\d+)\+/);
@@ -188,7 +190,7 @@ export default function FavouritesItemsPage() {
     const fetchAllItems = async () => {
         setFetchingAllItems(true);
         try {
-            const response = await fetch(`${backend}/items`, {
+            const response = await fetch(`${backend}/api/user/favorites`, {
                 credentials: 'include',
             });
             if (!response.ok) {
@@ -197,10 +199,10 @@ export default function FavouritesItemsPage() {
             let items = await response.json();
 
             items.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-            items = items.filter(x => favouriteItems.includes(x._id))
-
-            dispatch(setSaleItems(items));
-            setFilteredItems(items);
+            // dispatch(setSaleItems(items));
+            dispatch(setFavouriteItems(items.map((item)=>item._id)))
+            setFavouriteItemsFull(items)
+            setFilteredItems(items.map((item)=>item._id));
             setVisibleItems(items.slice(0, ITEMS_PER_PAGE));
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);
@@ -287,43 +289,6 @@ export default function FavouritesItemsPage() {
             pullDownThreshold={60}
             aria-label='pulltorefresh'
         >
-            {/* <>
-                {bgColor.length > 0 &&
-                    <Col css={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        borderColor: '#0c0c0c',
-                        marginBottom: '40px'
-                    }}>
-                        <img
-                            width={'100%'}
-                            height={60}
-                            style={{
-                                background: `linear-gradient(to bottom, #F31260, ${theme.theme.colors.background.value})`,
-                                // backgroundColor: bgColor,
-                                filter: 'blur(40px)'
-                            }}
-                        />
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '28px',
-                                backgroundColor: theme.type === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(20,20,20,0.75)',
-                                borderRadius: '40px',
-                                height: 'max-content',
-                            }}
-                        >
-                            <FaHeart size={20} color="#F31260"
-                                style={{
-                                    margin: '12px 12px 6px 12px'
-                                }}
-                            />
-                        </div>
-                    </Col>
-                }
-            </> */}
-
             <Grid.Container>
                 {
                     <Grid.Container css={{
@@ -331,20 +296,6 @@ export default function FavouritesItemsPage() {
                         jc: 'center',
                         marginBottom: '100px'
                     }}>
-                        {/* <Text css={{
-                        fontWeight: '$medium',
-                        '@xsMin': {
-                            fontSize: '$3xl',
-                            padding: '1% 2%'
-                        },
-                        '@xsMax': {
-                            fontSize: '$xl',
-                            padding: '2%'
-                        },
-                        width: 'max-content'
-                    }}>
-                        {localStorage.getItem('userName').split(" ")[0]}'s Favourites
-                    </Text> */}
                         <Row css={{
                             '@xsMin': {
                                 padding: '0% 2% 1% 2%'
@@ -494,7 +445,6 @@ export default function FavouritesItemsPage() {
                             </Row>
 
                         </Grid.Container>
-
                         {!fetchingAllItems && !backdropLoaderOpen && filteredItems.length>0 &&
                             <FlatList
                                 list={filteredItems}

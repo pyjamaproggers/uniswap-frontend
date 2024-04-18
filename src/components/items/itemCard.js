@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from 'react-redux';
 import { Badge, Col, Grid, Avatar, Text, Image, Row, Collapse, Button, useTheme } from "@nextui-org/react";
 import './itemCard.css'
 import { IoLogoWhatsapp } from "react-icons/io";
@@ -220,7 +221,7 @@ export default function ItemCard(props) {
     if (item.live === 'n' && type === 'sale') {
         return null
     }
-    if (type === 'favourites' && !(favouriteItems.includes(item._id))) {
+    if(type === 'favourites' && !favouriteItems.includes(item._id)){
         return null
     }
     else {

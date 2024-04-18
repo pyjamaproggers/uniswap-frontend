@@ -166,6 +166,7 @@ export default function ExplorePage({ bottomNavColor, setBottomNavColor }) {
                     setPageIndex={setPageIndex}
                     getBackgroundColor={getBackgroundColor}
                     getTextColor={getTextColor}
+                    isSticky={isSticky}
                 />
             </div>
 

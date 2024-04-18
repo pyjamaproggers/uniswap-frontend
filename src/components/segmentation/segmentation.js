@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, useTheme } from "@nextui-org/react";
 
-function Segmentation({ pageValue, pageIndex, setPageIndex, getBackgroundColor, getTextColor }) {
+function Segmentation({ pageValue, pageIndex, setPageIndex, getBackgroundColor, getTextColor, isSticky }) {
     const theme = useTheme();
 
     return (
@@ -11,7 +11,7 @@ function Segmentation({ pageValue, pageIndex, setPageIndex, getBackgroundColor, 
             justifyContent: 'center',
             marginBottom: '6px',
             background: theme.type === 'light' ? 'rgb(250,250,250)' : '#000',
-            borderRadius: '10px',
+            borderRadius: isSticky? '0px 0px 10px 10px':'10px',
             padding: '5px 6px',
         }}>
             {pageValue.map((value, index) => (

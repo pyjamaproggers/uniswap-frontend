@@ -179,6 +179,7 @@ export default function EventsPage() {
                 console.log('User session verified:', data);
                 // fetchAllItems(data.user.userEmail)
                 setFilteredItems(events)
+                fetchAllItems(data.user.userEmail)
                 // Optionally update the UI or state based on the response
             })
             .catch(error => {
@@ -247,7 +248,7 @@ export default function EventsPage() {
             let tempUserItems = items.filter(item => item.userEmail === userEmail)
 
             dispatch(setUserItems(tempUserItems));
-            setFilteredItems(tempUserItems);
+            setFilteredItems(events);
             setVisibleItems(tempUserItems.slice(0, ITEMS_PER_PAGE));
             setLastItemIndex(ITEMS_PER_PAGE);
         } catch (error) {

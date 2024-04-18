@@ -204,20 +204,16 @@ export default function UserItemsPage(props) {
     const fetchAllItems = async (userEmail) => {
         setFetchingAllItems(true);
         try {
-            const response = await fetch(`${backend}/items`, {
+            const response = await fetch(`${backend}/api/user/items`, {
                 credentials: 'include',
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             let items = await response.json();
-
-            items.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-            let tempUserItems = items.filter(item => item.userEmail === userEmail)
-
-            dispatch(setUserItems(tempUserItems));
-            setFilteredItems(tempUserItems);
-            setVisibleItems(tempUserItems.slice(0, ITEMS_PER_PAGE));
+            dispatch(setUserItems(items));
+            setFilteredItems(items);
+            setVisibleItems(items.slice(0, ITEMS_PER_PAGE));
             setLastItemIndex(ITEMS_PER_PAGE);
         } catch (error) {
             console.error('There has been a problem with your fetch operation:', error);

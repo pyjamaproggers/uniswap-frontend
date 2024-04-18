@@ -24,15 +24,14 @@ import { FaChevronLeft } from "react-icons/fa";
 import getCroppedImg from '../../components/items/cropImage'
 import Paper from '@mui/material/Paper';
 import BottomNavigation from '@mui/material/BottomNavigation';
+import InputEventCard from "../../components/events/inputEventCard";
 
 export default function CreateEventPage() {
 
     const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false)
     const [showErrorSnackbar, setShowErrorSnackbar] = useState(false)
-
     const backend = process.env.REACT_APP_BACKEND
     const bucket = process.env.REACT_APP_AWS_BUCKET_NAME;
-
     const theme = useTheme()
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const [render, setRender] = useState(false)
@@ -72,52 +71,55 @@ export default function CreateEventPage() {
 
     const [backdropLoaderOpen, setBackdropLoaderOpen] = useState(false)
 
-    const [item, setItem] = useState({
+    const [event, setEvent] = useState({
         userName: localStorage.getItem('userName'),
         userEmail: localStorage.getItem('userEmail'),
         userPicture: localStorage.getItem('userPicture'),
-        itemName: '',
-        itemDescription: '',
-        itemPrice: 0,
-        itemCategory: '',
-        itemPicture: '', //this has to be the url we obtain by uploading the user-uploaded picture to aws bucket
-        contactNumber: localStorage.getItem('contactNumber'), //we have to now obtain from localstorage once we set it in cookie after taking it
+        eventName: '', //required, max 40 char
+        eventDescription: '', //required, max 150 char
+        eventDate: '', //required, cannot post event for beyond a week
+        eventTime: '', //required
+        eventLocation: '', //required from dropdown
+        eventCategory: '', //required from dropdown
+        notifications: [], 
         live: 'y',
         dateAdded: '' //today's date
     })
 
-    const [imageFile, setImageFile] = useState(null)
-    const [previewUrl, setPreviewUrl] = useState(null)
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-
     const checkForm = () => {
-        // itemName: Required and must be a non-empty string
-        if (!item.itemName || typeof item.itemName !== 'string' || item.itemName.trim().length === 0) {
-            alert('Item name is required.');
+        // eventName: Required and must be a non-empty string
+        if (!event.eventName || typeof event.eventName !== 'string' || event.eventName.trim().length === 0) {
+            alert('Event name is required.');
             return false;
         }
 
-        // itemPrice: Required and must be an integer
-        if (!Number.isInteger(item.itemPrice)) {
-            alert('Item price must be a number.');
+        // eventCategory: Required and must be a non-empty string
+        if (!event.eventCategory || typeof event.eventCategory !== 'string' || event.eventCategory.trim().length === 0) {
+            alert('Event category is required.');
             return false;
         }
 
-        // itemCategory: Required and must be a non-empty string
-        if (!item.itemCategory || typeof item.itemCategory !== 'string' || item.itemCategory.trim().length === 0) {
-            alert('Item category is required.');
+        // eventDescription: Required and must be a non-empty string
+        if (!event.eventDescription || typeof event.eventDescription !== 'string' || event.eventDescription.trim().length === 0) {
+            alert('Event description is required.');
             return false;
         }
 
-        // contactNumber: Required and must be a non-empty string
-        // Additional validation can be added here, e.g., regex for phone numbers
-        if (!item.contactNumber || typeof item.contactNumber !== 'string' || item.contactNumber.trim().length === 0) {
-            alert('Contact number is required.');
+        // eventTime: Required and must be a non-empty string
+        if (!event.eventTime || event.eventTime.trim().length === 0) {
+            alert('Event time is required.');
             return false;
         }
 
-        if (!imageFile) {
-            alert('Image is required');
+        // eventLocation: Required and must be a non-empty string
+        if (!event.eventLocation || event.eventLocation.trim().length === 0) {
+            alert('Event location is required.');
+            return false;
+        }
+
+        // eventDate: Required and must be a non-empty string
+        if (!event.eventDate || event.eventDate.trim().length === 0) {
+            alert('Event date is required.');
             return false;
         }
 
@@ -125,7 +127,12 @@ export default function CreateEventPage() {
         return true;
     };
 
-    const postItemToBackend = async (itemData) => {
+    const postEventToBackend = async (itemData) => {
+        setBackdropLoaderOpen(true)
+        if (!checkForm()) {
+            setBackdropLoaderOpen(false)
+            return;
+        }
         console.log(`${backend}/api/items`)
         try {
             const response = await fetch(`${backend}/api/items`, {
@@ -149,81 +156,18 @@ export default function CreateEventPage() {
             } else {
                 // Handle the error if the server response was not OK.
                 const errorData = await response.json();
-                console.error('Failed to post item:', errorData);
+                console.error('Failed to post event:', errorData);
                 setShowErrorSnackbar(true)
                 setBackdropLoaderOpen(false)
                 // Show an error message to the user
             }
         } catch (error) {
-            console.error('Error posting item to backend:', error);
+            console.error('Error posting event to backend:', error);
             setShowErrorSnackbar(true)
             setBackdropLoaderOpen(false)
             // Handle network errors or other errors outside the HTTP response
         }
     };
-
-    const sendItem = async () => {
-        setBackdropLoaderOpen(true)
-        if (!checkForm()) {
-            setBackdropLoaderOpen(false)
-            return;
-        }
-
-        try {
-            // Get presigned URL from your backend
-            // console.log(croppedAreaPixels)
-            const finalImage = await getCroppedImg(previewUrl, croppedAreaPixels)
-            // console.log(finalImage)
-            const uploadResponse = await fetch(`${backend}/api/upload`, { credentials: 'include' });
-            const uploadData = await uploadResponse.json();
-            const { url, key } = uploadData; // Assuming your backend provides the key
-
-            // Upload the image to S3 using the presigned URL
-            const putResponse = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'image/jpeg', // Make sure this matches your file's type
-                },
-                body: finalImage, // Directly use the file as the body
-            });
-
-            if (putResponse.ok) {
-                console.log('Image uploaded successfully.');
-
-                // Construct the image URL from the key
-                const imageUrl = `https://${bucket}.s3.amazonaws.com/${key}`;
-
-                // Prepare item data, including the imageUrl
-                const itemData = {
-                    ...item,
-                    itemPicture: imageUrl,
-                    dateAdded: new Date().toISOString(),
-                };
-
-                // Send item data to your backend
-                await postItemToBackend(itemData);
-            } else {
-                setBackdropLoaderOpen(false)
-                setShowErrorSnackbar(true)
-                console.error('Failed to upload image:', await putResponse.text());
-            }
-        } catch (error) {
-            setBackdropLoaderOpen(false)
-            setShowErrorSnackbar(true)
-            console.error('Error:', error);
-        }
-    };
-
-    useEffect(() => {
-        if (imageFile) { // Check if imageFile is a Blob (File is also a Blob)
-            const url = URL.createObjectURL(imageFile);
-            setPreviewUrl(url);
-
-            // Cleanup function to revoke the object URL
-            return () => URL.revokeObjectURL(url);
-        }
-    }, [imageFile]);
-
 
     if (localStorage.getItem('userEmail') === null) {
         return (
@@ -256,7 +200,10 @@ export default function CreateEventPage() {
                     Complete your event, upload to the public and reach your audience faster!
                 </Text>
 
-                <InputItemCard item={item} setItem={setItem} imageFile={imageFile} setImageFile={setImageFile} previewUrl={previewUrl} setPreviewUrl={setPreviewUrl} type={'createsale'} setCroppedAreaPixels={setCroppedAreaPixels} />
+                <InputEventCard
+                    event={event}
+                    setEvent={setEvent}
+                    type={'createevent'} />
 
                 <Grid.Container css={{
                     '@xsMin': {
@@ -290,7 +237,7 @@ export default function CreateEventPage() {
                                 color={'primary'}
                                 onClick={() => {
                                     if (checkForm()) {
-                                        sendItem()
+                                        postEventToBackend()
                                     }
                                 }}>
 
@@ -308,7 +255,7 @@ export default function CreateEventPage() {
                                         fontWeight: '$medium',
                                         color: theme.type === 'light' ? '#0072F5' : '#3694FF'
                                     }}>
-                                        Upload
+                                        Create Event
                                     </Text>
                                     <IoSendSharp size={16} style={{}} />
                                 </Row>

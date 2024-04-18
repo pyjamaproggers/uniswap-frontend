@@ -267,7 +267,7 @@ export default function CreateSalePage() {
                         display: 'flex'
                     },
                     zIndex: '1000',
-                    position: 'fixed',
+                    position: 'absolute',
                     bottom: 0,
                     left: 0,
                     right: 0
@@ -308,7 +308,7 @@ export default function CreateSalePage() {
                                         fontWeight: '$medium',
                                         color: theme.type === 'light' ? '#7828C8' : '#B583E7'
                                     }}>
-                                        Upload
+                                        Create Sale
                                     </Text>
                                     <IoSendSharp size={16} style={{  }} />
                                 </Row>
