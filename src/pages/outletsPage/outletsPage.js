@@ -106,7 +106,7 @@ export default function OutletsPage() {
             name: 'Roti Boti',
             timing: '12pm To 2am',
             picture: RotiBoti,
-            phone: '+918104213125',
+            phone: '+919896950018',
             menu: [RB1, RB2, RB3, RB4, RB5],
             location: 'Food Street (Next To Tennis Court)',
             website: ''
